@@ -6,12 +6,15 @@ PubSubClient client(espClient);
 const char *BROKER_IP;
 int BROKER_PORT;
 const char *DEVICE_NAME;
+const char *RX_TOPIC;
 
+extern bool debug_log;
 
-void setup_mqtt(const char *MQTT_BROKER_IP, const int MQTT_BROKER_PORT, const char *DEV_NAME) {
+void setup_mqtt(const char *MQTT_BROKER_IP, const int MQTT_BROKER_PORT, const char *DEV_NAME, const char *MANAGEMENT_TOPIC) {
     BROKER_IP = MQTT_BROKER_IP;
     BROKER_PORT = MQTT_BROKER_PORT;
     DEVICE_NAME = DEV_NAME;
+    RX_TOPIC = MANAGEMENT_TOPIC;
 
     client.setServer(BROKER_IP, BROKER_PORT);
 
@@ -42,7 +45,7 @@ void mqtt_reconnect() {
     if (client.connect(DEVICE_NAME)) {
       Serial.println("connected");
       // Subscribe
-      client.subscribe("esp32/output");
+      client.subscribe(RX_TOPIC);
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -54,27 +57,36 @@ void mqtt_reconnect() {
 }
 
 void message_rx_callback(char* topic, byte* message, unsigned int length) {
-  Serial.print("Message arrived on topic: ");
-  Serial.print(topic);
-  Serial.print(". Message: ");
   String messageTemp;
+
+  if(debug_log) {
+    Serial.print("Message arrived on topic: ");
+    Serial.print(topic);
+    Serial.print(". Message: ");
+  }
+  
   
   for (int i = 0; i < length; i++) {
-    Serial.print((char)message[i]);
+    if(debug_log) {
+      Serial.print((char)message[i]);
+    }
     messageTemp += (char)message[i];
   }
-  Serial.println();
+  if(debug_log) {
+    Serial.println();
+  }
+  
 
   // If a message is received on the topic esp32/output, you check if the message is either "on" or "off". 
   // Changes the output state according to the message
-  if (String(topic) == "esp32/output") {
-    Serial.print("Changing output to ");
-    if(messageTemp == "on"){
-      Serial.println("on");
-    }
-    else if(messageTemp == "off"){
-      Serial.println("off");
-    }
-  }
+  // if (String(topic) == "esp32/output") {
+  //   Serial.print("Changing output to ");
+  //   if(messageTemp == "on"){
+  //     Serial.println("on");
+  //   }
+  //   else if(messageTemp == "off"){
+  //     Serial.println("off");
+  //   }
+  // }
 }
 

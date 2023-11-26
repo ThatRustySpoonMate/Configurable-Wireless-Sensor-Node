@@ -5,6 +5,7 @@
 const char *MQTT_TOPIC_TEMP = "weather/location/temperature";
 const char *MQTT_TOPIC_HUMI = "weather/location/humidity";
 const char *MQTT_TOPIC_HEATINDEX = "weather/location/heat_index";
+const char *MQTT_MANAGEMENT_TOPIC = "manage/weather";
 
 /* Exported Data Types */
 

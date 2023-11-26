@@ -1,7 +1,7 @@
 #include "WifiTasks.hpp"
 #include <PubSubClient.h>
 
-void setup_mqtt(const char *MQTT_BROKER_IP, const int MQTT_BROKER_PORT, const char *DEV_NAME);
+void setup_mqtt(const char *MQTT_BROKER_IP, const int MQTT_BROKER_PORT, const char *DEV_NAME, const char *MANAGE_PORT);
 
 void mqtt_transmit(const char *topic, const char *payload);
 

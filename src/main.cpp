@@ -11,12 +11,15 @@
 #include "main.h"
 #include "credentials.h"
 #include "MQTTTasks.hpp"
+#include "InputTask.hpp"
 
 /* Variable Declarations*/
 static const uint32_t SAMPLING_INTERVAL = 2000; // ms
 static const uint32_t TRANSMIT_INTERVAL = 5000; // ms
 
 float payload[3]; // MQTT Data to be transmitted
+
+bool debug_log = false;
 
 DHT dht(DHTPIN, DHTTYPE); // DHT Sensor
 
@@ -29,7 +32,7 @@ void setup() {
   setup_wifi(WIFI_SSID, WIFI_PASSWORD);
   
 
-  setup_mqtt(MQTT_BROKER_IP, MQTT_BROKER_PORT, DEVICE_ID);
+  setup_mqtt(MQTT_BROKER_IP, MQTT_BROKER_PORT, DEVICE_ID, MQTT_MANAGEMENT_TOPIC);
 
 }
 
@@ -40,6 +43,9 @@ void loop() {
   
   // Read DHT Sensor
   sampleTask();
+
+  // Handle serial input
+  serialTask();
 
 }
 
@@ -57,7 +63,9 @@ void sampleTask() {
     payload[1] = dht.readHumidity();
     payload[2] = dht.computeHeatIndex(false);
 
-    //Serial.println("Polled the following values from DHT11 sensor:"); Serial.println(payload[0]); Serial.println(payload[1]); Serial.println(payload[2]); 
+    if(debug_log) {
+      Serial.println("Polled the following values from DHT11 sensor:");Serial.print("Temp: ");Serial.println(payload[0]);Serial.print("Humidity: ");Serial.println(payload[1]);Serial.print("Heat Index: ");Serial.println(payload[2]); 
+    }
 
     lastSampleTime = currentTime;
   }
@@ -90,9 +98,9 @@ void transmitTask() {
     mqtt_transmit(MQTT_TOPIC_HUMI, humidityString);
     mqtt_transmit(MQTT_TOPIC_HEATINDEX, heatIndexString);
 
-    //Serial.println("Transmitted the following values to MQTT broker:"); Serial.println(temperatureString); Serial.println(humidityString); Serial.println(heatIndexString); 
-
-    Serial.println();
+    if(debug_log) {
+      Serial.println("Transmitted the following values to MQTT broker:"); Serial.println(temperatureString); Serial.println(humidityString); Serial.println(heatIndexString); 
+    }
     
     lastTransmitTime = currentTime;
   }
