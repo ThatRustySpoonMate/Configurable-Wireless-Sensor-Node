@@ -14,8 +14,8 @@
 #include "InputTask.hpp"
 
 /* Variable Declarations*/
-static const uint32_t SAMPLING_INTERVAL = 2000; // ms
-static const uint32_t TRANSMIT_INTERVAL = 5000; // ms
+static const uint32_t SAMPLING_INTERVAL = 10000; // ms
+static const uint32_t TRANSMIT_INTERVAL = 10000; // ms
 
 float payload[3]; // MQTT Data to be transmitted
 
@@ -26,6 +26,9 @@ DHT dht(DHTPIN, DHTTYPE); // DHT Sensor
 
 /* Arduino Framework base functions */
 void setup() {
+  setCpuFrequencyMhz(80);
+
+
   Serial.begin(115200);
   dht.begin();
 
@@ -38,14 +41,16 @@ void setup() {
 
 void loop() {
 
-  // Transmit readings
-  transmitTask();
-  
   // Read DHT Sensor
   sampleTask();
 
+  // Transmit readings
+  transmitTask();
+
   // Handle serial input
   serialTask();
+
+  delay(100); // For Power efficiency - change to sleep state later
 
 }
 
