@@ -5,6 +5,7 @@
 #include "MQTTTasks.hpp"
 #include "SensorTasks.hpp"
 
+#define MQTT_TRANSMIT_TIME_BUFFER 500 // Amount of time after queueing last message to be sent before disconnecting and sleeping
 
 void transmitTask_init();
 

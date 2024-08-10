@@ -44,6 +44,28 @@ void read_bme280(transmit_data_t *temp, transmit_data_t *humidity, transmit_data
 
 #define SEALEVELPRESSURE_HPA (1013.25)
 
+/* For other tasks to see what is connected */
+
+#if defined(BME280) // || defined(DHT11)
+#define TEMPERATURE_SENSOR_CONNECTED
+#endif
+
+#if defined(BME280)
+#define HUMIDITY_SENSOR_CONNECTED
+#endif
+
+#if defined(BME280)
+#define PRESSURE_SENSOR_CONNECTED
+#endif
+
+#if defined(BME280)
+#define ALTITUDE_SENSOR_CONNECTED
+#endif
+
+#if defined(SOIL_MOISTURE_SENSOR) // || defined(DHT11)
+#define SOIL_MOISTURE_SENSOR_CONNECTED
+#endif
+
 
 
 void sensorTask_init();
