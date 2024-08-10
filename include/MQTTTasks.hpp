@@ -13,6 +13,7 @@ extern const char *MQTT_TOPIC_TEMPERATURE;
 extern const char *MQTT_TOPIC_HUMIDITY;
 extern const char *MQTT_TOPIC_PRESSURE;
 extern const char *MQTT_TOPIC_ALTITUDE;
+extern const char *MQTT_TOPIC_SUPPLY_VOLTAGE;
 extern const char *MQTT_TOPIC_MANAGEMENT;
 
 // Example:

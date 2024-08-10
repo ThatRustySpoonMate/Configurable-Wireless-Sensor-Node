@@ -11,11 +11,12 @@ extern bool debug_log;
 extern uint32_t time_to_sleep;
 
 typedef enum data_points_e {
-    TEMPERATURE = 0,
-    HUMIDITY,
-    PRESSURE,
-    ALTITUDE,
-    SOIL_MOISTURE,
+    TEMPERATURE_IDX = 0,
+    HUMIDITY_IDX,
+    PRESSURE_IDX,
+    ALTITUDE_IDX,
+    SOIL_MOISTURE_IDX,
+    SUPPLY_VOLTAGE_IDX,
 
     DATAPOINTS_NUM
 } data_points_t;
