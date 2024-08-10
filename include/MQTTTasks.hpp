@@ -5,6 +5,8 @@
 #include <PubSubClient.h>
 #include "main.hpp"
 
+#define MQTT_TOPIC_LENGTH_MAX 100
+
 // Declarations
 extern const char *MQTT_TOPIC_MOISTURE;
 extern const char *MQTT_TOPIC_TEMPERATURE;

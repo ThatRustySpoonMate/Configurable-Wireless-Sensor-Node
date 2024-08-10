@@ -8,6 +8,17 @@ extern bool debug_log;
 #define DEBUG_PRINT(_STRING_) if(debug_log) { Serial.print(_STRING_); }
 #define DEBUG_PRINTLN(_STRING_) if(debug_log) { Serial.println(_STRING_); }
 
+
+typedef enum data_points_e {
+    TEMPERATURE = 0,
+    HUMIDITY,
+    PRESSURE,
+    ALTITUDE,
+    SOIL_MOISTURE,
+
+    DATAPOINTS_NUM
+} data_points_t;
+
 void upon_wake();
 
 #endif

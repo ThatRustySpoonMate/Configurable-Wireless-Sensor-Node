@@ -12,12 +12,20 @@ const char *MQTT_TOPIC_PRESSURE = "home/unconfigured";
 const char *MQTT_TOPIC_ALTITUDE = "home/unconfigured";
 const char *MQTT_MANAGEMENT_TOPIC = "manage/unconfigured";
 
+
 const char *BROKER_IP;
 int BROKER_PORT;
 const char *DEVICE_NAME;
 const char *RX_TOPIC;
 
 void setup_mqtt(const char *MQTT_BROKER_IP, const int MQTT_BROKER_PORT, const char *DEV_NAME, const char *MANAGEMENT_TOPIC) {
+  assert(strlen(MQTT_TOPIC_MOISTURE) < MQTT_TOPIC_LENGTH_MAX);
+  assert(strlen(MQTT_TOPIC_TEMPERATURE) < MQTT_TOPIC_LENGTH_MAX);
+  assert(strlen(MQTT_TOPIC_HUMIDITY) < MQTT_TOPIC_LENGTH_MAX);
+  assert(strlen(MQTT_TOPIC_PRESSURE) < MQTT_TOPIC_LENGTH_MAX);
+  assert(strlen(MQTT_TOPIC_ALTITUDE) < MQTT_TOPIC_LENGTH_MAX);
+  assert(strlen(MQTT_MANAGEMENT_TOPIC) < MQTT_TOPIC_LENGTH_MAX);
+
   BROKER_IP = MQTT_BROKER_IP;
   BROKER_PORT = MQTT_BROKER_PORT;
   DEVICE_NAME = DEV_NAME;
