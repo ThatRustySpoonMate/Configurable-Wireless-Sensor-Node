@@ -3,15 +3,35 @@
 WiFiClient espClient;
 PubSubClient client(espClient);
 
+// Define the location slug
+#define MQTT_TOPIC_LOCATION_SLUG "home/unconfigured"
 
-/* Configure these - see header file for example */
-const char *MQTT_TOPIC_MOISTURE = "home/unconfigured";
-const char *MQTT_TOPIC_TEMPERATURE = "home/unconfigured";
-const char *MQTT_TOPIC_HUMIDITY = "home/unconfigured";
-const char *MQTT_TOPIC_PRESSURE = "home/unconfigured";
-const char *MQTT_TOPIC_ALTITUDE = "home/unconfigured";
-const char *MQTT_MANAGEMENT_TOPIC = "manage/unconfigured";
+// Define topic suffixes
+#define MOISTURE_TOPIC "/moisture"
+#define TEMPERATURE_TOPIC "/temperature"
+#define HUMIDITY_TOPIC "/humidity"
+#define PRESSURE_TOPIC "/pressure"
+#define ALTITUDE_TOPIC "/altitude"
+#define MANAGE_TOPIC "manage/unconfigured"
 
+// Helper macros to concatenate strings
+#define CONCATENATE(a, b) a b
+
+// Create full topic strings using macros
+#define MQTT_TOPIC_MOISTURE_STR CONCATENATE(MQTT_TOPIC_LOCATION_SLUG, MOISTURE_TOPIC)
+#define MQTT_TOPIC_TEMPERATURE_STR CONCATENATE(MQTT_TOPIC_LOCATION_SLUG, TEMPERATURE_TOPIC)
+#define MQTT_TOPIC_HUMIDITY_STR CONCATENATE(MQTT_TOPIC_LOCATION_SLUG, HUMIDITY_TOPIC)
+#define MQTT_TOPIC_PRESSURE_STR CONCATENATE(MQTT_TOPIC_LOCATION_SLUG, PRESSURE_TOPIC)
+#define MQTT_TOPIC_ALTITUDE_STR CONCATENATE(MQTT_TOPIC_LOCATION_SLUG, ALTITUDE_TOPIC)
+#define MQTT_TOPIC_MANAGEMENT_STR CONCATENATE(MQTT_TOPIC_LOCATION_SLUG, MANAGE_TOPIC)
+
+// Define constants for the topics
+const char *MQTT_TOPIC_MOISTURE = MQTT_TOPIC_MOISTURE_STR;
+const char *MQTT_TOPIC_TEMPERATURE = MQTT_TOPIC_TEMPERATURE_STR;
+const char *MQTT_TOPIC_HUMIDITY = MQTT_TOPIC_HUMIDITY_STR;
+const char *MQTT_TOPIC_PRESSURE = MQTT_TOPIC_PRESSURE_STR;
+const char *MQTT_TOPIC_ALTITUDE = MQTT_TOPIC_ALTITUDE_STR;
+const char *MQTT_TOPIC_MANAGEMENT = MQTT_TOPIC_MANAGEMENT_STR;
 
 const char *BROKER_IP;
 int BROKER_PORT;
@@ -19,12 +39,13 @@ const char *DEVICE_NAME;
 const char *RX_TOPIC;
 
 void setup_mqtt(const char *MQTT_BROKER_IP, const int MQTT_BROKER_PORT, const char *DEV_NAME, const char *MANAGEMENT_TOPIC) {
+
   assert(strlen(MQTT_TOPIC_MOISTURE) < MQTT_TOPIC_LENGTH_MAX);
   assert(strlen(MQTT_TOPIC_TEMPERATURE) < MQTT_TOPIC_LENGTH_MAX);
   assert(strlen(MQTT_TOPIC_HUMIDITY) < MQTT_TOPIC_LENGTH_MAX);
   assert(strlen(MQTT_TOPIC_PRESSURE) < MQTT_TOPIC_LENGTH_MAX);
   assert(strlen(MQTT_TOPIC_ALTITUDE) < MQTT_TOPIC_LENGTH_MAX);
-  assert(strlen(MQTT_MANAGEMENT_TOPIC) < MQTT_TOPIC_LENGTH_MAX);
+  assert(strlen(MQTT_TOPIC_MANAGEMENT) < MQTT_TOPIC_LENGTH_MAX);
 
   BROKER_IP = MQTT_BROKER_IP;
   BROKER_PORT = MQTT_BROKER_PORT;

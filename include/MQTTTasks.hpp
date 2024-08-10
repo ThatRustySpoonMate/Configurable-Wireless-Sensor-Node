@@ -13,7 +13,7 @@ extern const char *MQTT_TOPIC_TEMPERATURE;
 extern const char *MQTT_TOPIC_HUMIDITY;
 extern const char *MQTT_TOPIC_PRESSURE;
 extern const char *MQTT_TOPIC_ALTITUDE;
-extern const char *MQTT_MANAGEMENT_TOPIC;
+extern const char *MQTT_TOPIC_MANAGEMENT;
 
 // Example:
 // const char *MQTT_TOPIC_MOISTURE = "home/outside/garden/moisture";
@@ -21,7 +21,7 @@ extern const char *MQTT_MANAGEMENT_TOPIC;
 // const char *MQTT_TOPIC_HUMIDITY = "home/outside/garden/humidity";
 // const char *MQTT_TOPIC_PRESSURE = "home/outside/garden/pressure";
 // const char *MQTT_TOPIC_ALTITUDE = "home/outside/garden/altitude";
-// const char *MQTT_MANAGEMENT_TOPIC = "manage/garden";
+// const char *MQTT_TOPIC_MANAGEMENT = "manage/garden";
 
 void setup_mqtt(const char *MQTT_BROKER_IP, const int MQTT_BROKER_PORT, const char *DEV_NAME, const char *MANAGE_PORT);
 

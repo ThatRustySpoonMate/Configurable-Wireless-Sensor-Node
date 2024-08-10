@@ -30,7 +30,7 @@ void setup() {
 
   sensorTask_init();
 
-  setup_mqtt(MQTT_BROKER_IP, MQTT_BROKER_PORT, DEVICE_ID, MQTT_MANAGEMENT_TOPIC);
+  setup_mqtt(MQTT_BROKER_IP, MQTT_BROKER_PORT, DEVICE_ID, MQTT_TOPIC_MANAGEMENT);
 
   pinMode(LED_BUILTIN, OUTPUT);
 
