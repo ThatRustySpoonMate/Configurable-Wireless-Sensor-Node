@@ -2,9 +2,7 @@
 
 
 
-
 void setup_wifi(const char *ssid, const char *password) {
-  delay(10);
   // We start by connecting to a WiFi network
   Serial.println();
   Serial.print("Connecting to ");
@@ -21,4 +19,10 @@ void setup_wifi(const char *ssid, const char *password) {
   Serial.println("WiFi connected");
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
+}
+
+void wifi_disconnect() {
+  WiFi.disconnect();
+
+  return;
 }

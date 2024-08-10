@@ -11,3 +11,5 @@ void mqtt_reconnect();
 
 void message_rx_callback(char* topic, byte* message, unsigned int length);
 
+void mqtt_disconnect();
+
