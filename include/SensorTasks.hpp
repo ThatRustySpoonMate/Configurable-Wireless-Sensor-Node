@@ -1,3 +1,6 @@
+#ifndef SENSOR_TASK_HPP
+#define SENSOR_TASK_HPP
+
 #include "Arduino.h"
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
@@ -11,3 +14,5 @@
 void initSensors();
 
 void readSensors(uint16_t *moistureReading, float *temp, float *humidity, float *baroPres, float *altitude);
+
+#endif

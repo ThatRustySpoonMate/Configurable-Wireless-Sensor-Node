@@ -3,6 +3,15 @@
 WiFiClient espClient;
 PubSubClient client(espClient);
 
+
+/* Configure these - see header file for example */
+const char *MQTT_TOPIC_MOISTURE = "home/unconfigured";
+const char *MQTT_TOPIC_TEMPERATURE = "home/unconfigured";
+const char *MQTT_TOPIC_HUMIDITY = "home/unconfigured";
+const char *MQTT_TOPIC_PRESSURE = "home/unconfigured";
+const char *MQTT_TOPIC_ALTITUDE = "home/unconfigured";
+const char *MQTT_MANAGEMENT_TOPIC = "manage/unconfigured";
+
 const char *BROKER_IP;
 int BROKER_PORT;
 const char *DEVICE_NAME;
@@ -44,16 +53,16 @@ void mqtt_keep_alive() {
 void mqtt_reconnect() {
   // Loop until we're reconnected
   while (!client.connected()) {
-    Serial.print("Attempting MQTT connection...");
+    DEBUG_PRINT("Attempting MQTT connection...");
     // Attempt to connect
     if (client.connect(DEVICE_NAME)) {
-      Serial.println("connected");
+      DEBUG_PRINTLN("connected");
       // Subscribe
       client.subscribe(RX_TOPIC);
     } else {
-      Serial.print("failed, rc=");
-      Serial.print(client.state());
-      Serial.println(" try again in 5 seconds");
+      DEBUG_PRINT("failed, rc=");
+      DEBUG_PRINT(client.state());
+      DEBUG_PRINTLN(" try again in 5 seconds");
       // Wait 5 seconds before retrying
       delay(5000);
     }
@@ -65,29 +74,29 @@ void mqtt_reconnect() {
 void message_rx_callback(char* topic, byte* message, unsigned int length) {
   String messageTemp;
 
-  Serial.print("Message arrived on topic: ");
-  Serial.print(topic);
-  Serial.print(". Message: ");
+  DEBUG_PRINT("Message arrived on topic: ");
+  DEBUG_PRINT(topic);
+  DEBUG_PRINT(". Message: ");
 
   
   for (int i = 0; i < length; i++) {
-    Serial.print((char)message[i]);
+    DEBUG_PRINT((char)message[i]);
     
     messageTemp += (char)message[i];
   }
-  Serial.println();
+  DEBUG_PRINTLN("");
   
   
 
   // If a message is received on the topic esp32/output, you check if the message is either "on" or "off". 
   // Changes the output state according to the message
   // if (String(topic) == RX_TOPIC) {
-  //   Serial.print("Changing output to ");
+  //   DEBUG_PRINT("Changing output to ");
   //   if(messageTemp == "on"){
-  //     Serial.println("on");
+  //     DEBUG_PRINTLN("on");
   //   }
   //   else if(messageTemp == "off"){
-  //     Serial.println("off");
+  //     DEBUG_PRINTLN("off");
   //   }
   // }
 

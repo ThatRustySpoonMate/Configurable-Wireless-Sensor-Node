@@ -1,7 +1,13 @@
 #include "main.hpp"
+#include "credentials.h"
+#include "MQTTTasks.hpp"
+#include "SensorTasks.hpp"
 
 #define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP  30      /* Time ESP32 will sleep for (in seconds) */
+
+uint32_t time_to_sleep = 30;      /* Time ESP32 will sleep for (in seconds) */
+
+bool debug_log = false;
 
 void setup() {
 
@@ -19,11 +25,13 @@ void setup() {
 
 }
 
+
 void loop() {
-  esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
+  esp_sleep_enable_timer_wakeup(time_to_sleep * uS_TO_S_FACTOR);
   upon_wake();
   esp_deep_sleep_start();
 }
+
 
 void upon_wake() {
   static uint16_t moistureReadingRaw;
