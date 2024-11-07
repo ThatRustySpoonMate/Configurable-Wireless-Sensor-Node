@@ -24,7 +24,13 @@ typedef struct transmit_data_entry_s {
 
 } transmit_data_entry_t;
 
-/* Define connected devices here */
+/* Define connected devices here
+*  Available devices:
+*  - DEVICE_BME280
+*  - DEVICE_SOIL_MOISTURE_SENSOR
+*  - SUPPLY_MONITORING
+*/
+
 //#define DEVICE_SOIL_MOISTURE_SENSOR
 #define DEVICE_BME280
 #define SUPPLY_MONITORING // Resistor divider from supply to ADC Pin

@@ -6,7 +6,7 @@
 
 #define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
 
-uint32_t time_to_sleep = 30;      /* Time ESP32 will sleep for (in seconds) */
+uint32_t time_to_sleep = 60;      /* Time ESP32 will sleep for (in seconds) */
 
 bool debug_log = false;
 
@@ -20,17 +20,18 @@ void setup() {
 
   Serial.println("Running");
 
-  strcpy(transmitData[TEMPERATURE].topic, MQTT_TOPIC_TEMPERATURE);
-  strcpy(transmitData[HUMIDITY].topic, MQTT_TOPIC_HUMIDITY);
-  strcpy(transmitData[PRESSURE].topic, MQTT_TOPIC_PRESSURE);
-  strcpy(transmitData[ALTITUDE].topic, MQTT_TOPIC_ALTITUDE);
-  strcpy(transmitData[SOIL_MOISTURE].topic, MQTT_TOPIC_MOISTURE);
+  strcpy(transmitData[TEMPERATURE_IDX].topic, MQTT_TOPIC_TEMPERATURE);
+  strcpy(transmitData[HUMIDITY_IDX].topic, MQTT_TOPIC_HUMIDITY);
+  strcpy(transmitData[PRESSURE_IDX].topic, MQTT_TOPIC_PRESSURE);
+  strcpy(transmitData[ALTITUDE_IDX].topic, MQTT_TOPIC_ALTITUDE);
+  strcpy(transmitData[SOIL_MOISTURE_IDX].topic, MQTT_TOPIC_MOISTURE);
+  strcpy(transmitData[SUPPLY_VOLTAGE_IDX].topic, MQTT_TOPIC_SUPPLY_VOLTAGE);
 
   transmitTask_init();
 
-  sensorTask_init();
-
   setup_mqtt(MQTT_BROKER_IP, MQTT_BROKER_PORT, DEVICE_ID, MQTT_TOPIC_MANAGEMENT);
+
+  sensorTask_init();
 
   pinMode(LED_BUILTIN, OUTPUT);
 
@@ -52,10 +53,10 @@ void upon_wake() {
   setup_wifi(WIFI_SSID, WIFI_PASSWORD);
 
   // Connect to MQTT
-  mqtt_reconnect();
+  mqtt_keep_alive();
 
   // Read soil moisture and BME280 sensors
-  readSensors(&(transmitData[SOIL_MOISTURE].data), &(transmitData[TEMPERATURE].data), &(transmitData[HUMIDITY].data), &(transmitData[PRESSURE].data), &(transmitData[ALTITUDE].data));
+  readSensors(&(transmitData[SOIL_MOISTURE_IDX].data), &(transmitData[TEMPERATURE_IDX].data), &(transmitData[HUMIDITY_IDX].data), &(transmitData[PRESSURE_IDX].data), &(transmitData[ALTITUDE_IDX].data), &(transmitData[SUPPLY_VOLTAGE_IDX].data) );
 
   transmitTask_run(transmitData);
 

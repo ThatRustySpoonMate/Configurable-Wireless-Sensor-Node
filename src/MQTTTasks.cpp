@@ -4,7 +4,7 @@ WiFiClient espClient;
 PubSubClient client(espClient);
 
 // Define the location slug
-#define MQTT_TOPIC_LOCATION_SLUG "home/unconfigured"
+#define MQTT_TOPIC_LOCATION_SLUG "home/outside/garden"
 
 // Define topic suffixes
 #define MOISTURE_TOPIC "/moisture"
@@ -12,6 +12,7 @@ PubSubClient client(espClient);
 #define HUMIDITY_TOPIC "/humidity"
 #define PRESSURE_TOPIC "/pressure"
 #define ALTITUDE_TOPIC "/altitude"
+#define SUPPLY_TOPIC "/supply-voltage"
 #define MANAGE_TOPIC "manage/unconfigured"
 
 // Helper macros to concatenate strings
@@ -23,6 +24,7 @@ PubSubClient client(espClient);
 #define MQTT_TOPIC_HUMIDITY_STR CONCATENATE(MQTT_TOPIC_LOCATION_SLUG, HUMIDITY_TOPIC)
 #define MQTT_TOPIC_PRESSURE_STR CONCATENATE(MQTT_TOPIC_LOCATION_SLUG, PRESSURE_TOPIC)
 #define MQTT_TOPIC_ALTITUDE_STR CONCATENATE(MQTT_TOPIC_LOCATION_SLUG, ALTITUDE_TOPIC)
+#define MQTT_TOPIC_SUPPLY_VOLTAGE_STR  CONCATENATE(MQTT_TOPIC_LOCATION_SLUG, SUPPLY_TOPIC)
 #define MQTT_TOPIC_MANAGEMENT_STR CONCATENATE(MQTT_TOPIC_LOCATION_SLUG, MANAGE_TOPIC)
 
 // Define constants for the topics
@@ -31,6 +33,7 @@ const char *MQTT_TOPIC_TEMPERATURE = MQTT_TOPIC_TEMPERATURE_STR;
 const char *MQTT_TOPIC_HUMIDITY = MQTT_TOPIC_HUMIDITY_STR;
 const char *MQTT_TOPIC_PRESSURE = MQTT_TOPIC_PRESSURE_STR;
 const char *MQTT_TOPIC_ALTITUDE = MQTT_TOPIC_ALTITUDE_STR;
+const char *MQTT_TOPIC_SUPPLY_VOLTAGE = MQTT_TOPIC_SUPPLY_VOLTAGE_STR;
 const char *MQTT_TOPIC_MANAGEMENT = MQTT_TOPIC_MANAGEMENT_STR;
 
 const char *BROKER_IP;
@@ -45,6 +48,7 @@ void setup_mqtt(const char *MQTT_BROKER_IP, const int MQTT_BROKER_PORT, const ch
   assert(strlen(MQTT_TOPIC_HUMIDITY) < MQTT_TOPIC_LENGTH_MAX);
   assert(strlen(MQTT_TOPIC_PRESSURE) < MQTT_TOPIC_LENGTH_MAX);
   assert(strlen(MQTT_TOPIC_ALTITUDE) < MQTT_TOPIC_LENGTH_MAX);
+  assert(strlen(MQTT_TOPIC_SUPPLY_VOLTAGE) < MQTT_TOPIC_LENGTH_MAX);
   assert(strlen(MQTT_TOPIC_MANAGEMENT) < MQTT_TOPIC_LENGTH_MAX);
 
   BROKER_IP = MQTT_BROKER_IP;
