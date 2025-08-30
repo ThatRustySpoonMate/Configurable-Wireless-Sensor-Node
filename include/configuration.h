@@ -2,10 +2,10 @@
 #define CONFIGURATION_H
 
 // ========== POWER MANAGEMENT ==========
-#define DEFAULT_SLEEP_TIME_SECONDS 60          // Normal sleep time - time between readings
-#define LOW_BATTERY_SLEEP_TIME_SECONDS 300     // Sleep time when battery is low (5 minutes) - currently unimplemented
+#define DEFAULT_SLEEP_TIME_SECONDS 60           // Normal sleep time - time between readings
+#define LOW_BATTERY_SLEEP_TIME_SECONDS 300      // Sleep time when battery is low (5 minutes) - currently unimplemented
 #define VERY_LOW_BATTERY_SLEEP_TIME_SECONDS 600 // Sleep time when battery is very low (10 minutes) - currently unimplemented
-#define CPU_FREQUENCY_MHZ 80                   // Lower frequency saves power
+#define CPU_FREQUENCY_MHZ 80                    // Lower frequency saves power
 
 // ========== BATTERY MONITORING ==========
 #define LOW_BATTERY_THRESHOLD_V 3.4f           // Voltage to trigger power saving
@@ -32,11 +32,17 @@
 #define UPTIME_TOPIC_SUFFIX "/uptime"
 #define MANAGEMENT_TOPIC_SUFFIX "/manage/unconfigured"
 
+// ========== PREFERENCES (FLASH-EMULATED-EEPROM) CONFIGURATION ==========
+#define PREFS_NAMESPACE "device"
+#define UPTIME_KEY "uptime"
+
+
 
 // ========== DEVICE CONFIGURATION ==========
 // Uncomment the devices you have connected
 //#define DEVICE_SOIL_MOISTURE_SENSOR
 #define DEVICE_BME280
+#define UPTIME_MONITORING   // Software feature
 //#define SUPPLY_MONITORING // Resistor divider from supply to ADC Pin
 
 
@@ -71,6 +77,7 @@
 
 // Microseconds conversion
 #define uS_TO_S_FACTOR 1000000
+#define mS_TO_S_Factor 1000
 
 // Power saving voltage thresholds
 #define MODERATE_POWER_SAVE_THRESHOLD_V 3.4f

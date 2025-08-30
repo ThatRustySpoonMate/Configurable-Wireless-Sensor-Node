@@ -10,12 +10,18 @@ void transmitTask_init() {
 
 void transmitTask_run(transmit_data_entry_t transmitData[DATAPOINTS_NUM]) {
 
-  static String moistureReadingStr, tempReadingStr, humidityReadingStr, pressureReadingStr, altitudeReadingStr, supplyVStr;
-  /* Convert readings to string objects then transmit them */
+  static String moistureReadingStr, tempReadingStr, humidityReadingStr, pressureReadingStr, altitudeReadingStr, supplyVStr, uptimeStr;
+
+  /* Convert readings to string objects then transmit them - only send data points for connected devices */
 
   #ifdef SUPPLY_MONITORING_CONNECTED
   supplyVStr = String(transmitData[SUPPLY_VOLTAGE_IDX].data.data_u16);
   mqtt_transmit(transmitData[SUPPLY_VOLTAGE_IDX].topic, supplyVStr.c_str());
+  #endif
+
+  #ifdef UPTIME_MONITORING
+  uptimeStr = String(transmitData[UPTIME_IDX].data.data_u32);
+  mqtt_transmit(transmitData[UPTIME_IDX].topic, uptimeStr.c_str());
   #endif
 
   #ifdef SOIL_MOISTURE_SENSOR_CONNECTED
@@ -42,8 +48,6 @@ void transmitTask_run(transmit_data_entry_t transmitData[DATAPOINTS_NUM]) {
   altitudeReadingStr = String(transmitData[ALTITUDE_IDX].data.data_f32);
   mqtt_transmit(transmitData[ALTITUDE_IDX].topic, altitudeReadingStr.c_str()); 
   #endif
-
-  
 
   // Allow time to transmit message before disconnecting from MQTT
   delay(MQTT_TRANSMIT_TIME_BUFFER); 

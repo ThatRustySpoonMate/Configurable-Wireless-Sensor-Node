@@ -113,8 +113,8 @@ bool mqtt_reconnect_with_timeout(uint32_t timeout_ms) {
     delay(1000);
     
     // Feed watchdog during connection attempt
-    extern void feed_watchdog();
-    feed_watchdog();
+    extern void pat_watchdog();
+    pat_watchdog();
   }
   
   DEBUG_PRINTLN("MQTT connection timeout");

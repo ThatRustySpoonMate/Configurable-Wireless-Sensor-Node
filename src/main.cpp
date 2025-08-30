@@ -5,19 +5,25 @@
 #include "TransmitTask.hpp"
 #include "esp_task_wdt.h" 
 
-uint32_t time_to_sleep = DEFAULT_SLEEP_TIME_SECONDS;    /* Time ESP32 will sleep for between readings (in seconds) */
 
+uint32_t time_to_sleep = DEFAULT_SLEEP_TIME_SECONDS;    /* Time ESP32 will sleep for between readings (in seconds) */
 bool debug_log = DEBUG_DEFAULT_STATE;
 
+Preferences preferences;
+uint32_t device_uptime = 0;
+
+// Data reading array to store sensor data and transmit it 
 transmit_data_entry_t transmitData[DATAPOINTS_NUM];
 
 void setup() {
 
   setCpuFrequencyMhz(CPU_FREQUENCY_MHZ);
-
   Serial.begin(SERIAL_BAUD_RATE);
-
   Serial.println("Running");
+
+  preferences.begin(PREFS_NAMESPACE, false); // false = read/write mode
+
+  setup_watchdog();
 
   strcpy(transmitData[TEMPERATURE_IDX].topic, MQTT_TOPIC_TEMPERATURE);
   strcpy(transmitData[HUMIDITY_IDX].topic, MQTT_TOPIC_HUMIDITY);
@@ -25,13 +31,11 @@ void setup() {
   strcpy(transmitData[ALTITUDE_IDX].topic, MQTT_TOPIC_ALTITUDE);
   strcpy(transmitData[SOIL_MOISTURE_IDX].topic, MQTT_TOPIC_MOISTURE);
   strcpy(transmitData[SUPPLY_VOLTAGE_IDX].topic, MQTT_TOPIC_SUPPLY_VOLTAGE);
+  strcpy(transmitData[UPTIME_IDX].topic, MQTT_TOPIC_UPTIME);
 
   transmitTask_init();
-
   setup_mqtt(MQTT_BROKER_IP, MQTT_BROKER_PORT, DEVICE_ID, MQTT_TOPIC_MANAGEMENT);
-
   sensorTask_init();
-
   pinMode(LED_BUILTIN, OUTPUT);
 
 }
@@ -44,10 +48,11 @@ void loop() {
 
 
 void upon_wake() {
+
   // LED On
   digitalWrite(LED_BUILTIN, HIGH);
 
-  feed_watchdog(); 
+  pat_watchdog(); 
 
   // Connect to WIFI
   if (!setup_wifi_with_timeout(WIFI_SSID, WIFI_PASSWORD, WIFI_CONNECT_TIMEOUT_MS)) { // 30 second timeout
@@ -57,19 +62,24 @@ void upon_wake() {
     return;
   }
 
-  feed_watchdog(); 
+  pat_watchdog(); 
 
   // Connect to MQTT
-  mqtt_keep_alive();
+  if (!mqtt_reconnect_with_timeout(MQTT_CONNECT_TIMEOUT_MS)) { // 10 second timeouts
+    DEBUG_PRINTLN("MQTT connection failed - entering deep sleep");
+    digitalWrite(LED_BUILTIN, LOW);
+    enter_deep_sleep();
+    return;
+  }
 
-  feed_watchdog(); 
+  pat_watchdog(); 
 
-  // Read soil moisture and BME280 sensors
-  //readSensors(&(transmitData[SOIL_MOISTURE_IDX].data), &(transmitData[TEMPERATURE_IDX].data), &(transmitData[HUMIDITY_IDX].data), &(transmitData[PRESSURE_IDX].data), &(transmitData[ALTITUDE_IDX].data), &(transmitData[SUPPLY_VOLTAGE_IDX].data) );
-  // Stub function
-  stubReadSensors(&(transmitData[SOIL_MOISTURE_IDX].data), &(transmitData[TEMPERATURE_IDX].data), &(transmitData[HUMIDITY_IDX].data), &(transmitData[PRESSURE_IDX].data), &(transmitData[ALTITUDE_IDX].data), &(transmitData[SUPPLY_VOLTAGE_IDX].data));
+  // Read all connected sensors
+  //readSensors(&(transmitData[SOIL_MOISTURE_IDX].data), &(transmitData[TEMPERATURE_IDX].data), &(transmitData[HUMIDITY_IDX].data), &(transmitData[PRESSURE_IDX].data), &(transmitData[ALTITUDE_IDX].data), &(transmitData[SUPPLY_VOLTAGE_IDX].data), &(transmitData[UPTIME_IDX].data) );
+  // Stub function alternative 
+  stubReadSensors(&(transmitData[SOIL_MOISTURE_IDX].data), &(transmitData[TEMPERATURE_IDX].data), &(transmitData[HUMIDITY_IDX].data), &(transmitData[PRESSURE_IDX].data), &(transmitData[ALTITUDE_IDX].data), &(transmitData[SUPPLY_VOLTAGE_IDX].data), &(transmitData[UPTIME_IDX].data));
   
-  feed_watchdog(); 
+  pat_watchdog(); 
 
   transmitTask_run(transmitData);
 
@@ -79,6 +89,16 @@ void upon_wake() {
 }
 
 void enter_deep_sleep() {
+
+  // Record when we're going to sleep
+  #ifdef UPTIME_MONITORING
+  device_uptime += DEFAULT_SLEEP_TIME_SECONDS; // Convert to seconds
+  preferences.putULong(UPTIME_KEY, device_uptime);
+  #endif
+
+  // Close preferences to ensure pending writes are complete
+  preferences.end();
+
   // Disable WiFi and Bluetooth to save power
   WiFi.disconnect(true);
   WiFi.mode(WIFI_OFF);
@@ -104,7 +124,7 @@ void setup_watchdog() {
   esp_task_wdt_add(NULL); // Add current task to watchdog
 }
 
-void feed_watchdog() {
+void pat_watchdog() {
   esp_task_wdt_reset();
 }
 

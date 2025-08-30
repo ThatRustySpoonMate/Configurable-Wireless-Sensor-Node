@@ -34,8 +34,8 @@ bool setup_wifi_with_timeout(const char *ssid, const char *password, uint32_t ti
     DEBUG_PRINT(".");
     
     // Feed watchdog during connection attempt
-    extern void feed_watchdog();
-    feed_watchdog();
+    extern void pat_watchdog();
+    pat_watchdog();
   }
 
   if (WiFi.status() == WL_CONNECTED) {
