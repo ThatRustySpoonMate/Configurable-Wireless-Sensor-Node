@@ -6,6 +6,7 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 #include "MQTTTasks.hpp"
+#include "configuration.h"  // Added configuration include
 
 typedef union transmit_data_u {
     uint8_t data_u8;
@@ -24,59 +25,36 @@ typedef struct transmit_data_entry_s {
 
 } transmit_data_entry_t;
 
-/* Define connected devices here
-*  Available devices:
-*  - DEVICE_BME280
-*  - DEVICE_SOIL_MOISTURE_SENSOR
-*  - SUPPLY_MONITORING
+/* Device configuration moved to configuration.h 
+   Uncomment the devices you have in configuration.h:
+   - DEVICE_BME280
+   - DEVICE_SOIL_MOISTURE_SENSOR  
+   - SUPPLY_MONITORING
 */
-
-//#define DEVICE_SOIL_MOISTURE_SENSOR
-#define DEVICE_BME280
-//#define SUPPLY_MONITORING // Resistor divider from supply to ADC Pin
-
 
 /* Configure connected devices here */
 #ifdef DEVICE_SOIL_MOISTURE_SENSOR
-#define SOIL_MOISUTRE_SENS_VCC 7
-#define SOIL_MOISTURE_SENS_DIN 8 // 5 - ADC1_CH4 for ESP32 Dev Board
-#define SOIL_MOISTURE_SETTLE_TIME 1000
 uint32_t init_soil_sensor();
 #endif
 
 #ifdef DEVICE_BME280
-
+// No additional config needed
 #endif
 
 #ifdef SUPPLY_MONITORING
-#define SUPPLY_MON_ADC_PIN 3 // ADC1_CH2 on WEMOS
-#define SUPPLY_MON_R1 100000.0 // 100k
-#define SUPPLY_MON_R2 100000.0 // 100k
-#define SUPPLY_MON_RDIV_RATIO (1.0 / (SUPPLY_MON_R2 / (SUPPLY_MON_R1 + SUPPLY_MON_R2)))
-#define SUPPLY_MON_FUDGE_FACTOR_DIV 1.25200
+// No additional config needed
 #endif
-
-#define SEALEVELPRESSURE_HPA (1031.0f) // hPa
 
 /* For other tasks to see what is connected */
 
-#if defined(DEVICE_BME280) // || defined(DHT11)
+#if defined(DEVICE_BME280)
 #define TEMPERATURE_SENSOR_CONNECTED
-#endif
-
-#if defined(DEVICE_BME280)
 #define HUMIDITY_SENSOR_CONNECTED
-#endif
-
-#if defined(DEVICE_BME280)
 #define PRESSURE_SENSOR_CONNECTED
-#endif
-
-#if defined(DEVICE_BME280)
 #define ALTITUDE_SENSOR_CONNECTED
 #endif
 
-#if defined(DEVICE_SOIL_MOISTURE_SENSOR) // || defined(DHT11)
+#if defined(DEVICE_SOIL_MOISTURE_SENSOR)
 #define SOIL_MOISTURE_SENSOR_CONNECTED
 #endif
 

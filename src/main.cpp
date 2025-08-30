@@ -5,19 +5,17 @@
 #include "TransmitTask.hpp"
 #include "esp_task_wdt.h" 
 
-#define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
+uint32_t time_to_sleep = DEFAULT_SLEEP_TIME_SECONDS;    /* Time ESP32 will sleep for between readings (in seconds) */
 
-uint32_t time_to_sleep = 60;    /* Time ESP32 will sleep for between readings (in seconds) */
-
-bool debug_log = false;
+bool debug_log = DEBUG_DEFAULT_STATE;
 
 transmit_data_entry_t transmitData[DATAPOINTS_NUM];
 
 void setup() {
 
-  setCpuFrequencyMhz(80);
+  setCpuFrequencyMhz(CPU_FREQUENCY_MHZ);
 
-  Serial.begin(115200);
+  Serial.begin(SERIAL_BAUD_RATE);
 
   Serial.println("Running");
 
@@ -52,7 +50,7 @@ void upon_wake() {
   feed_watchdog(); 
 
   // Connect to WIFI
-  if (!setup_wifi_with_timeout(WIFI_SSID, WIFI_PASSWORD, 30000)) { // 30 second timeout
+  if (!setup_wifi_with_timeout(WIFI_SSID, WIFI_PASSWORD, WIFI_CONNECT_TIMEOUT_MS)) { // 30 second timeout
     DEBUG_PRINTLN("WiFi connection failed - entering deep sleep");
     digitalWrite(LED_BUILTIN, LOW);
     enter_deep_sleep();
@@ -102,7 +100,7 @@ void enter_deep_sleep() {
 
 
 void setup_watchdog() {
-  esp_task_wdt_init(30, true); // 30 second timeout, panic on timeout
+  esp_task_wdt_init(WATCHDOG_TIMEOUT_SECONDS, true); // 30 second timeout, panic on timeout
   esp_task_wdt_add(NULL); // Add current task to watchdog
 }
 

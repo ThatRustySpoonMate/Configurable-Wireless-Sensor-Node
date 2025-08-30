@@ -2,6 +2,7 @@
 #define MAIN_HPP
 
 #include <Arduino.h>
+#include "configuration.h"
 
 extern bool debug_log;
 
@@ -25,6 +26,5 @@ void upon_wake();
 void setup_watchdog();
 void feed_watchdog();
 void enter_deep_sleep();
-
 
 #endif

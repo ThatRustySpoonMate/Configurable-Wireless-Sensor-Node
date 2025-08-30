@@ -8,21 +8,14 @@
 #define MQTT_TOPIC_LENGTH_MAX 100
 
 // Declarations
-extern const char *MQTT_TOPIC_MOISTURE;
-extern const char *MQTT_TOPIC_TEMPERATURE;
-extern const char *MQTT_TOPIC_HUMIDITY;
-extern const char *MQTT_TOPIC_PRESSURE;
-extern const char *MQTT_TOPIC_ALTITUDE;
-extern const char *MQTT_TOPIC_SUPPLY_VOLTAGE;
-extern const char *MQTT_TOPIC_MANAGEMENT;
-
-// Example:
-// const char *MQTT_TOPIC_MOISTURE = "home/outside/garden/moisture";
-// const char *MQTT_TOPIC_TEMPERATURE = "home/outside/garden/temperature";
-// const char *MQTT_TOPIC_HUMIDITY = "home/outside/garden/humidity";
-// const char *MQTT_TOPIC_PRESSURE = "home/outside/garden/pressure";
-// const char *MQTT_TOPIC_ALTITUDE = "home/outside/garden/altitude";
-// const char *MQTT_TOPIC_MANAGEMENT = "manage/garden";
+extern const char *MQTT_TOPIC_MOISTURE;         // Example: "home/outside/garden/moisture";
+extern const char *MQTT_TOPIC_TEMPERATURE;      // Example: "home/outside/garden/temperature";
+extern const char *MQTT_TOPIC_HUMIDITY;         // Example: "home/outside/garden/humidity"; 
+extern const char *MQTT_TOPIC_PRESSURE;         // Example: "home/outside/garden/pressure"; 
+extern const char *MQTT_TOPIC_ALTITUDE;         // Example: "home/outside/garden/altitude";
+extern const char *MQTT_TOPIC_SUPPLY_VOLTAGE;   // Example: "home/outside/garden/supply-voltage";
+extern const char *MQTT_TOPIC_UPTIME;           // Example: "home/outside/garden/uptime";
+extern const char *MQTT_TOPIC_MANAGEMENT;       // Example: "manage/garden";
 
 void setup_mqtt(const char *MQTT_BROKER_IP, const int MQTT_BROKER_PORT, const char *DEV_NAME, const char *MANAGE_PORT);
 
