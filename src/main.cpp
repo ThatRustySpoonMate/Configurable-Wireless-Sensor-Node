@@ -1,151 +1,110 @@
-/*
-  NOTE: If WIFI Fails to connect, you either have the credentials incorrect, or the DHT data pin is on an invalid GPIO port
-*/
-
-/* Includes */
-#include <Arduino.h>
-#include "main.h"
-
-#include <Adafruit_Sensor.h>
-
-#if SENSOR == 1
-#include <DHT.h>
-#elif SENSOR == 2
-#include <Adafruit_AHTX0.h>
-#endif
-
-
+#include "main.hpp"
 #include "credentials.h"
 #include "MQTTTasks.hpp"
-#include "InputTask.hpp"
+#include "SensorTasks.hpp"
+#include "TransmitTask.hpp"
+#include "esp_task_wdt.h" 
 
-/* Variable Declarations*/
-static const uint32_t SAMPLING_INTERVAL = 10000; // ms
-static const uint32_t TRANSMIT_INTERVAL = 10000; // ms
+uint32_t time_to_sleep = DEFAULT_SLEEP_TIME_SECONDS;    /* Time ESP32 will sleep for between readings (in seconds) */
 
-float payload[3]; // MQTT Data to be transmitted
+bool debug_log = DEBUG_DEFAULT_STATE;
 
-bool debug_log = false;
+transmit_data_entry_t transmitData[DATAPOINTS_NUM];
 
-#if SENSOR == 1
-DHT dht(DHTPIN, DHTTYPE); // DHT Sensor
-#elif SENSOR == 2
-Adafruit_AHTX0 aht;
-#endif
-
-
-/* Arduino Framework base functions */
 void setup() {
-  setCpuFrequencyMhz(80);
 
+  setCpuFrequencyMhz(CPU_FREQUENCY_MHZ);
 
-  Serial.begin(115200);
+  Serial.begin(SERIAL_BAUD_RATE);
 
-  #if SENSOR == 1
-  dht.begin();
+  Serial.println("Running");
 
-  #elif SENSOR == 2
-  if (! aht.begin()) {
-    Serial.println("Could not find AHT? Check wiring");
-    while (1) delay(10);
-  }
-  Serial.println("AHT10 or AHT20 found");
+  strcpy(transmitData[TEMPERATURE_IDX].topic, MQTT_TOPIC_TEMPERATURE);
+  strcpy(transmitData[HUMIDITY_IDX].topic, MQTT_TOPIC_HUMIDITY);
+  strcpy(transmitData[PRESSURE_IDX].topic, MQTT_TOPIC_PRESSURE);
+  strcpy(transmitData[ALTITUDE_IDX].topic, MQTT_TOPIC_ALTITUDE);
+  strcpy(transmitData[SOIL_MOISTURE_IDX].topic, MQTT_TOPIC_MOISTURE);
+  strcpy(transmitData[SUPPLY_VOLTAGE_IDX].topic, MQTT_TOPIC_SUPPLY_VOLTAGE);
 
-  #endif
+  transmitTask_init();
 
-  setup_wifi(WIFI_SSID, WIFI_PASSWORD);
-  
+  setup_mqtt(MQTT_BROKER_IP, MQTT_BROKER_PORT, DEVICE_ID, MQTT_TOPIC_MANAGEMENT);
 
-  setup_mqtt(MQTT_BROKER_IP, MQTT_BROKER_PORT, DEVICE_ID, MQTT_MANAGEMENT_TOPIC);
+  sensorTask_init();
+
+  pinMode(LED_BUILTIN, OUTPUT);
 
 }
+
 
 void loop() {
-
-  // Read DHT Sensor
-  sampleTask();
-
-  // Transmit readings
-  transmitTask();
-
-  // Handle serial input
-  serialTask();   
-
-  // For Power efficiency - change to sleep state later
-  delay(500); 
-
+  upon_wake();
+  enter_deep_sleep();
 }
 
-/* Function Definitions*/
 
-void sampleTask() {
-  static uint32_t lastSampleTime = 0;
+void upon_wake() {
+  // LED On
+  digitalWrite(LED_BUILTIN, HIGH);
 
-  uint32_t currentTime = millis();
+  feed_watchdog(); 
 
-  float pl_temperature, pl_humidity, pl_heatIndex;
-
-  // Only run once per x timeframe 
-  if(currentTime > lastSampleTime + SAMPLING_INTERVAL) {
-    // Take a new sample - can take a substantial amount of time - maybe split each read over set timespan
-    
-    #if SENSOR == 1
-    pl_temperature = dht.readTemperature();
-    pl_humidity = dht.readHumidity();
-    pl_heatIndex = dht.computeHeatIndex(false);
-
-    #elif SENSOR == 2
-    sensors_event_t humidity, temp;
-    aht.getEvent(&humidity, &temp);// populate temp and humidity objects with fresh data
-    pl_temperature = temp.temperature;
-    pl_humidity = humidity.relative_humidity;
-    #endif
-    
-    payload[0] = pl_temperature;
-    payload[1] = pl_humidity;
-    payload[2] = pl_heatIndex;
-
-    if(debug_log) {
-      Serial.println("Polled the following values:");Serial.print("Temp: ");Serial.println(payload[0]);Serial.print("Humidity: ");Serial.println(payload[1]);Serial.print("Heat Index: ");Serial.println(payload[2]); 
-    }
-
-    lastSampleTime = currentTime;
+  // Connect to WIFI
+  if (!setup_wifi_with_timeout(WIFI_SSID, WIFI_PASSWORD, WIFI_CONNECT_TIMEOUT_MS)) { // 30 second timeout
+    DEBUG_PRINTLN("WiFi connection failed - entering deep sleep");
+    digitalWrite(LED_BUILTIN, LOW);
+    enter_deep_sleep();
+    return;
   }
 
+  feed_watchdog(); 
+
+  // Connect to MQTT
+  mqtt_keep_alive();
+
+  feed_watchdog(); 
+
+  // Read soil moisture and BME280 sensors
+  //readSensors(&(transmitData[SOIL_MOISTURE_IDX].data), &(transmitData[TEMPERATURE_IDX].data), &(transmitData[HUMIDITY_IDX].data), &(transmitData[PRESSURE_IDX].data), &(transmitData[ALTITUDE_IDX].data), &(transmitData[SUPPLY_VOLTAGE_IDX].data) );
+  // Stub function
+  stubReadSensors(&(transmitData[SOIL_MOISTURE_IDX].data), &(transmitData[TEMPERATURE_IDX].data), &(transmitData[HUMIDITY_IDX].data), &(transmitData[PRESSURE_IDX].data), &(transmitData[ALTITUDE_IDX].data), &(transmitData[SUPPLY_VOLTAGE_IDX].data));
+  
+  feed_watchdog(); 
+
+  transmitTask_run(transmitData);
+
+  digitalWrite(LED_BUILTIN, LOW);
 
   return;
-
 }
 
-void transmitTask() {
-  static uint32_t lastTransmitTime = 0;
-
-  uint32_t currentTime = millis();
-
-  mqtt_keep_alive(); // Keep MQTT session alive
-
-
-  // Only run once per x timeframe 
-  if(millis() > lastTransmitTime + TRANSMIT_INTERVAL) {
-    // Transmit payload via MQTT
-    char temperatureString[8], humidityString[8], heatIndexString[8];
-
-    // Convert floats to strings
-    dtostrf(payload[Payload_Temperature], 2, 2, temperatureString);
-    dtostrf(payload[Payload_Humidity], 2, 2, humidityString);
-    dtostrf(payload[Payload_Heat_Index], 2, 2, heatIndexString);
-
-    // Transmit strings
-    mqtt_transmit(MQTT_TOPIC_TEMP, temperatureString);
-    mqtt_transmit(MQTT_TOPIC_HUMI, humidityString);
-    mqtt_transmit(MQTT_TOPIC_HEATINDEX, heatIndexString);
-
-    if(debug_log) {
-      Serial.println("Transmitted the following values to MQTT broker:"); Serial.println(temperatureString); Serial.println(humidityString); Serial.println(heatIndexString); 
-    }
-    
-    lastTransmitTime = currentTime;
-  }
+void enter_deep_sleep() {
+  // Disable WiFi and Bluetooth to save power
+  WiFi.disconnect(true);
+  WiFi.mode(WIFI_OFF);
+  btStop();
   
+  // Configure wake sources
+  esp_sleep_enable_timer_wakeup(time_to_sleep * uS_TO_S_FACTOR);
+  
+  // Power down peripherals to save battery
+  esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_OFF);
+  esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_SLOW_MEM, ESP_PD_OPTION_OFF);
+  esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_FAST_MEM, ESP_PD_OPTION_OFF);
+  
+  DEBUG_PRINTLN("Entering deep sleep...");
+  Serial.flush(); // Make sure debug message is sent
+  
+  esp_deep_sleep_start();
+}
+
+
+void setup_watchdog() {
+  esp_task_wdt_init(WATCHDOG_TIMEOUT_SECONDS, true); // 30 second timeout, panic on timeout
+  esp_task_wdt_add(NULL); // Add current task to watchdog
+}
+
+void feed_watchdog() {
+  esp_task_wdt_reset();
 }
 

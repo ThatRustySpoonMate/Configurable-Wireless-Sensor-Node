@@ -1,32 +1,68 @@
 #include "MQTTTasks.hpp"
+#include "configuration.h"
 
 WiFiClient espClient;
 PubSubClient client(espClient);
+
+// Helper macros to concatenate strings
+#define CONCATENATE(a, b) a b
+
+// Create full topic strings using macros
+#define MQTT_TOPIC_MOISTURE_STR CONCATENATE(MQTT_TOPIC_LOCATION_SLUG, MOISTURE_TOPIC_SUFFIX)
+#define MQTT_TOPIC_TEMPERATURE_STR CONCATENATE(MQTT_TOPIC_LOCATION_SLUG, TEMPERATURE_TOPIC_SUFFIX)
+#define MQTT_TOPIC_HUMIDITY_STR CONCATENATE(MQTT_TOPIC_LOCATION_SLUG, HUMIDITY_TOPIC_SUFFIX)
+#define MQTT_TOPIC_PRESSURE_STR CONCATENATE(MQTT_TOPIC_LOCATION_SLUG, PRESSURE_TOPIC_SUFFIX)
+#define MQTT_TOPIC_ALTITUDE_STR CONCATENATE(MQTT_TOPIC_LOCATION_SLUG, ALTITUDE_TOPIC_SUFFIX)
+#define MQTT_TOPIC_SUPPLY_VOLTAGE_STR  CONCATENATE(MQTT_TOPIC_LOCATION_SLUG, SUPPLY_VOLTAGE_TOPIC_SUFFIX)
+#define MQTT_TOPIC_UPTIME_STR  CONCATENATE(MQTT_TOPIC_LOCATION_SLUG, UPTIME_TOPIC_SUFFIX)
+#define MQTT_TOPIC_MANAGEMENT_STR CONCATENATE(MQTT_TOPIC_LOCATION_SLUG, MANAGEMENT_TOPIC_SUFFIX)
+
+// Define constants for the topics
+const char *MQTT_TOPIC_MOISTURE = MQTT_TOPIC_MOISTURE_STR;
+const char *MQTT_TOPIC_TEMPERATURE = MQTT_TOPIC_TEMPERATURE_STR;
+const char *MQTT_TOPIC_HUMIDITY = MQTT_TOPIC_HUMIDITY_STR;
+const char *MQTT_TOPIC_PRESSURE = MQTT_TOPIC_PRESSURE_STR;
+const char *MQTT_TOPIC_ALTITUDE = MQTT_TOPIC_ALTITUDE_STR;
+const char *MQTT_TOPIC_UPTIME = MQTT_TOPIC_UPTIME_STR;
+const char *MQTT_TOPIC_SUPPLY_VOLTAGE = MQTT_TOPIC_SUPPLY_VOLTAGE_STR;
+const char *MQTT_TOPIC_MANAGEMENT = MQTT_TOPIC_MANAGEMENT_STR;
 
 const char *BROKER_IP;
 int BROKER_PORT;
 const char *DEVICE_NAME;
 const char *RX_TOPIC;
 
-extern bool debug_log;
-
 void setup_mqtt(const char *MQTT_BROKER_IP, const int MQTT_BROKER_PORT, const char *DEV_NAME, const char *MANAGEMENT_TOPIC) {
-    BROKER_IP = MQTT_BROKER_IP;
-    BROKER_PORT = MQTT_BROKER_PORT;
-    DEVICE_NAME = DEV_NAME;
-    RX_TOPIC = MANAGEMENT_TOPIC;
 
-    client.setServer(BROKER_IP, BROKER_PORT);
+  assert(strlen(MQTT_TOPIC_MOISTURE) < MQTT_TOPIC_LENGTH_MAX);
+  assert(strlen(MQTT_TOPIC_TEMPERATURE) < MQTT_TOPIC_LENGTH_MAX);
+  assert(strlen(MQTT_TOPIC_HUMIDITY) < MQTT_TOPIC_LENGTH_MAX);
+  assert(strlen(MQTT_TOPIC_PRESSURE) < MQTT_TOPIC_LENGTH_MAX);
+  assert(strlen(MQTT_TOPIC_ALTITUDE) < MQTT_TOPIC_LENGTH_MAX);
+  assert(strlen(MQTT_TOPIC_SUPPLY_VOLTAGE) < MQTT_TOPIC_LENGTH_MAX);
+  assert(strlen(MQTT_TOPIC_UPTIME) < MQTT_TOPIC_LENGTH_MAX);
+  assert(strlen(MQTT_TOPIC_MANAGEMENT) < MQTT_TOPIC_LENGTH_MAX);
 
-    client.setCallback(message_rx_callback);
+  BROKER_IP = MQTT_BROKER_IP;
+  BROKER_PORT = MQTT_BROKER_PORT;
+  DEVICE_NAME = DEV_NAME;
+  RX_TOPIC = MANAGEMENT_TOPIC;
+
+  client.setServer(BROKER_IP, BROKER_PORT);
+
+  client.setCallback(message_rx_callback);
+
+  return;
 }
 
 
 void mqtt_transmit(const char *topic, const char *payload) {
-    client.publish(topic, payload);
+  mqtt_keep_alive();
+  client.publish(topic, payload);
 
-    return;
+  return;
 }
+
 
 void mqtt_keep_alive() {
   if (!client.connected()) {
@@ -34,59 +70,93 @@ void mqtt_keep_alive() {
   }
 
   client.loop();
+
+  return;
 }
 
 
 void mqtt_reconnect() {
   // Loop until we're reconnected
   while (!client.connected()) {
-    Serial.print("Attempting MQTT connection...");
+    DEBUG_PRINT("Attempting MQTT connection...");
     // Attempt to connect
     if (client.connect(DEVICE_NAME)) {
-      Serial.println("connected");
+      DEBUG_PRINTLN("connected");
       // Subscribe
       client.subscribe(RX_TOPIC);
     } else {
-      Serial.print("failed, rc=");
-      Serial.print(client.state());
-      Serial.println(" try again in 5 seconds");
+      DEBUG_PRINT("failed, rc=");
+      DEBUG_PRINT(client.state());
+      DEBUG_PRINTLN(" try again in 5 seconds");
       // Wait 5 seconds before retrying
       delay(5000);
     }
   }
+
+  return;
 }
+
+bool mqtt_reconnect_with_timeout(uint32_t timeout_ms) {
+  uint32_t start_time = millis();
+  
+  while (!client.connected() && (millis() - start_time < timeout_ms)) {
+    DEBUG_PRINTLN("Attempting MQTT connection...");
+    
+    if (client.connect(DEVICE_NAME)) {
+      DEBUG_PRINTLN("MQTT connected");
+      client.subscribe(RX_TOPIC);
+      return true;
+    }
+    
+    DEBUG_PRINT("MQTT failed, rc=");
+    DEBUG_PRINTLN(client.state());
+    delay(1000);
+    
+    // Feed watchdog during connection attempt
+    extern void feed_watchdog();
+    feed_watchdog();
+  }
+  
+  DEBUG_PRINTLN("MQTT connection timeout");
+  return false; // Timeout reached
+}
+
 
 void message_rx_callback(char* topic, byte* message, unsigned int length) {
   String messageTemp;
 
-  if(debug_log) {
-    Serial.print("Message arrived on topic: ");
-    Serial.print(topic);
-    Serial.print(". Message: ");
-  }
-  
+  DEBUG_PRINT("Message arrived on topic: ");
+  DEBUG_PRINT(topic);
+  DEBUG_PRINT(". Message: ");
+
   
   for (int i = 0; i < length; i++) {
-    if(debug_log) {
-      Serial.print((char)message[i]);
-    }
+    DEBUG_PRINT((char)message[i]);
+    
     messageTemp += (char)message[i];
   }
-  if(debug_log) {
-    Serial.println();
-  }
+  DEBUG_PRINTLN("");
+  
   
 
   // If a message is received on the topic esp32/output, you check if the message is either "on" or "off". 
   // Changes the output state according to the message
   // if (String(topic) == RX_TOPIC) {
-  //   Serial.print("Changing output to ");
+  //   DEBUG_PRINT("Changing output to ");
   //   if(messageTemp == "on"){
-  //     Serial.println("on");
+  //     DEBUG_PRINTLN("on");
   //   }
   //   else if(messageTemp == "off"){
-  //     Serial.println("off");
+  //     DEBUG_PRINTLN("off");
   //   }
   // }
+
+  return;
 }
 
+
+void mqtt_disconnect() {
+  client.disconnect();
+  
+  return;
+}

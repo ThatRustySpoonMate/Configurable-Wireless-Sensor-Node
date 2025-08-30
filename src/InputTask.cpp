@@ -1,6 +1,6 @@
 #include "InputTask.hpp"
 
-extern HardwareSerial Serial;
+//extern HardwareSerial Serial;
 
 extern bool debug_log;
 

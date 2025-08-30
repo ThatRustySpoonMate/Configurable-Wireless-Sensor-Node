@@ -1,5 +1,21 @@
+#ifndef MQTT_TASKS_HPP
+#define MQTT_TASKS_HPP
+
 #include "WifiTasks.hpp"
 #include <PubSubClient.h>
+#include "main.hpp"
+
+#define MQTT_TOPIC_LENGTH_MAX 100
+
+// Declarations
+extern const char *MQTT_TOPIC_MOISTURE;         // Example: "home/outside/garden/moisture";
+extern const char *MQTT_TOPIC_TEMPERATURE;      // Example: "home/outside/garden/temperature";
+extern const char *MQTT_TOPIC_HUMIDITY;         // Example: "home/outside/garden/humidity"; 
+extern const char *MQTT_TOPIC_PRESSURE;         // Example: "home/outside/garden/pressure"; 
+extern const char *MQTT_TOPIC_ALTITUDE;         // Example: "home/outside/garden/altitude";
+extern const char *MQTT_TOPIC_SUPPLY_VOLTAGE;   // Example: "home/outside/garden/supply-voltage";
+extern const char *MQTT_TOPIC_UPTIME;           // Example: "home/outside/garden/uptime";
+extern const char *MQTT_TOPIC_MANAGEMENT;       // Example: "manage/garden";
 
 void setup_mqtt(const char *MQTT_BROKER_IP, const int MQTT_BROKER_PORT, const char *DEV_NAME, const char *MANAGE_PORT);
 
@@ -9,5 +25,10 @@ void mqtt_keep_alive();
 
 void mqtt_reconnect();
 
+bool mqtt_reconnect_with_timeout(uint32_t timeout_ms);
+
 void message_rx_callback(char* topic, byte* message, unsigned int length);
 
+void mqtt_disconnect();
+
+#endif

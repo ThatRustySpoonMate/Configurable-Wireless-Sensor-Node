@@ -1,24 +1,58 @@
 #include "WifiTasks.hpp"
 
 
-
-
 void setup_wifi(const char *ssid, const char *password) {
-  delay(10);
   // We start by connecting to a WiFi network
-  Serial.println();
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
+  DEBUG_PRINTLN();
+  DEBUG_PRINT("Connecting to ");
+  DEBUG_PRINTLN(ssid);
 
   WiFi.begin(ssid, password);
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    Serial.print(".");
+    DEBUG_PRINT(".");
   }
 
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
+  DEBUG_PRINTLN("");
+  DEBUG_PRINTLN("WiFi connected");
+  DEBUG_PRINTLN("IP address: ");
+  DEBUG_PRINTLN(WiFi.localIP());
+}
+
+bool setup_wifi_with_timeout(const char *ssid, const char *password, uint32_t timeout_ms) {
+  DEBUG_PRINTLN();
+  DEBUG_PRINT("Connecting to ");
+  DEBUG_PRINTLN(ssid);
+
+  WiFi.begin(ssid, password);
+  
+  uint32_t start_time = millis();
+  
+  while (WiFi.status() != WL_CONNECTED && (millis() - start_time < timeout_ms)) {
+    delay(500);
+    DEBUG_PRINT(".");
+    
+    // Feed watchdog during connection attempt
+    extern void feed_watchdog();
+    feed_watchdog();
+  }
+
+  if (WiFi.status() == WL_CONNECTED) {
+    DEBUG_PRINTLN("");
+    DEBUG_PRINTLN("WiFi connected");
+    DEBUG_PRINTLN("IP address: ");
+    DEBUG_PRINTLN(WiFi.localIP());
+    return true;
+  } else {
+    DEBUG_PRINTLN("");
+    DEBUG_PRINTLN("WiFi connection timeout");
+    return false;
+  }
+}
+
+void wifi_disconnect() {
+  WiFi.disconnect();
+
+  return;
 }
