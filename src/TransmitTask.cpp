@@ -24,7 +24,7 @@ void transmitTask_run(transmit_data_entry_t transmitData[DATAPOINTS_NUM]) {
   #endif
 
   #ifdef TEMPERATURE_SENSOR_CONNECTED
-  tempReadingStr     = String(transmitData[TEMPERATURE_IDX].data.data_f32);
+  tempReadingStr = String(transmitData[TEMPERATURE_IDX].data.data_f32);
   mqtt_transmit(transmitData[TEMPERATURE_IDX].topic, tempReadingStr.c_str()); 
   #endif
 

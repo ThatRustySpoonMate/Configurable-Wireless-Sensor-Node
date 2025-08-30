@@ -33,7 +33,7 @@ typedef struct transmit_data_entry_s {
 
 //#define DEVICE_SOIL_MOISTURE_SENSOR
 #define DEVICE_BME280
-#define SUPPLY_MONITORING // Resistor divider from supply to ADC Pin
+//#define SUPPLY_MONITORING // Resistor divider from supply to ADC Pin
 
 
 /* Configure connected devices here */
@@ -86,6 +86,8 @@ uint32_t init_soil_sensor();
 
 
 void sensorTask_init();
+
+void stubReadSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *baroPres, transmit_data_t *altitude, transmit_data_t *supply_v);
 
 void readSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *baroPres, transmit_data_t *altitude, transmit_data_t *supply_v);
 

@@ -30,15 +30,26 @@ void sensorTask_init() {
   return;
 }
 
+// Stub function allows for testing without any connected sensors
+void stubReadSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *baroPres, transmit_data_t *altitude, transmit_data_t *supply_v) {
+
+  moistureReading->data_u16 = random() % 65535;
+  supply_v->data_u32 = random() % 4200;
+  temp->data_f32 = random() % 65535;
+  humidity->data_f32 = random() % 65535;
+  baroPres->data_f32 = random() % 65535;
+  altitude->data_f32 = random() % 65535;
+
+  return;
+}
+
+// Function that calls the read function of all connected sensors and packs the data correctly into the given transmit_data struct pointers
 void readSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *baroPres, transmit_data_t *altitude, transmit_data_t *supply_v) {
 
   // Power up Soil sensor
   #ifdef DEVICE_SOIL_MOISTURE_SENSOR
   digitalWrite(SOIL_MOISUTRE_SENS_VCC, HIGH);
   #endif
-
-
-
 
   /* Read values from DEVICE_BME280 */
   #ifdef DEVICE_BME280
@@ -49,9 +60,6 @@ void readSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transm
   #ifdef SUPPLY_MONITORING
   read_supply_voltage(supply_v);
   #endif
-
-
-
 
   // Allow time for startup of soil moisture sensor before taking reading
   #ifdef DEVICE_SOIL_MOISTURE_SENSOR
