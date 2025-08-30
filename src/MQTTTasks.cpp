@@ -108,6 +108,32 @@ void mqtt_reconnect() {
   return;
 }
 
+bool mqtt_reconnect_with_timeout(uint32_t timeout_ms) {
+  uint32_t start_time = millis();
+  
+  while (!client.connected() && (millis() - start_time < timeout_ms)) {
+    DEBUG_PRINTLN("Attempting MQTT connection...");
+    
+    if (client.connect(DEVICE_NAME)) {
+      DEBUG_PRINTLN("MQTT connected");
+      client.subscribe(RX_TOPIC);
+      return true;
+    }
+    
+    DEBUG_PRINT("MQTT failed, rc=");
+    DEBUG_PRINTLN(client.state());
+    delay(1000); // Shorter delay than original
+    
+    // Feed watchdog during connection attempt
+    extern void feed_watchdog();
+    feed_watchdog();
+  }
+  
+  DEBUG_PRINTLN("MQTT connection timeout");
+  return false; // Timeout reached
+}
+
+
 void message_rx_callback(char* topic, byte* message, unsigned int length) {
   String messageTemp;
 

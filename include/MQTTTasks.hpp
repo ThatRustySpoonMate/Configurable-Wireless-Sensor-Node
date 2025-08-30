@@ -32,6 +32,8 @@ void mqtt_keep_alive();
 
 void mqtt_reconnect();
 
+bool mqtt_reconnect_with_timeout(uint32_t timeout_ms);
+
 void message_rx_callback(char* topic, byte* message, unsigned int length);
 
 void mqtt_disconnect();

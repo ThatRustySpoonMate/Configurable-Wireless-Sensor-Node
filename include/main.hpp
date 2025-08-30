@@ -22,5 +22,9 @@ typedef enum data_points_e {
 } data_points_t;
 
 void upon_wake();
+void setup_watchdog();
+void feed_watchdog();
+void enter_deep_sleep();
+
 
 #endif

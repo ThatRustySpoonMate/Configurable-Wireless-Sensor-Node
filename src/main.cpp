@@ -3,10 +3,11 @@
 #include "MQTTTasks.hpp"
 #include "SensorTasks.hpp"
 #include "TransmitTask.hpp"
+#include "esp_task_wdt.h" 
 
 #define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
 
-uint32_t time_to_sleep = 60;      /* Time ESP32 will sleep for (in seconds) */
+uint32_t time_to_sleep = 60;    /* Time ESP32 will sleep for between readings (in seconds) */
 
 bool debug_log = false;
 
@@ -39,9 +40,8 @@ void setup() {
 
 
 void loop() {
-  esp_sleep_enable_timer_wakeup(time_to_sleep * uS_TO_S_FACTOR);
   upon_wake();
-  esp_deep_sleep_start();
+  enter_deep_sleep();
 }
 
 
@@ -49,17 +49,29 @@ void upon_wake() {
   // LED On
   digitalWrite(LED_BUILTIN, HIGH);
 
+  feed_watchdog(); 
+
   // Connect to WIFI
-  setup_wifi(WIFI_SSID, WIFI_PASSWORD);
+  if (!setup_wifi_with_timeout(WIFI_SSID, WIFI_PASSWORD, 30000)) { // 30 second timeout
+    DEBUG_PRINTLN("WiFi connection failed - entering deep sleep");
+    digitalWrite(LED_BUILTIN, LOW);
+    enter_deep_sleep();
+    return;
+  }
+
+  feed_watchdog(); 
 
   // Connect to MQTT
   mqtt_keep_alive();
+
+  feed_watchdog(); 
 
   // Read soil moisture and BME280 sensors
   //readSensors(&(transmitData[SOIL_MOISTURE_IDX].data), &(transmitData[TEMPERATURE_IDX].data), &(transmitData[HUMIDITY_IDX].data), &(transmitData[PRESSURE_IDX].data), &(transmitData[ALTITUDE_IDX].data), &(transmitData[SUPPLY_VOLTAGE_IDX].data) );
   // Stub function
   stubReadSensors(&(transmitData[SOIL_MOISTURE_IDX].data), &(transmitData[TEMPERATURE_IDX].data), &(transmitData[HUMIDITY_IDX].data), &(transmitData[PRESSURE_IDX].data), &(transmitData[ALTITUDE_IDX].data), &(transmitData[SUPPLY_VOLTAGE_IDX].data));
   
+  feed_watchdog(); 
 
   transmitTask_run(transmitData);
 
@@ -68,4 +80,33 @@ void upon_wake() {
   return;
 }
 
+void enter_deep_sleep() {
+  // Disable WiFi and Bluetooth to save power
+  WiFi.disconnect(true);
+  WiFi.mode(WIFI_OFF);
+  btStop();
+  
+  // Configure wake sources
+  esp_sleep_enable_timer_wakeup(time_to_sleep * uS_TO_S_FACTOR);
+  
+  // Power down peripherals to save battery
+  esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_OFF);
+  esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_SLOW_MEM, ESP_PD_OPTION_OFF);
+  esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_FAST_MEM, ESP_PD_OPTION_OFF);
+  
+  DEBUG_PRINTLN("Entering deep sleep...");
+  Serial.flush(); // Make sure debug message is sent
+  
+  esp_deep_sleep_start();
+}
+
+
+void setup_watchdog() {
+  esp_task_wdt_init(30, true); // 30 second timeout, panic on timeout
+  esp_task_wdt_add(NULL); // Add current task to watchdog
+}
+
+void feed_watchdog() {
+  esp_task_wdt_reset();
+}
 
