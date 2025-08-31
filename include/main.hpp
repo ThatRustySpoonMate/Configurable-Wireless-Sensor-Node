@@ -30,4 +30,7 @@ void setup_watchdog();
 void pat_watchdog();
 void enter_deep_sleep();
 
+inline void wake_led_on();
+inline void wake_led_off();
+
 #endif
