@@ -2,7 +2,7 @@
 #define CONFIGURATION_H
 
 // ========== POWER MANAGEMENT ==========
-#define DEFAULT_SLEEP_TIME_SECONDS 10           // Normal sleep time - time between readings
+#define DEFAULT_SLEEP_TIME_SECONDS 60           // Normal sleep time - time between readings
 #define LOW_BATTERY_SLEEP_TIME_SECONDS 300      // Sleep time when battery is low (5 minutes) - currently unimplemented
 #define VERY_LOW_BATTERY_SLEEP_TIME_SECONDS 600 // Sleep time when battery is very low (10 minutes) - currently unimplemented
 #define CPU_FREQUENCY_MHZ 80                    // Lower frequency saves power
@@ -18,7 +18,7 @@
 #define WATCHDOG_TIMEOUT_SECONDS 30            // 30 seconds before watchdog triggers
 
 // ========== MQTT CONFIGURATION ==========
-#define MQTT_TOPIC_LOCATION_SLUG "home/outside/garden"
+#define MQTT_TOPIC_LOCATION_SLUG "home/unconfigured"
 #define MQTT_TOPIC_LENGTH_MAX 100
 #define MQTT_TRANSMIT_TIME_BUFFER 750          // Amount of time after queueing last message to be sent before disconnecting and sleeping
 
@@ -44,6 +44,7 @@
 //#define DEVICE_BME280
 #define DEVICE_AHT20
 #define UPTIME_MONITORING   // Software feature
+#define WAKE_LED
 //#define SUPPLY_MONITORING // Resistor divider from supply to ADC Pin
 
 
@@ -67,6 +68,11 @@
 #define ADC_RESOLUTION_BITS 12
 #define ADC_MAX_VALUE 4095
 #define ESP32_ADC_REFERENCE_VOLTAGE 3.3f
+#endif
+
+// Wake LED configuration
+#ifdef WAKE_LED
+#define WAKE_LED_PIN LED_BUILTIN
 #endif
 
 // ========== DEBUG CONFIGURATION ==========

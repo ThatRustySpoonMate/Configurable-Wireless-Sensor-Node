@@ -36,8 +36,10 @@ void setup() {
   transmitTask_init();
   setup_mqtt(MQTT_BROKER_IP, MQTT_BROKER_PORT, DEVICE_ID, MQTT_TOPIC_MANAGEMENT);
   sensorTask_init();
-  pinMode(LED_BUILTIN, OUTPUT);
 
+  #ifdef WAKE_LED
+  pinMode(WAKE_LED_PIN, OUTPUT);
+  #endif
 }
 
 
@@ -50,14 +52,14 @@ void loop() {
 void upon_wake() {
 
   // LED On
-  digitalWrite(LED_BUILTIN, HIGH);
+  wake_led_on();
 
   pat_watchdog(); 
 
   // Connect to WIFI
   if (!setup_wifi_with_timeout(WIFI_SSID, WIFI_PASSWORD, WIFI_CONNECT_TIMEOUT_MS)) { // 30 second timeout
     DEBUG_PRINTLN("WiFi connection failed - entering deep sleep");
-    digitalWrite(LED_BUILTIN, LOW);
+    wake_led_off();
     enter_deep_sleep();
     return;
   }
@@ -67,7 +69,7 @@ void upon_wake() {
   // Connect to MQTT
   if (!mqtt_reconnect_with_timeout(MQTT_CONNECT_TIMEOUT_MS)) { // 10 second timeouts
     DEBUG_PRINTLN("MQTT connection failed - entering deep sleep");
-    digitalWrite(LED_BUILTIN, LOW);
+    wake_led_off();
     enter_deep_sleep();
     return;
   }
@@ -76,14 +78,12 @@ void upon_wake() {
 
   // Read all connected sensors
   readSensors(&(transmitData[SOIL_MOISTURE_IDX].data), &(transmitData[TEMPERATURE_IDX].data), &(transmitData[HUMIDITY_IDX].data), &(transmitData[PRESSURE_IDX].data), &(transmitData[ALTITUDE_IDX].data), &(transmitData[SUPPLY_VOLTAGE_IDX].data), &(transmitData[UPTIME_IDX].data) );
-  // Stub function alternative 
-  //stubReadSensors(&(transmitData[SOIL_MOISTURE_IDX].data), &(transmitData[TEMPERATURE_IDX].data), &(transmitData[HUMIDITY_IDX].data), &(transmitData[PRESSURE_IDX].data), &(transmitData[ALTITUDE_IDX].data), &(transmitData[SUPPLY_VOLTAGE_IDX].data), &(transmitData[UPTIME_IDX].data));
-  
+
   pat_watchdog(); 
 
   transmitTask_run(transmitData);
 
-  digitalWrite(LED_BUILTIN, LOW);
+  wake_led_off();
 
   return;
 }
@@ -128,3 +128,14 @@ void pat_watchdog() {
   esp_task_wdt_reset();
 }
 
+inline void wake_led_on() {
+  #ifdef WAKE_LED
+  digitalWrite(WAKE_LED_PIN, HIGH);
+  #endif
+}
+
+inline void wake_led_off() {
+  #ifdef WAKE_LED
+  digitalWrite(WAKE_LED_PIN, LOW);
+  #endif
+}
