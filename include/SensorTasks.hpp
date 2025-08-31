@@ -4,7 +4,6 @@
 #include "Arduino.h"
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
-#include <Adafruit_BME280.h>
 #include "MQTTTasks.hpp"
 #include "configuration.h"  // Added configuration include
 
@@ -29,21 +28,29 @@ typedef struct transmit_data_entry_s {
    Uncomment the devices you have in configuration.h:
    - DEVICE_BME280
    - DEVICE_SOIL_MOISTURE_SENSOR  
+   - DEVICE_AHT20
    - SUPPLY_MONITORING
 */
 
 /* Configure connected devices here */
 #ifdef DEVICE_SOIL_MOISTURE_SENSOR
-uint32_t init_soil_sensor();
+// No additional public config needed
 #endif
 
 #ifdef DEVICE_BME280
-// No additional config needed
+#include <Adafruit_BME280.h>
+// No additional public config needed
+#endif
+
+#ifdef DEVICE_AHT20
+#include <Adafruit_AHTX0.h>
+// No additional public config needed
 #endif
 
 #ifdef SUPPLY_MONITORING
-// No additional config needed
+// No additional public config needed
 #endif
+
 
 /* For other tasks to see what is connected */
 
@@ -52,6 +59,11 @@ uint32_t init_soil_sensor();
 #define HUMIDITY_SENSOR_CONNECTED
 #define PRESSURE_SENSOR_CONNECTED
 #define ALTITUDE_SENSOR_CONNECTED
+#endif
+
+#if defined(DEVICE_AHT20)
+#define TEMPERATURE_SENSOR_CONNECTED
+#define HUMIDITY_SENSOR_CONNECTED
 #endif
 
 #if defined(DEVICE_SOIL_MOISTURE_SENSOR)

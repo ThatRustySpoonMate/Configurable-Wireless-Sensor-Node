@@ -2,7 +2,7 @@
 #define CONFIGURATION_H
 
 // ========== POWER MANAGEMENT ==========
-#define DEFAULT_SLEEP_TIME_SECONDS 60           // Normal sleep time - time between readings
+#define DEFAULT_SLEEP_TIME_SECONDS 10           // Normal sleep time - time between readings
 #define LOW_BATTERY_SLEEP_TIME_SECONDS 300      // Sleep time when battery is low (5 minutes) - currently unimplemented
 #define VERY_LOW_BATTERY_SLEEP_TIME_SECONDS 600 // Sleep time when battery is very low (10 minutes) - currently unimplemented
 #define CPU_FREQUENCY_MHZ 80                    // Lower frequency saves power
@@ -41,7 +41,8 @@
 // ========== DEVICE CONFIGURATION ==========
 // Uncomment the devices you have connected
 //#define DEVICE_SOIL_MOISTURE_SENSOR
-#define DEVICE_BME280
+//#define DEVICE_BME280
+#define DEVICE_AHT20
 #define UPTIME_MONITORING   // Software feature
 //#define SUPPLY_MONITORING // Resistor divider from supply to ADC Pin
 
