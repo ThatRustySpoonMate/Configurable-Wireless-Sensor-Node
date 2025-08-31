@@ -1,7 +1,7 @@
 
 
 # Battery Life
-80mA when awake and reading sensors/publishing data
+80mA when awake and reading sensors/publishing data and wake_led
 4mA when in deep sleep
 
 # Connections
