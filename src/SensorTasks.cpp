@@ -10,6 +10,12 @@ uint32_t init_bme280();
 void read_bme280(transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *baroPres, transmit_data_t *altitude);
 #endif
 
+#ifdef DEVICE_AHT20
+Adafruit_AHTX0 aht20;
+uint32_t init_aht20();
+void read_aht20(transmit_data_t *temp, transmit_data_t *humidity);
+#endif
+
 #ifdef SUPPLY_MONITORING
 void init_supply_monitoring();
 void read_supply_voltage(transmit_data_t *voltage);
@@ -19,6 +25,7 @@ void read_supply_voltage(transmit_data_t *voltage);
 void setup_uptime();
 #endif
 
+
 void sensorTask_init() {
   
   #ifdef DEVICE_SOIL_MOISTURE_SENSOR
@@ -27,6 +34,10 @@ void sensorTask_init() {
 
   #ifdef DEVICE_BME280
   init_bme280();
+  #endif
+
+  #ifdef DEVICE_AHT20
+  init_aht20();
   #endif
 
   #ifdef SUPPLY_MONITORING
@@ -51,7 +62,7 @@ void stubReadSensors(transmit_data_t *moistureReading, transmit_data_t *temp, tr
   baroPres->data_f32 = random() % 65535;
   altitude->data_f32 = random() % 65535;
 
-  //device_uptime += (millis() / 1000);
+  device_uptime += (millis() / 1000);
   uptime->data_u32 = device_uptime;
 
   return;
@@ -70,6 +81,11 @@ void readSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transm
   read_bme280(temp, humidity, baroPres, altitude);
   #endif
 
+  /* Read values from DEVICE_AHT20 */
+  #ifdef DEVICE_AHT20
+  read_aht20(temp, humidity);
+  #endif
+
   /* Read supply voltage*/
   #ifdef SUPPLY_MONITORING
   read_supply_voltage(supply_v);
@@ -77,8 +93,7 @@ void readSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transm
 
   /* Get Uptime */
   #ifdef UPTIME_MONITORING
-  extern uint32_t device_uptime;
-  device_uptime += millis();
+  device_uptime += (millis() / 1000);
   uptime->data_u32 = device_uptime;
   #endif
 
@@ -91,6 +106,12 @@ void readSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transm
   
   return;
 }
+
+/*
+*   ---------------------
+*   SENSOR INIT FUNCTIONS
+*   --------------------- 
+*/
 
 uint32_t init_soil_sensor() {
   #ifdef DEVICE_SOIL_MOISTURE_SENSOR
@@ -108,9 +129,9 @@ uint32_t init_soil_sensor() {
 }
 
 
-
+// Returns 0 - Fail, 1 - Success, 2 - Uninitialized
 uint32_t init_bme280() {
-  uint32_t status = 0;
+  uint32_t status = 2;
 
   #ifdef DEVICE_BME280
 
@@ -131,22 +152,33 @@ uint32_t init_bme280() {
   return status;
 }
 
+// Returns 0 - Fail, 1 - Success, 2 - Uninitialized
+uint32_t init_aht20() {
+  uint32_t status = 2;
 
-void read_bme280(transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *baroPres, transmit_data_t *altitude) {
-  #ifdef DEVICE_BME280
+  #ifdef DEVICE_AHT20
 
-  temp->data_f32 = bme.readTemperature();
-  humidity->data_f32 = bme.readHumidity();
-  baroPres->data_f32 = bme.readPressure();
-  altitude->data_f32 = bme.readAltitude(SEALEVELPRESSURE_HPA);
+  Serial.println("Detected AHT20");
+  /* Initialize DEVICE_BME280 */
+
+  status = aht20.begin();  
+  if (!status) {
+      Serial.println("Could not find a valid AHT20 sensor, check wiring, address, sensor ID!");
+      Serial.print("SensorID status: "); Serial.println(aht20.getStatus(),16);
+      return status;
+  }
+
+  Serial.println("AHT20 successfully Initialized");
 
   #endif
 
-  return;
+  return status;
 }
 
 
-void init_supply_monitoring() {
+
+uint32_t init_supply_monitoring() {
+  uint32_t status = 2;
 
   #ifdef SUPPLY_MONITORING
 
@@ -154,9 +186,11 @@ void init_supply_monitoring() {
 
   analogReadResolution(12);
 
+  status = 1;
+
   #endif
 
-  return;
+  return status;
 
 }
 
@@ -181,6 +215,42 @@ void setup_uptime() {
     DEBUG_PRINT(device_uptime);
     DEBUG_PRINTLN(" seconds");
   }
+}
+
+
+/*
+*   ---------------------
+*   SENSOR READ FUNCTIONS
+*   --------------------- 
+*/
+
+
+void read_bme280(transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *baroPres, transmit_data_t *altitude) {
+  #ifdef DEVICE_BME280
+
+  temp->data_f32 = bme.readTemperature();
+  humidity->data_f32 = bme.readHumidity();
+  baroPres->data_f32 = bme.readPressure();
+  altitude->data_f32 = bme.readAltitude(SEALEVELPRESSURE_HPA);
+
+  #endif
+
+  return;
+}
+
+void read_aht20(transmit_data_t *temp, transmit_data_t *humidity) {
+  #ifdef DEVICE_AHT20
+
+  sensors_event_t humidityEvent, tempEvent;
+
+  aht20.getEvent(&humidityEvent, &tempEvent);
+
+  temp->data_f32 = tempEvent.temperature;
+  humidity->data_f32 = humidityEvent.relative_humidity; 
+
+  #endif
+
+  return;
 }
 
 
