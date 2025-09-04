@@ -21,13 +21,21 @@ uint32_t init_supply_monitoring();
 void read_supply_voltage(transmit_data_t *voltage);
 #endif
 
+#ifdef DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR
+uint32_t init_soil_sensor();
+void read_capacitive_soil_moisture_sensor();
+#endif
+
+#ifdef INTERNAL_ADC_SAMPLING
+uint32_t init_internal_adc_sampling();
+void read_internal_adc_pins(transmit_data_t *analog_pins);
+#endif
+
 #ifdef UPTIME_MONITORING
 void setup_uptime();
 #endif
 
-#ifdef DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR
-uint32_t init_soil_sensor();
-#endif
+
 
 
 void sensorTask_init() {
@@ -48,16 +56,19 @@ void sensorTask_init() {
   init_supply_monitoring();
   #endif
 
+  #ifdef INTERNAL_ADC_SAMPLING
+  init_internal_adc_sampling();
+  #endif
+
   #ifdef UPTIME_MONITORING
   setup_uptime();
   #endif
-
 
   return;
 }
 
 // Stub function allows for testing without any connected sensors
-void stubReadSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *baroPres, transmit_data_t *altitude, transmit_data_t *supply_v, transmit_data_t *uptime) {
+void stubReadSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *baroPres, transmit_data_t *altitude, transmit_data_t *supply_v, transmit_data_t *uptime, transmit_data_t *analog_pins) {
   randomSeed(analogRead(0));
 
   /* Read values from DEVICE_BME280 */
@@ -79,27 +90,28 @@ void stubReadSensors(transmit_data_t *moistureReading, transmit_data_t *temp, tr
   supply_v->data_u32[INTERNAL_SUPPLY_MONITORING_ID] = random() % 4200;
   #endif
 
+  // Read Capacitive Soil Moisture Sensor
+  #ifdef DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR
+  moistureReading->data_u16[SOIL_MOISTURE_ID] = random() % 65535;
+  #endif
+
+  #ifdef INTERNAL_ADC_SAMPLING
+  for(uint8_t i = 0; i < INTERNAL_ADC_PIN_COUNT; i++) {
+    analog_pins->data_u16[i] = random() % 4096;
+  }
+  #endif
+
   /* Get Uptime */
   #ifdef UPTIME_MONITORING
   device_uptime += (millis() / 1000);
   uptime->data_u32[0] = device_uptime;
   #endif
 
-  // Read Capacitive Soil Moisture Sensor
-  #ifdef DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR
-  moistureReading->data_u16[SOIL_MOISTURE_ID] = random() % 65535;
-  #endif
-
   return;
 }
 
 // Function that calls the read function of all connected sensors and packs the data correctly into the given transmit_data struct pointers
-void readSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *baroPres, transmit_data_t *altitude, transmit_data_t *supply_v, transmit_data_t *uptime) {
-
-  // Power up Soil sensor
-  #ifdef DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR
-  digitalWrite(CAPACITIVE_SOIL_MOISTURE_SENS_VCC_PIN, HIGH);
-  #endif
+void readSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *baroPres, transmit_data_t *altitude, transmit_data_t *supply_v, transmit_data_t *uptime, transmit_data_t *analog_pins) {
 
   /* Read values from DEVICE_BME280 */
   #ifdef DEVICE_BME280
@@ -116,17 +128,20 @@ void readSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transm
   read_supply_voltage(supply_v);
   #endif
 
-  /* Get Uptime */
-  #ifdef UPTIME_MONITORING
-  device_uptime += (millis() / 1000);
-  uptime->data_u32[0] = device_uptime;
+  /* Read internal ADC pins */
+  #ifdef INTERNAL_ADC_SAMPLING
+  read_internal_adc_pins(analog_pins);
   #endif
 
   // Allow time for startup of soil moisture sensor before taking reading
   #ifdef DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR
-  delay(CAPACITIVE_SOIL_MOISTURE_SETTLE_TIME_MS); 
-  moistureReading->data_u16[SOIL_MOISTURE_ID] = analogRead(CAPACITIVE_SOIL_MOISTURE_SENS_DIN_PIN);
-  digitalWrite(CAPACITIVE_SOIL_MOISTURE_SENS_VCC_PIN, LOW);  // Power down soil sensor
+  read_capacitive_soil_moisture_sensor(moistureReading);
+  #endif
+
+  /* Get Uptime */
+  #ifdef UPTIME_MONITORING
+  device_uptime += (millis() / 1000);
+  uptime->data_u32[0] = device_uptime;
   #endif
   
   return;
@@ -145,6 +160,7 @@ uint32_t init_soil_sensor() {
 
   /* Initialize soil moisture sensors */ 
   pinMode(CAPACITIVE_SOIL_MOISTURE_SENS_VCC_PIN, PULLDOWN);
+  pinMode(CAPACITIVE_SOIL_MOISTURE_SENS_DIN_PIN, INPUT); // Untested - 05/09/2025
 
   Serial.println("Soil sensor successfully initialized");
 
@@ -200,8 +216,6 @@ uint32_t init_aht20() {
   return status;
 }
 
-
-
 uint32_t init_supply_monitoring() {
   uint32_t status = 2;
 
@@ -217,6 +231,27 @@ uint32_t init_supply_monitoring() {
 
   return status;
 
+}
+
+uint32_t init_internal_adc_sampling() {
+  uint32_t status = 2;
+
+  #ifdef INTERNAL_ADC_SAMPLING
+
+  uint8_t adc_pins[] = INTERNAL_ADC_PINS;
+
+  // Set prescribed monitored pins to INPUT mode
+  for(uint8_t i = 0; i < INTERNAL_ADC_PIN_COUNT; i++) {
+    pinMode(adc_pins[i], INPUT);
+  }
+
+  analogReadResolution(12);
+
+  status = 1;
+
+  #endif
+
+  return status;
 }
 
 // Function that is called in setup (whenever core resets or wakes up)
@@ -278,6 +313,22 @@ void read_aht20(transmit_data_t *temp, transmit_data_t *humidity) {
   return;
 }
 
+void read_capacitive_soil_moisture_sensor(transmit_data_t *moisture) {
+    
+  #ifdef DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR
+  // Power up Soil sensor
+  digitalWrite(CAPACITIVE_SOIL_MOISTURE_SENS_VCC_PIN, HIGH);
+  delay(CAPACITIVE_SOIL_MOISTURE_SETTLE_TIME_MS); 
+
+  // Take reading - TODO: Use averaged function with CAPACITIVE_SOIL_MOISTURE_SAMPLES_TO_AVERAGE?
+  moisture->data_u16[SOIL_MOISTURE_ID] = analogRead(CAPACITIVE_SOIL_MOISTURE_SENS_DIN_PIN);
+
+  // Power down soil sensor
+  digitalWrite(CAPACITIVE_SOIL_MOISTURE_SENS_VCC_PIN, LOW);  
+
+    #endif
+}
+
 
 void read_supply_voltage(transmit_data_t *voltage) {
   //static float supply_reading_counts_to_mv = 10000.0 / 4095.0 * 3.3 * SUPPLY_MON_RDIV_RATIO / 10;
@@ -329,6 +380,26 @@ float get_battery_voltage_calibrated() {
   #else
   return 0.0f;
   #endif
+}
+
+
+void read_internal_adc_pins(transmit_data_t *analog_pins) {
+
+  #ifdef INTERNAL_ADC_SAMPLING
+
+  // Get prescribed ADC pins
+  uint8_t adc_pins[] = INTERNAL_ADC_PINS;
+
+  // Read each prescribed ADC pin
+  uint16_t thisReading = 0;
+  for(uint8_t i = 0; i < INTERNAL_ADC_PIN_COUNT; i++) {
+    thisReading = readADCAveraged(i, INTERNAL_ADC_SAMPLES_TO_AVERAGE);
+    analog_pins->data_u16[i] = thisReading;
+  }
+
+  #endif
+
+  return;
 }
 
 

@@ -21,6 +21,7 @@ typedef enum data_points_e {
     SOIL_MOISTURE_IDX,
     SUPPLY_VOLTAGE_IDX,
     UPTIME_IDX,
+    ANALOG_PINS_IDX,
 
     DATAPOINTS_NUM
 } data_points_t;

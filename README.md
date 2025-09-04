@@ -18,9 +18,10 @@ AHT20-SDA  : WEMOS 33
 Supports a maximum of:
  - Two temperature readings
  - Two Humidity Readings
- - Four Soil Moisture Sensor Readings
  - Two Pressure Sensor Readings
  - Two Altitude Sensor Readings
+ - Four Soil Moisture Sensor Readings
+ - Four Analog Pin readings @ 16 bits per reading
  - One Uptime reading
  - One Supply reading
 

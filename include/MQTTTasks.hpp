@@ -14,6 +14,7 @@ extern const char *MQTT_TOPIC_HUMIDITY;         // Example: "home/outside/garden
 extern const char *MQTT_TOPIC_PRESSURE;         // Example: "home/outside/garden/pressure"; 
 extern const char *MQTT_TOPIC_ALTITUDE;         // Example: "home/outside/garden/altitude";
 extern const char *MQTT_TOPIC_SUPPLY_VOLTAGE;   // Example: "home/outside/garden/supply-voltage";
+extern const char *MQTT_TOPIC_ANALOG_PINS;      // Example: "home/outside/garden/analog-pins";
 extern const char *MQTT_TOPIC_UPTIME;           // Example: "home/outside/garden/uptime";
 extern const char *MQTT_TOPIC_MANAGEMENT;       // Example: "manage/garden";
 

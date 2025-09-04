@@ -69,6 +69,16 @@ void transmitTask_run(transmit_data_entry_t transmitData[DATAPOINTS_NUM]) {
     }
   #endif
 
+  #ifdef INTERNAL_ADC_CONNECTED
+    // Transmit all internal ADC readings
+    uint8_t adc_pins[] = INTERNAL_ADC_PINS;
+    for (int i = 0; i < INTERNAL_ADC_PIN_COUNT; i++) {
+        readingStr = String(transmitData[ANALOG_PINS_IDX].data.data_u16[i]);
+        topicWithIndex = String(transmitData[ANALOG_PINS_IDX].topic) + "/" + String(adc_pins[i]);
+        mqtt_transmit(topicWithIndex.c_str(), readingStr.c_str());
+    }
+  #endif
+
   // Allow time to transmit message before disconnecting from MQTT
   delay(MQTT_TRANSMIT_TIME_BUFFER);
   mqtt_disconnect();

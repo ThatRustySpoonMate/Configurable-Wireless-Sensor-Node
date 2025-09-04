@@ -32,6 +32,7 @@
 #define PRESSURE_TOPIC_SUFFIX "/pressure"
 #define ALTITUDE_TOPIC_SUFFIX "/altitude"
 #define SUPPLY_VOLTAGE_TOPIC_SUFFIX "/supply-voltage"
+#define ANALOG_PINS_TOPIC_SUFFIX "/analog_pins"
 #define UPTIME_TOPIC_SUFFIX "/uptime"
 #define MANAGEMENT_TOPIC_SUFFIX "/manage/unconfigured"
 
@@ -51,7 +52,6 @@
 #define INTERNAL_ADC_SAMPLING 
 
 
-
 // ========== SENSOR CONFIGURATION ==========
 #define SEALEVELPRESSURE_HPA 1013.25f          // Standard sea level pressure hPa
 
@@ -60,6 +60,7 @@
 #define CAPACITIVE_SOIL_MOISTURE_SENS_VCC_PIN 7
 #define CAPACITIVE_SOIL_MOISTURE_SENS_DIN_PIN 8           // ADC1_CH4 for WEMOS S2 Mini
 #define CAPACITIVE_SOIL_MOISTURE_SETTLE_TIME_MS 1000      // Time to wait for sensor to stabilize
+#define CAPACITIVE_SOIL_MOISTURE_SAMPLES_TO_AVERAGE 4
 #endif
 
 // Supply Voltage Monitoring
@@ -82,7 +83,7 @@
 #ifdef INTERNAL_ADC_SAMPLING                    
 #define INTERNAL_ADC_PINS {0, 1, 3, 5}          // Currently supports a maximum of 4 readings
 #define INTERNAL_ADC_PIN_COUNT 4                // Currently supports a maximum of 4 readings
-#define INTERNAL_ADC_SAMPLES_TO_AVERAGE 8       // Acceptable values: 1-255
+#define INTERNAL_ADC_SAMPLES_TO_AVERAGE 8       // Per-pin, Acceptable values: 1-255
 #endif
 
 // ========== OUTPUT PACKET CONFIGURATION ==========
@@ -182,5 +183,5 @@
 #define ALTITUDE_SENSOR_COUNT (HAS_BME280)
 #define SOIL_MOISTURE_SENSOR_COUNT (HAS_CAPACITIVE_SOIL_MOISTURE)
 #define SUPPLY_MONITORING_SENSOR_COUNT (HAS_INTERNAL_SUPPLY_MONITORING)
-
+// Internal ADC count is derived from from number of pins
 #endif // CONFIGURATION_H
