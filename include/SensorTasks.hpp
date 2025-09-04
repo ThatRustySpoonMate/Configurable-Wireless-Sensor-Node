@@ -8,13 +8,13 @@
 #include "configuration.h"  // Added configuration include
 
 typedef union transmit_data_u {
-    uint8_t data_u8;
-    uint16_t data_u16;
-    uint32_t data_u32;
-    int8_t data_i8;
-    int16_t data_i16;
-    int32_t data_i32;
-    float data_f32;
+    uint8_t data_u8[8];
+    uint16_t data_u16[4];
+    uint32_t data_u32[2];
+    int8_t data_i8[8];
+    int16_t data_i16[4];
+    int32_t data_i32[2];
+    float data_f32[2];
     double data_d64;
 } transmit_data_t;
 
@@ -27,13 +27,13 @@ typedef struct transmit_data_entry_s {
 /* Device configuration moved to configuration.h 
    Uncomment the devices you have in configuration.h:
    - DEVICE_BME280
-   - DEVICE_SOIL_MOISTURE_SENSOR  
+   - DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR  
    - DEVICE_AHT20
-   - SUPPLY_MONITORING
+   - INTERNAL_SUPPLY_MONITORING
 */
 
 /* Configure connected devices here */
-#ifdef DEVICE_SOIL_MOISTURE_SENSOR
+#ifdef DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR
 // No additional public config needed
 #endif
 
@@ -47,31 +47,8 @@ typedef struct transmit_data_entry_s {
 // No additional public config needed
 #endif
 
-#ifdef SUPPLY_MONITORING
+#ifdef INTERNAL_SUPPLY_MONITORING
 // No additional public config needed
-#endif
-
-
-/* For other tasks to see what is connected */
-
-#if defined(DEVICE_BME280)
-#define TEMPERATURE_SENSOR_CONNECTED
-#define HUMIDITY_SENSOR_CONNECTED
-#define PRESSURE_SENSOR_CONNECTED
-#define ALTITUDE_SENSOR_CONNECTED
-#endif
-
-#if defined(DEVICE_AHT20)
-#define TEMPERATURE_SENSOR_CONNECTED
-#define HUMIDITY_SENSOR_CONNECTED
-#endif
-
-#if defined(DEVICE_SOIL_MOISTURE_SENSOR)
-#define SOIL_MOISTURE_SENSOR_CONNECTED
-#endif
-
-#ifdef SUPPLY_MONITORING
-#define SUPPLY_MONITORING_CONNECTED
 #endif
 
 
