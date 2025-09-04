@@ -23,7 +23,7 @@ void read_supply_voltage(transmit_data_t *voltage);
 
 #ifdef DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR
 uint32_t init_soil_sensor();
-void read_capacitive_soil_moisture_sensor();
+void read_capacitive_soil_moisture_sensor(transmit_data_t *moisture);
 #endif
 
 #ifdef INTERNAL_ADC_SAMPLING

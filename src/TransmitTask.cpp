@@ -9,6 +9,11 @@ void transmitTask_run(transmit_data_entry_t transmitData[DATAPOINTS_NUM]) {
   static String topicWithIndex;
   
   /* Convert readings to string objects then transmit them - only send data points for connected devices */
+
+  #ifdef UPTIME_MONITORING
+    readingStr = String(transmitData[UPTIME_IDX].data.data_u32[0]);
+    mqtt_transmit(transmitData[UPTIME_IDX].topic, readingStr.c_str());
+  #endif
   
   #ifdef SUPPLY_MONITORING_CONNECTED
   // Transmit all supply monitoring sensor readings
@@ -17,11 +22,6 @@ void transmitTask_run(transmit_data_entry_t transmitData[DATAPOINTS_NUM]) {
         topicWithIndex = String(transmitData[SUPPLY_VOLTAGE_IDX].topic) + "/" + String(i);
         mqtt_transmit(topicWithIndex.c_str(), readingStr.c_str());
     }
-  #endif
-
-  #ifdef UPTIME_MONITORING
-    readingStr = String(transmitData[UPTIME_IDX].data.data_u32[0]);
-    mqtt_transmit(transmitData[UPTIME_IDX].topic, readingStr.c_str());
   #endif
 
   #ifdef SOIL_MOISTURE_SENSOR_CONNECTED
