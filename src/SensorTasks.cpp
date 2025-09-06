@@ -1,7 +1,6 @@
 #include "SensorTasks.hpp"
 #include "main.hpp"
 #include "esp_sleep.h"
-#include <Adafruit_Sensor.h> // Maybe Remove?
 
 
 // Include individual sensor headers
