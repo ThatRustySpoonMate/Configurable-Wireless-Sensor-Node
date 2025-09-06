@@ -59,7 +59,7 @@ void upon_wake() {
 
   // Connect to WIFI
   if (!setup_wifi_with_timeout(WIFI_SSID, WIFI_PASSWORD, WIFI_CONNECT_TIMEOUT_MS)) { // 30 second timeout
-    DEBUG_PRINTLN("WiFi connection failed - entering deep sleep");
+    MY_DEBUG_PRINTLN("WiFi connection failed - entering deep sleep");
     wake_led_off();
     enter_deep_sleep();
     return;
@@ -69,7 +69,7 @@ void upon_wake() {
 
   // Connect to MQTT
   if (!mqtt_reconnect_with_timeout(MQTT_CONNECT_TIMEOUT_MS)) { // 10 second timeouts
-    DEBUG_PRINTLN("MQTT connection failed - entering deep sleep");
+    MY_DEBUG_PRINTLN("MQTT connection failed - entering deep sleep");
     wake_led_off();
     enter_deep_sleep();
     return;
@@ -117,7 +117,7 @@ void enter_deep_sleep() {
   esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_SLOW_MEM, ESP_PD_OPTION_OFF);
   esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_FAST_MEM, ESP_PD_OPTION_OFF);
   
-  DEBUG_PRINTLN("Entering deep sleep...");
+  MY_DEBUG_PRINTLN("Entering deep sleep...");
   Serial.flush(); // Make sure debug message is sent
   
   esp_deep_sleep_start();

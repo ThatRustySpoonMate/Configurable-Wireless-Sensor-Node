@@ -1,20 +1,42 @@
 #include "SensorTasks.hpp"
-#include "configuration.h"
 #include "main.hpp"
 #include "esp_sleep.h"
+#include <Adafruit_Sensor.h>
 
 
 #ifdef DEVICE_BME280
+#include <Sensors/bme280.h>
 Adafruit_BME280 bme; // I2C
 uint32_t init_bme280();
 void read_bme280(transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *baroPres, transmit_data_t *altitude);
 #endif
 
 #ifdef DEVICE_AHT20
+#include <Adafruit_AHTX0.h>
 Adafruit_AHTX0 aht20;
 uint32_t init_aht20();
 void read_aht20(transmit_data_t *temp, transmit_data_t *humidity);
 #endif
+
+#if defined(DEVICE_DHT11) || defined(DEVICE_DHT21) || defined(DEVICE_DHT22)
+#include <DHT.h>
+#include <DHT_U.h>
+uint32_t init_dht_unified();
+void read_dht_unified(transmit_data_t *temp, transmit_data_t *humidity);
+#endif
+
+#ifdef DEVICE_DHT11
+DHT_Unified dht11(DHT11_OUT_PIN, DHT11);
+#endif
+
+#ifdef DEVICE_DHT21
+DHT_Unified dht21(DHT21_OUT_PIN, DHT21);
+#endif
+
+#ifdef DEVICE_DHT22
+DHT_Unified dht22(DHT21_OUT_PIN, DHT22);
+#endif
+
 
 #ifdef INTERNAL_SUPPLY_MONITORING
 uint32_t init_supply_monitoring();
@@ -36,8 +58,6 @@ void setup_uptime();
 #endif
 
 
-
-
 void sensorTask_init() {
   
   #ifdef DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR
@@ -50,6 +70,10 @@ void sensorTask_init() {
 
   #ifdef DEVICE_AHT20
   init_aht20();
+  #endif
+
+  #if defined(DEVICE_DHT11) ||  defined(DEVICE_DHT21) || defined(DEVICE_DHT22)
+  init_dht_unified();
   #endif
 
   #ifdef INTERNAL_SUPPLY_MONITORING
@@ -123,6 +147,10 @@ void readSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transm
   read_aht20(temp, humidity);
   #endif
 
+  #if defined(DEVICE_DHT11) ||  defined(DEVICE_DHT21) || defined(DEVICE_DHT22)
+  read_dht_unified(temp, humidity);
+  #endif
+
   /* Read supply voltage*/
   #ifdef INTERNAL_SUPPLY_MONITORING
   read_supply_voltage(supply_v);
@@ -178,7 +206,7 @@ uint32_t init_bme280() {
 
   Serial.println("Detected BME280");
   /* Initialize DEVICE_BME280 */
-  status = bme.begin();  
+  status = bme.begin(BME280_ADDR); // Added address
   if (!status) {
       Serial.println("Could not find a valid BME280 sensor, check wiring, address, sensor ID!");
       Serial.print("SensorID was: 0x"); Serial.println(bme.sensorID(),16);
@@ -215,6 +243,40 @@ uint32_t init_aht20() {
 
   return status;
 }
+
+uint32_t init_dht_unified() {
+  uint32_t status = 2;
+
+  #ifdef DEVICE_DHT11
+
+  Serial.println("Detected DHT11");
+  /* Initialize DEVICE_DHT11 */
+
+  dht11.begin();
+
+  Serial.println("DHT11 successfully Initialized");
+
+  #endif
+
+  #ifdef DEVICE_DHT21
+  /* Initialize DEVICE_DHT21 */
+
+  dht21.begin();
+
+  Serial.println("DHT21 successfully Initialized");
+  #endif
+
+  #ifdef DEVICE_DHT22
+  /* Initialize DEVICE_DHT22 */
+
+  dht22.begin();
+
+  Serial.println("DHT22 successfully Initialized");
+  #endif
+
+  return status;
+}
+
 
 uint32_t init_supply_monitoring() {
   uint32_t status = 2;
@@ -267,13 +329,13 @@ void setup_uptime() {
     // This is a power-on reset, brownout, or external reset - reset uptime
     device_uptime = 0;
     preferences.putULong(UPTIME_KEY, 0);
-    DEBUG_PRINTLN("Power-on reset detected - uptime reset to 0");
+    MY_DEBUG_PRINTLN("Power-on reset detected - uptime reset to 0");
   } else {
     // This is a wake from deep sleep - load saved uptime
     device_uptime = preferences.getULong(UPTIME_KEY, 0);
-    DEBUG_PRINT("Wake from deep sleep - loaded uptime: ");
-    DEBUG_PRINT(device_uptime);
-    DEBUG_PRINTLN(" seconds");
+    MY_DEBUG_PRINT("Wake from deep sleep - loaded uptime: ");
+    MY_DEBUG_PRINT(device_uptime);
+    MY_DEBUG_PRINTLN(" seconds");
   }
 }
 
@@ -307,6 +369,76 @@ void read_aht20(transmit_data_t *temp, transmit_data_t *humidity) {
 
   temp->data_f32[AHT20_TEMPERATURE_ID] = tempEvent.temperature;
   humidity->data_f32[AHT20_HUMIDITY_ID] = humidityEvent.relative_humidity; 
+
+  #endif
+
+  return;
+}
+
+
+void read_dht_unified(transmit_data_t *temp, transmit_data_t *humidity) {
+  sensors_event_t event;
+  
+  #ifdef DEVICE_DHT11
+
+  dht11.temperature().getEvent(&event);
+  if (isnan(event.temperature)) {
+    MY_DEBUG_PRINTLN(F("Error reading temperature from DHT11!"));
+  }
+  else {
+    temp->data_f32[DHT11_TEMPERATURE_ID] = event.temperature;
+  }
+
+  // Get humidity event and print its value.
+  dht11.humidity().getEvent(&event);
+  if (isnan(event.relative_humidity)) {
+    MY_DEBUG_PRINTLN(F("Error reading humidity!"));
+  }
+  else {
+    humidity->data_f32[DHT11_HUMIDITY_ID] = event.relative_humidity;
+  }
+
+  #endif
+
+  #ifdef DEVICE_DHT21
+
+  dht21.temperature().getEvent(&event);
+  if (isnan(event.temperature)) {
+    MY_DEBUG_PRINTLN(F("Error reading temperature from DHT21!"));
+  }
+  else {
+    temp->data_f32[DHT21_TEMPERATURE_ID] = event.temperature;
+  }
+
+  // Get humidity event and print its value.
+  dht21.humidity().getEvent(&event);
+  if (isnan(event.relative_humidity)) {
+    MY_DEBUG_PRINTLN(F("Error reading humidity!"));
+  }
+  else {
+    humidity->data_f32[DHT21_HUMIDITY_ID] = event.relative_humidity;
+  }
+
+  #endif
+
+  #ifdef DEVICE_DHT22
+
+  dht22.temperature().getEvent(&event);
+  if (isnan(event.temperature)) {
+    MY_DEBUG_PRINTLN(F("Error reading temperature!"));
+  }
+  else {
+    temp->data_f32[DHT22_TEMPERATURE_ID] = event.temperature;
+  }
+
+  // Get humidity event and print its value.
+  dht22.humidity().getEvent(&event);
+  if (isnan(event.relative_humidity)) {
+    MY_DEBUG_PRINTLN(F("Error reading humidity from DHT22!"));
+  }
+  else {
+    humidity->data_f32[DHT22_HUMIDITY_ID] = event.relative_humidity;
+  }
 
   #endif
 
@@ -359,17 +491,17 @@ float get_battery_voltage_calibrated() {
   
   // Add low battery detection and power management
   if (voltage < AGGRESSIVE_POWER_SAVE_THRESHOLD_V) {
-    DEBUG_PRINTLN("LOW BATTERY WARNING!");
-    DEBUG_PRINT("Battery voltage: ");
-    DEBUG_PRINTLN(voltage);
+    MY_DEBUG_PRINTLN("LOW BATTERY WARNING!");
+    MY_DEBUG_PRINT("Battery voltage: ");
+    MY_DEBUG_PRINTLN(voltage);
     
     // Extend sleep time to conserve power
     if (time_to_sleep < VERY_LOW_BATTERY_SLEEP_TIME_SECONDS) {
       time_to_sleep = VERY_LOW_BATTERY_SLEEP_TIME_SECONDS;
-      DEBUG_PRINTLN("Extended sleep time due to low battery");
+      MY_DEBUG_PRINTLN("Extended sleep time due to low battery");
     }
   } else if (voltage < MODERATE_POWER_SAVE_THRESHOLD_V) {
-    DEBUG_PRINTLN("Battery getting low");
+    MY_DEBUG_PRINTLN("Battery getting low");
     // Moderate power saving
     if (time_to_sleep < LOW_BATTERY_SLEEP_TIME_SECONDS) {
       time_to_sleep = LOW_BATTERY_SLEEP_TIME_SECONDS;

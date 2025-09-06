@@ -2,7 +2,7 @@
 #define CONFIGURATION_H
 
 // ========== SIMULATION MODE ==========
-#define SIMULATION_MODE true // Change to true to simulate connected devices (the ones you specify down below)
+#define SIMULATION_MODE false                   // Change to true to simulate connected devices (the ones you specify down below)
 
 // ========== POWER MANAGEMENT ==========
 #define DEFAULT_SLEEP_TIME_SECONDS 60           // Normal sleep time - time between readings
@@ -11,19 +11,19 @@
 #define CPU_FREQUENCY_MHZ 80                    // Lower frequency saves power
 
 // ========== BATTERY MONITORING ==========
-#define MODERATE_POWER_SAVE_THRESHOLD_V 3.0f           // Voltage to trigger power saving
-#define AGGRESSIVE_POWER_SAVE_THRESHOLD_V 2.7f      // Voltage to trigger aggressive power saving
-#define BATTERY_ADC_SAMPLES 16                 // Number of ADC samples to average
+#define MODERATE_POWER_SAVE_THRESHOLD_V 3.0f    // Voltage to trigger power saving
+#define AGGRESSIVE_POWER_SAVE_THRESHOLD_V 2.7f  // Voltage to trigger aggressive power saving
+#define BATTERY_ADC_SAMPLES 16                  // Number of ADC samples to average
 
 // ========== CONNECTION TIMEOUTS ==========
-#define WIFI_CONNECT_TIMEOUT_MS 30000          // 30 seconds
-#define MQTT_CONNECT_TIMEOUT_MS 10000          // 10 seconds
-#define WATCHDOG_TIMEOUT_SECONDS 30            // 30 seconds before watchdog triggers
+#define WIFI_CONNECT_TIMEOUT_MS 30000           // 30 seconds
+#define MQTT_CONNECT_TIMEOUT_MS 10000           // 10 seconds
+#define WATCHDOG_TIMEOUT_SECONDS 30             // 30 seconds before watchdog triggers
 
 // ========== MQTT CONFIGURATION ==========
-#define MQTT_TOPIC_LOCATION_SLUG "home/downstairs/simulated"
+#define MQTT_TOPIC_LOCATION_SLUG "home/downstairs/testing"
 #define MQTT_TOPIC_LENGTH_MAX 100
-#define MQTT_TRANSMIT_TIME_BUFFER 750          // Amount of time after queueing last message to be sent before disconnecting and sleeping
+#define MQTT_TRANSMIT_TIME_BUFFER 750           // Amount of time after queueing last message to be sent before disconnecting and sleeping
 
 // MQTT Topic suffixes
 #define MOISTURE_TOPIC_SUFFIX "/moisture"
@@ -44,12 +44,15 @@
 // ========== DEVICE CONFIGURATION ==========
 // Uncomment the devices you have connected
 #define DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR
-#define DEVICE_BME280
-#define DEVICE_AHT20
-#define UPTIME_MONITORING   // Software feature
-#define WAKE_LED
-#define INTERNAL_SUPPLY_MONITORING // Resistor divider from supply to ADC Pin
-#define INTERNAL_ADC_SAMPLING 
+//#define DEVICE_BME280
+//#define DEVICE_AHT20
+#define DEVICE_DHT11
+//#define DEVICE_DHT21
+//#define DEVICE_DHT22
+#define UPTIME_MONITORING            // Software feature
+#define WAKE_LED                     // Toggle an LED on during wake and off during sleep
+#define INTERNAL_SUPPLY_MONITORING   // Resistor divider from supply to ADC Pin
+//#define INTERNAL_ADC_SAMPLING 
 
 
 // ========== SENSOR CONFIGURATION ==========
@@ -80,10 +83,31 @@
 #define WAKE_LED_PIN LED_BUILTIN
 #endif
 
+// Internal ADC configuration
 #ifdef INTERNAL_ADC_SAMPLING                    
 #define INTERNAL_ADC_PINS {0, 1, 3, 5}          // Currently supports a maximum of 4 readings
 #define INTERNAL_ADC_PIN_COUNT 4                // Currently supports a maximum of 4 readings
 #define INTERNAL_ADC_SAMPLES_TO_AVERAGE 8       // Per-pin, Acceptable values: 1-255
+#endif
+
+// BME280 Sensor Configuration
+#ifdef DEVICE_BME280
+#define BME280_ADDR 0x76            // 0x76 or 0x77
+#endif
+
+// DHT11 Sensor Configuration
+#ifdef DEVICE_DHT11
+#define DHT11_OUT_PIN 13            // Data Out pin of DHT11
+#endif
+
+// DHT21 Sensor Configuration
+#ifdef DEVICE_DHT21
+#define DHT21_OUT_PIN 13            // Data Out pin of DHT21
+#endif
+
+// DHT22 Sensor Configuration
+#ifdef DEVICE_DHT22
+#define DHT22_OUT_PIN 13            // Data Out pin of DHT22
 #endif
 
 // ========== OUTPUT PACKET CONFIGURATION ==========
@@ -97,8 +121,8 @@
 #endif
 
 #if defined(DEVICE_AHT20)
-#define AHT20_TEMPERATURE_ID 1
-#define AHT20_HUMIDITY_ID 1
+#define AHT20_TEMPERATURE_ID 0
+#define AHT20_HUMIDITY_ID 0
 #endif
 
 #if defined(DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR)
@@ -111,6 +135,21 @@
 
 #if defined(INTERNAL_ADC_SAMPLING)
 // Packet config derived from number of pins and order of the array
+#endif
+
+#if defined(DEVICE_DHT11)
+#define DHT11_TEMPERATURE_ID 0
+#define DHT11_HUMIDITY_ID 0
+#endif
+
+#if defined(DEVICE_DHT21)
+#define DHT21_TEMPERATURE_ID 0
+#define DHT21_HUMIDITY_ID 0
+#endif
+
+#if defined(DEVICE_DHT22)
+#define DHT22_TEMPERATURE_ID 0
+#define DHT22_HUMIDITY_ID 0
 #endif
 
 
@@ -152,6 +191,30 @@
 #define HAS_AHT20 0
 #endif
 
+#if defined(DEVICE_DHT11)
+#define TEMPERATURE_SENSOR_CONNECTED
+#define HUMIDITY_SENSOR_CONNECTED
+#define HAS_DHT11 1
+#else
+#define HAS_DHT11 0
+#endif
+
+#if defined(DEVICE_DHT21)
+#define TEMPERATURE_SENSOR_CONNECTED
+#define HUMIDITY_SENSOR_CONNECTED
+#define HAS_DHT21 1
+#else
+#define HAS_DHT21 0
+#endif
+
+#if defined(DEVICE_DHT22)
+#define TEMPERATURE_SENSOR_CONNECTED
+#define HUMIDITY_SENSOR_CONNECTED
+#define HAS_DHT22 1
+#else
+#define HAS_DHT22 0
+#endif
+
 #if defined(DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR)
 #define SOIL_MOISTURE_SENSOR_CONNECTED
 #define HAS_CAPACITIVE_SOIL_MOISTURE 1
@@ -177,8 +240,8 @@
 
 // ========== SENSOR COUNT CALCULATIONS ==========
 // Temperature sensors
-#define TEMPERATURE_SENSOR_COUNT (HAS_BME280 + HAS_AHT20)
-#define HUMIDITY_SENSOR_COUNT (HAS_BME280 + HAS_AHT20)
+#define TEMPERATURE_SENSOR_COUNT (HAS_BME280 + HAS_AHT20 + HAS_DHT11 + HAS_DHT21 + HAS_DHT22)
+#define HUMIDITY_SENSOR_COUNT (HAS_BME280 + HAS_AHT20 + HAS_DHT11 + HAS_DHT21 + HAS_DHT22)
 #define PRESSURE_SENSOR_COUNT (HAS_BME280)
 #define ALTITUDE_SENSOR_COUNT (HAS_BME280)
 #define SOIL_MOISTURE_SENSOR_COUNT (HAS_CAPACITIVE_SOIL_MOISTURE)

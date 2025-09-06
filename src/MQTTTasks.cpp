@@ -81,16 +81,16 @@ void mqtt_keep_alive() {
 void mqtt_reconnect() {
   // Loop until we're reconnected
   while (!client.connected()) {
-    DEBUG_PRINT("Attempting MQTT connection...");
+    MY_DEBUG_PRINT("Attempting MQTT connection...");
     // Attempt to connect
     if (client.connect(DEVICE_NAME)) {
-      DEBUG_PRINTLN("connected");
+      MY_DEBUG_PRINTLN("connected");
       // Subscribe
       client.subscribe(RX_TOPIC);
     } else {
-      DEBUG_PRINT("failed, rc=");
-      DEBUG_PRINT(client.state());
-      DEBUG_PRINTLN(" try again in 5 seconds");
+      MY_DEBUG_PRINT("failed, rc=");
+      MY_DEBUG_PRINT(client.state());
+      MY_DEBUG_PRINTLN(" try again in 5 seconds");
       // Wait 5 seconds before retrying
       delay(5000);
     }
@@ -103,16 +103,16 @@ bool mqtt_reconnect_with_timeout(uint32_t timeout_ms) {
   uint32_t start_time = millis();
   
   while (!client.connected() && (millis() - start_time < timeout_ms)) {
-    DEBUG_PRINTLN("Attempting MQTT connection...");
+    MY_DEBUG_PRINTLN("Attempting MQTT connection...");
     
     if (client.connect(DEVICE_NAME)) {
-      DEBUG_PRINTLN("MQTT connected");
+      MY_DEBUG_PRINTLN("MQTT connected");
       client.subscribe(RX_TOPIC);
       return true;
     }
     
-    DEBUG_PRINT("MQTT failed, rc=");
-    DEBUG_PRINTLN(client.state());
+    MY_DEBUG_PRINT("MQTT failed, rc=");
+    MY_DEBUG_PRINTLN(client.state());
     delay(1000);
     
     // Feed watchdog during connection attempt
@@ -120,7 +120,7 @@ bool mqtt_reconnect_with_timeout(uint32_t timeout_ms) {
     pat_watchdog();
   }
   
-  DEBUG_PRINTLN("MQTT connection timeout");
+  MY_DEBUG_PRINTLN("MQTT connection timeout");
   return false; // Timeout reached
 }
 
@@ -128,29 +128,29 @@ bool mqtt_reconnect_with_timeout(uint32_t timeout_ms) {
 void message_rx_callback(char* topic, byte* message, unsigned int length) {
   String messageTemp;
 
-  DEBUG_PRINT("Message arrived on topic: ");
-  DEBUG_PRINT(topic);
-  DEBUG_PRINT(". Message: ");
+  MY_DEBUG_PRINT("Message arrived on topic: ");
+  MY_DEBUG_PRINT(topic);
+  MY_DEBUG_PRINT(". Message: ");
 
   
   for (int i = 0; i < length; i++) {
-    DEBUG_PRINT((char)message[i]);
+    MY_DEBUG_PRINT((char)message[i]);
     
     messageTemp += (char)message[i];
   }
-  DEBUG_PRINTLN("");
+  MY_DEBUG_PRINTLN("");
   
   
 
   // If a message is received on the topic esp32/output, you check if the message is either "on" or "off". 
   // Changes the output state according to the message
   // if (String(topic) == RX_TOPIC) {
-  //   DEBUG_PRINT("Changing output to ");
+  //   MY_DEBUG_PRINT("Changing output to ");
   //   if(messageTemp == "on"){
-  //     DEBUG_PRINTLN("on");
+  //     MY_DEBUG_PRINTLN("on");
   //   }
   //   else if(messageTemp == "off"){
-  //     DEBUG_PRINTLN("off");
+  //     MY_DEBUG_PRINTLN("off");
   //   }
   // }
 

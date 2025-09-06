@@ -3,9 +3,8 @@
 
 #include "Arduino.h"
 #include <Wire.h>
-#include <Adafruit_Sensor.h>
 #include "MQTTTasks.hpp"
-#include "configuration.h"  // Added configuration include
+#include "configuration.h"
 
 typedef union transmit_data_u {
     uint8_t data_u8[8];
@@ -38,17 +37,22 @@ typedef struct transmit_data_entry_s {
 #endif
 
 #ifdef DEVICE_BME280
-#include <Adafruit_BME280.h>
+#include <Sensors/bme280.h>
 // No additional public config needed
 #endif
 
 #ifdef DEVICE_AHT20
-#include <Adafruit_AHTX0.h>
+#include <Sensors/aht20.h>
 // No additional public config needed
 #endif
 
 #ifdef INTERNAL_SUPPLY_MONITORING
 // No additional public config needed
+#endif
+
+#if defined(DEVICE_DHT11) || defined(DEVICE_DHT21) || defined(DEVICE_DHT22)
+// No additional public config needed
+#include <Sensors/dht_family.h>
 #endif
 
 

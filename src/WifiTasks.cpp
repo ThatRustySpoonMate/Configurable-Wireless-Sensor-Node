@@ -3,27 +3,27 @@
 
 void setup_wifi(const char *ssid, const char *password) {
   // We start by connecting to a WiFi network
-  DEBUG_PRINTLN();
-  DEBUG_PRINT("Connecting to ");
-  DEBUG_PRINTLN(ssid);
+  MY_DEBUG_PRINTLN();
+  MY_DEBUG_PRINT("Connecting to ");
+  MY_DEBUG_PRINTLN(ssid);
 
   WiFi.begin(ssid, password);
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    DEBUG_PRINT(".");
+    MY_DEBUG_PRINT(".");
   }
 
-  DEBUG_PRINTLN("");
-  DEBUG_PRINTLN("WiFi connected");
-  DEBUG_PRINTLN("IP address: ");
-  DEBUG_PRINTLN(WiFi.localIP());
+  MY_DEBUG_PRINTLN("");
+  MY_DEBUG_PRINTLN("WiFi connected");
+  MY_DEBUG_PRINTLN("IP address: ");
+  MY_DEBUG_PRINTLN(WiFi.localIP());
 }
 
 bool setup_wifi_with_timeout(const char *ssid, const char *password, uint32_t timeout_ms) {
-  DEBUG_PRINTLN();
-  DEBUG_PRINT("Connecting to ");
-  DEBUG_PRINTLN(ssid);
+  MY_DEBUG_PRINTLN();
+  MY_DEBUG_PRINT("Connecting to ");
+  MY_DEBUG_PRINTLN(ssid);
 
   WiFi.begin(ssid, password);
   
@@ -31,7 +31,7 @@ bool setup_wifi_with_timeout(const char *ssid, const char *password, uint32_t ti
   
   while (WiFi.status() != WL_CONNECTED && (millis() - start_time < timeout_ms)) {
     delay(500);
-    DEBUG_PRINT(".");
+    MY_DEBUG_PRINT(".");
     
     // Feed watchdog during connection attempt
     extern void pat_watchdog();
@@ -39,14 +39,14 @@ bool setup_wifi_with_timeout(const char *ssid, const char *password, uint32_t ti
   }
 
   if (WiFi.status() == WL_CONNECTED) {
-    DEBUG_PRINTLN("");
-    DEBUG_PRINTLN("WiFi connected");
-    DEBUG_PRINTLN("IP address: ");
-    DEBUG_PRINTLN(WiFi.localIP());
+    MY_DEBUG_PRINTLN("");
+    MY_DEBUG_PRINTLN("WiFi connected");
+    MY_DEBUG_PRINTLN("IP address: ");
+    MY_DEBUG_PRINTLN(WiFi.localIP());
     return true;
   } else {
-    DEBUG_PRINTLN("");
-    DEBUG_PRINTLN("WiFi connection timeout");
+    MY_DEBUG_PRINTLN("");
+    MY_DEBUG_PRINTLN("WiFi connection timeout");
     return false;
   }
 }

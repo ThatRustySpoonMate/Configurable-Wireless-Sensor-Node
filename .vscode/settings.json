@@ -3,6 +3,16 @@
         "array": "cpp",
         "string": "cpp",
         "string_view": "cpp",
-        "random": "cpp"
+        "random": "cpp",
+        "deque": "cpp",
+        "unordered_map": "cpp",
+        "unordered_set": "cpp",
+        "vector": "cpp",
+        "initializer_list": "cpp",
+        "cmath": "cpp",
+        "dht_family.h": "c",
+        "bme280.h": "c",
+        "adafruit_bme280.h": "c",
+        "configuration.h": "c"
     }
 }
