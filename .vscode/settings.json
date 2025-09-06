@@ -13,6 +13,9 @@
         "dht_family.h": "c",
         "bme280.h": "c",
         "adafruit_bme280.h": "c",
-        "configuration.h": "c"
+        "configuration.h": "c",
+        "sensortasks.hpp": "c",
+        "aht20.h": "c",
+        "arduino.h": "c"
     }
 }

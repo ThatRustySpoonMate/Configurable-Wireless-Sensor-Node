@@ -23,39 +23,6 @@ typedef struct transmit_data_entry_s {
 
 } transmit_data_entry_t;
 
-/* Device configuration moved to configuration.h 
-   Uncomment the devices you have in configuration.h:
-   - DEVICE_BME280
-   - DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR  
-   - DEVICE_AHT20
-   - INTERNAL_SUPPLY_MONITORING
-*/
-
-/* Configure connected devices here */
-#ifdef DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR
-// No additional public config needed
-#endif
-
-#ifdef DEVICE_BME280
-#include <Sensors/bme280.h>
-// No additional public config needed
-#endif
-
-#ifdef DEVICE_AHT20
-#include <Sensors/aht20.h>
-// No additional public config needed
-#endif
-
-#ifdef INTERNAL_SUPPLY_MONITORING
-// No additional public config needed
-#endif
-
-#if defined(DEVICE_DHT11) || defined(DEVICE_DHT21) || defined(DEVICE_DHT22)
-// No additional public config needed
-#include <Sensors/dht_family.h>
-#endif
-
-
 void sensorTask_init();
 
 void stubReadSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *baroPres, transmit_data_t *altitude, transmit_data_t *supply_v, transmit_data_t *uptime, transmit_data_t *analog_pins);

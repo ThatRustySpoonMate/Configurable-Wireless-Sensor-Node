@@ -1,56 +1,32 @@
 #include "SensorTasks.hpp"
 #include "main.hpp"
 #include "esp_sleep.h"
-#include <Adafruit_Sensor.h>
+#include <Adafruit_Sensor.h> // Maybe Remove?
 
 
+// Include individual sensor headers
 #ifdef DEVICE_BME280
-#include <Sensors/bme280.h>
-Adafruit_BME280 bme; // I2C
-uint32_t init_bme280();
-void read_bme280(transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *baroPres, transmit_data_t *altitude);
+#include "Sensors/bme280.hpp"
 #endif
 
 #ifdef DEVICE_AHT20
-#include <Adafruit_AHTX0.h>
-Adafruit_AHTX0 aht20;
-uint32_t init_aht20();
-void read_aht20(transmit_data_t *temp, transmit_data_t *humidity);
+#include "Sensors/aht20.hpp"
 #endif
 
 #if defined(DEVICE_DHT11) || defined(DEVICE_DHT21) || defined(DEVICE_DHT22)
-#include <DHT.h>
-#include <DHT_U.h>
-uint32_t init_dht_unified();
-void read_dht_unified(transmit_data_t *temp, transmit_data_t *humidity);
+#include "Sensors/dht_family.hpp"
 #endif
-
-#ifdef DEVICE_DHT11
-DHT_Unified dht11(DHT11_OUT_PIN, DHT11);
-#endif
-
-#ifdef DEVICE_DHT21
-DHT_Unified dht21(DHT21_OUT_PIN, DHT21);
-#endif
-
-#ifdef DEVICE_DHT22
-DHT_Unified dht22(DHT21_OUT_PIN, DHT22);
-#endif
-
 
 #ifdef INTERNAL_SUPPLY_MONITORING
-uint32_t init_supply_monitoring();
-void read_supply_voltage(transmit_data_t *voltage);
+#include "Sensors/supply_monitor.hpp"
 #endif
 
 #ifdef DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR
-uint32_t init_soil_sensor();
-void read_capacitive_soil_moisture_sensor(transmit_data_t *moisture);
+#include "Sensors/capacitive_soil_moisture.hpp"
 #endif
 
 #ifdef INTERNAL_ADC_SAMPLING
-uint32_t init_internal_adc_sampling();
-void read_internal_adc_pins(transmit_data_t *analog_pins);
+#include "Sensors/adc_sampling.hpp"
 #endif
 
 #ifdef UPTIME_MONITORING
@@ -107,6 +83,21 @@ void stubReadSensors(transmit_data_t *moistureReading, transmit_data_t *temp, tr
   #ifdef DEVICE_AHT20
   temp->data_f32[AHT20_TEMPERATURE_ID] = random() % 65535;
   humidity->data_f32[AHT20_HUMIDITY_ID] = random() % 65535;
+  #endif
+
+  #ifdef DEVICE_DHT11
+  temp->data_f32[DHT11_TEMPERATURE_ID] = random() % 65535;
+  humidity->data_f32[DHT11_HUMIDITY_ID] = random() % 65535;
+  #endif
+
+  #ifdef DEVICE_DHT21
+  temp->data_f32[DHT21_TEMPERATURE_ID] = random() % 65535;
+  humidity->data_f32[DHT21_HUMIDITY_ID] = random() % 65535;
+  #endif
+
+  #ifdef DEVICE_DHT22
+  temp->data_f32[DHT22_TEMPERATURE_ID] = random() % 65535;
+  humidity->data_f32[DHT22_HUMIDITY_ID] = random() % 65535;
   #endif
 
   /* Read supply voltage*/
@@ -175,146 +166,12 @@ void readSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transm
   return;
 }
 
+
 /*
 *   ---------------------
 *   SENSOR INIT FUNCTIONS
 *   --------------------- 
 */
-
-uint32_t init_soil_sensor() {
-  #ifdef DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR
-
-  Serial.println("Detected Soil Sensor");
-
-  /* Initialize soil moisture sensors */ 
-  pinMode(CAPACITIVE_SOIL_MOISTURE_SENS_VCC_PIN, PULLDOWN);
-  pinMode(CAPACITIVE_SOIL_MOISTURE_SENS_DIN_PIN, INPUT); // Untested - 05/09/2025
-
-  Serial.println("Soil sensor successfully initialized");
-
-  #endif
-
-  return 0;
-}
-
-
-// Returns 0 - Fail, 1 - Success, 2 - Uninitialized
-uint32_t init_bme280() {
-  uint32_t status = 2;
-
-  #ifdef DEVICE_BME280
-
-  Serial.println("Detected BME280");
-  /* Initialize DEVICE_BME280 */
-  status = bme.begin(BME280_ADDR); // Added address
-  if (!status) {
-      Serial.println("Could not find a valid BME280 sensor, check wiring, address, sensor ID!");
-      Serial.print("SensorID was: 0x"); Serial.println(bme.sensorID(),16);
-  }
-
-  Serial.println("BME280 successfully Initialized");
-
-  //bme.init();
-
-  #endif
-
-  return status;
-}
-
-// Returns 0 - Fail, 1 - Success, 2 - Uninitialized
-uint32_t init_aht20() {
-  uint32_t status = 2;
-
-  #ifdef DEVICE_AHT20
-
-  Serial.println("Detected AHT20");
-  /* Initialize DEVICE_BME280 */
-
-  status = aht20.begin();  
-  if (!status) {
-      Serial.println("Could not find a valid AHT20 sensor, check wiring, address, sensor ID!");
-      Serial.print("SensorID status: "); Serial.println(aht20.getStatus(),16);
-      return status;
-  }
-
-  Serial.println("AHT20 successfully Initialized");
-
-  #endif
-
-  return status;
-}
-
-uint32_t init_dht_unified() {
-  uint32_t status = 2;
-
-  #ifdef DEVICE_DHT11
-
-  Serial.println("Detected DHT11");
-  /* Initialize DEVICE_DHT11 */
-
-  dht11.begin();
-
-  Serial.println("DHT11 successfully Initialized");
-
-  #endif
-
-  #ifdef DEVICE_DHT21
-  /* Initialize DEVICE_DHT21 */
-
-  dht21.begin();
-
-  Serial.println("DHT21 successfully Initialized");
-  #endif
-
-  #ifdef DEVICE_DHT22
-  /* Initialize DEVICE_DHT22 */
-
-  dht22.begin();
-
-  Serial.println("DHT22 successfully Initialized");
-  #endif
-
-  return status;
-}
-
-
-uint32_t init_supply_monitoring() {
-  uint32_t status = 2;
-
-  #ifdef INTERNAL_SUPPLY_MONITORING
-
-  pinMode(SUPPLY_MON_ADC_PIN, INPUT);
-
-  analogReadResolution(12);
-
-  status = 1;
-
-  #endif
-
-  return status;
-
-}
-
-uint32_t init_internal_adc_sampling() {
-  uint32_t status = 2;
-
-  #ifdef INTERNAL_ADC_SAMPLING
-
-  uint8_t adc_pins[] = INTERNAL_ADC_PINS;
-
-  // Set prescribed monitored pins to INPUT mode
-  for(uint8_t i = 0; i < INTERNAL_ADC_PIN_COUNT; i++) {
-    pinMode(adc_pins[i], INPUT);
-  }
-
-  analogReadResolution(12);
-
-  status = 1;
-
-  #endif
-
-  return status;
-}
 
 // Function that is called in setup (whenever core resets or wakes up)
 void setup_uptime() {
@@ -339,207 +196,3 @@ void setup_uptime() {
   }
 }
 
-
-/*
-*   ---------------------
-*   SENSOR READ FUNCTIONS
-*   --------------------- 
-*/
-
-
-void read_bme280(transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *baroPres, transmit_data_t *altitude) {
-  #ifdef DEVICE_BME280
-
-  temp->data_f32[BME280_TEMPERATURE_ID] = bme.readTemperature();
-  humidity->data_f32[BME280_HUMIDITY_ID] = bme.readHumidity();
-  baroPres->data_f32[BME280_PRESSURE_ID] = bme.readPressure();
-  altitude->data_f32[BME280_ALTITUDE_ID] = bme.readAltitude(SEALEVELPRESSURE_HPA);
-
-  #endif
-
-  return;
-}
-
-void read_aht20(transmit_data_t *temp, transmit_data_t *humidity) {
-  #ifdef DEVICE_AHT20
-
-  sensors_event_t humidityEvent, tempEvent;
-
-  aht20.getEvent(&humidityEvent, &tempEvent);
-
-  temp->data_f32[AHT20_TEMPERATURE_ID] = tempEvent.temperature;
-  humidity->data_f32[AHT20_HUMIDITY_ID] = humidityEvent.relative_humidity; 
-
-  #endif
-
-  return;
-}
-
-
-void read_dht_unified(transmit_data_t *temp, transmit_data_t *humidity) {
-  sensors_event_t event;
-  
-  #ifdef DEVICE_DHT11
-
-  dht11.temperature().getEvent(&event);
-  if (isnan(event.temperature)) {
-    MY_DEBUG_PRINTLN(F("Error reading temperature from DHT11!"));
-  }
-  else {
-    temp->data_f32[DHT11_TEMPERATURE_ID] = event.temperature;
-  }
-
-  // Get humidity event and print its value.
-  dht11.humidity().getEvent(&event);
-  if (isnan(event.relative_humidity)) {
-    MY_DEBUG_PRINTLN(F("Error reading humidity!"));
-  }
-  else {
-    humidity->data_f32[DHT11_HUMIDITY_ID] = event.relative_humidity;
-  }
-
-  #endif
-
-  #ifdef DEVICE_DHT21
-
-  dht21.temperature().getEvent(&event);
-  if (isnan(event.temperature)) {
-    MY_DEBUG_PRINTLN(F("Error reading temperature from DHT21!"));
-  }
-  else {
-    temp->data_f32[DHT21_TEMPERATURE_ID] = event.temperature;
-  }
-
-  // Get humidity event and print its value.
-  dht21.humidity().getEvent(&event);
-  if (isnan(event.relative_humidity)) {
-    MY_DEBUG_PRINTLN(F("Error reading humidity!"));
-  }
-  else {
-    humidity->data_f32[DHT21_HUMIDITY_ID] = event.relative_humidity;
-  }
-
-  #endif
-
-  #ifdef DEVICE_DHT22
-
-  dht22.temperature().getEvent(&event);
-  if (isnan(event.temperature)) {
-    MY_DEBUG_PRINTLN(F("Error reading temperature!"));
-  }
-  else {
-    temp->data_f32[DHT22_TEMPERATURE_ID] = event.temperature;
-  }
-
-  // Get humidity event and print its value.
-  dht22.humidity().getEvent(&event);
-  if (isnan(event.relative_humidity)) {
-    MY_DEBUG_PRINTLN(F("Error reading humidity from DHT22!"));
-  }
-  else {
-    humidity->data_f32[DHT22_HUMIDITY_ID] = event.relative_humidity;
-  }
-
-  #endif
-
-  return;
-}
-
-void read_capacitive_soil_moisture_sensor(transmit_data_t *moisture) {
-    
-  #ifdef DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR
-  // Power up Soil sensor
-  digitalWrite(CAPACITIVE_SOIL_MOISTURE_SENS_VCC_PIN, HIGH);
-  delay(CAPACITIVE_SOIL_MOISTURE_SETTLE_TIME_MS); 
-
-  // Take reading - TODO: Use averaged function with CAPACITIVE_SOIL_MOISTURE_SAMPLES_TO_AVERAGE?
-  moisture->data_u16[SOIL_MOISTURE_ID] = analogRead(CAPACITIVE_SOIL_MOISTURE_SENS_DIN_PIN);
-
-  // Power down soil sensor
-  digitalWrite(CAPACITIVE_SOIL_MOISTURE_SENS_VCC_PIN, LOW);  
-
-    #endif
-}
-
-
-void read_supply_voltage(transmit_data_t *voltage) {
-  //static float supply_reading_counts_to_mv = 10000.0 / 4095.0 * 3.3 * SUPPLY_MON_RDIV_RATIO / 10;
-  
-
-  #ifdef INTERNAL_SUPPLY_MONITORING
-
-  uint32_t batteryVoltageRaw = 0;
-
-  batteryVoltageRaw = readADCAveraged(SUPPLY_MON_ADC_PIN, BATTERY_ADC_SAMPLES);
-
-  voltage->data_u16[INTERNAL_SUPPLY_MONITORING_ID] = (batteryVoltageRaw * 10000 / ADC_MAX_VALUE * ESP32_ADC_REFERENCE_VOLTAGE * SUPPLY_MON_RDIV_RATIO / 10) / SUPPLY_MON_FUDGE_FACTOR_DIV; // returns value in mV
-  //voltage->data_f32[INTERNAL_SUPPLY_MONITORING_ID] = ((float) batteryVoltageRaw / 4095.0) * 3.3 * 2;
-  #endif
-
-  return;
-}
-
-float get_battery_voltage_calibrated() {
-  extern uint32_t time_to_sleep; // Access global sleep time
-  
-  #ifdef INTERNAL_SUPPLY_MONITORING
-  uint32_t raw_reading = readADCAveraged(SUPPLY_MON_ADC_PIN, BATTERY_ADC_SAMPLES); // More samples for accuracy
-  
-  // Improved calibration
-  float voltage = ((float)raw_reading / 4095.0f) * 3.3f * SUPPLY_MON_RDIV_RATIO;
-  voltage /= SUPPLY_MON_FUDGE_FACTOR_DIV;
-  
-  // Add low battery detection and power management
-  if (voltage < AGGRESSIVE_POWER_SAVE_THRESHOLD_V) {
-    MY_DEBUG_PRINTLN("LOW BATTERY WARNING!");
-    MY_DEBUG_PRINT("Battery voltage: ");
-    MY_DEBUG_PRINTLN(voltage);
-    
-    // Extend sleep time to conserve power
-    if (time_to_sleep < VERY_LOW_BATTERY_SLEEP_TIME_SECONDS) {
-      time_to_sleep = VERY_LOW_BATTERY_SLEEP_TIME_SECONDS;
-      MY_DEBUG_PRINTLN("Extended sleep time due to low battery");
-    }
-  } else if (voltage < MODERATE_POWER_SAVE_THRESHOLD_V) {
-    MY_DEBUG_PRINTLN("Battery getting low");
-    // Moderate power saving
-    if (time_to_sleep < LOW_BATTERY_SLEEP_TIME_SECONDS) {
-      time_to_sleep = LOW_BATTERY_SLEEP_TIME_SECONDS;
-    }
-  }
-  
-  return voltage;
-  #else
-  return 0.0f;
-  #endif
-}
-
-
-void read_internal_adc_pins(transmit_data_t *analog_pins) {
-
-  #ifdef INTERNAL_ADC_SAMPLING
-
-  // Get prescribed ADC pins
-  uint8_t adc_pins[] = INTERNAL_ADC_PINS;
-
-  // Read each prescribed ADC pin
-  uint16_t thisReading = 0;
-  for(uint8_t i = 0; i < INTERNAL_ADC_PIN_COUNT; i++) {
-    thisReading = readADCAveraged(i, INTERNAL_ADC_SAMPLES_TO_AVERAGE);
-    analog_pins->data_u16[i] = thisReading;
-  }
-
-  #endif
-
-  return;
-}
-
-
-uint16_t readADCAveraged(uint8_t adc_pin, uint8_t samples) {
-  uint32_t total = 0;
-  for(uint8_t i = 0; i < samples; i++) {
-    total += analogRead(adc_pin);
-  }
-
-  return total / samples;
-}

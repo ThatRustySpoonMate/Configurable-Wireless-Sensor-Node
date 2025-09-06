@@ -2,7 +2,7 @@
 #define CONFIGURATION_H
 
 // ========== SIMULATION MODE ==========
-#define SIMULATION_MODE false                   // Change to true to simulate connected devices (the ones you specify down below)
+#define SIMULATION_MODE true                   // Change to true to simulate connected devices (the ones you specify down below)
 
 // ========== POWER MANAGEMENT ==========
 #define DEFAULT_SLEEP_TIME_SECONDS 60           // Normal sleep time - time between readings
@@ -44,11 +44,11 @@
 // ========== DEVICE CONFIGURATION ==========
 // Uncomment the devices you have connected
 #define DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR
-//#define DEVICE_BME280
+#define DEVICE_BME280
 //#define DEVICE_AHT20
-#define DEVICE_DHT11
+//#define DEVICE_DHT11
 //#define DEVICE_DHT21
-//#define DEVICE_DHT22
+#define DEVICE_DHT22
 #define UPTIME_MONITORING            // Software feature
 #define WAKE_LED                     // Toggle an LED on during wake and off during sleep
 #define INTERNAL_SUPPLY_MONITORING   // Resistor divider from supply to ADC Pin
@@ -148,8 +148,8 @@
 #endif
 
 #if defined(DEVICE_DHT22)
-#define DHT22_TEMPERATURE_ID 0
-#define DHT22_HUMIDITY_ID 0
+#define DHT22_TEMPERATURE_ID 1
+#define DHT22_HUMIDITY_ID 1
 #endif
 
 
