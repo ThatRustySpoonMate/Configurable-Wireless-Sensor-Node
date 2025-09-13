@@ -158,7 +158,7 @@
 
 // ========== DEBUG CONFIGURATION ==========
 #define SERIAL_BAUD_RATE 115200
-#define DEBUG_DEFAULT_STATE true              // Start with debug off
+#define DEBUG_DEFAULT_STATE false              // Start with debug off
 
 // ========== DERIVED CONFIGURATIONS ==========
 // These are calculated from the above settings
