@@ -16,7 +16,7 @@ PubSubClient client(espClient);
 #define MQTT_TOPIC_SUPPLY_VOLTAGE_STR  CONCATENATE(MQTT_TOPIC_LOCATION_SLUG, SUPPLY_VOLTAGE_TOPIC_SUFFIX)
 #define MQTT_TOPIC_ANALOG_PINS_STR  CONCATENATE(MQTT_TOPIC_LOCATION_SLUG, ANALOG_PINS_TOPIC_SUFFIX)
 #define MQTT_TOPIC_UPTIME_STR  CONCATENATE(MQTT_TOPIC_LOCATION_SLUG, UPTIME_TOPIC_SUFFIX)
-#define MQTT_TOPIC_MANAGEMENT_STR CONCATENATE(MQTT_TOPIC_LOCATION_SLUG, MANAGEMENT_TOPIC_SUFFIX)
+#define MQTT_TOPIC_MANAGEMENT_INTERVAL_STR CONCATENATE(MQTT_TOPIC_LOCATION_SLUG, MANAGEMENT_OUTPUT_INTERVAL_TOPIC_SUFFIX)
 
 // Define constants for the topics
 const char *MQTT_TOPIC_MOISTURE = MQTT_TOPIC_MOISTURE_STR;
@@ -27,14 +27,13 @@ const char *MQTT_TOPIC_ALTITUDE = MQTT_TOPIC_ALTITUDE_STR;
 const char *MQTT_TOPIC_SUPPLY_VOLTAGE = MQTT_TOPIC_SUPPLY_VOLTAGE_STR;
 const char *MQTT_TOPIC_ANALOG_PINS = MQTT_TOPIC_ANALOG_PINS_STR;
 const char *MQTT_TOPIC_UPTIME = MQTT_TOPIC_UPTIME_STR;
-const char *MQTT_TOPIC_MANAGEMENT = MQTT_TOPIC_MANAGEMENT_STR;
+const char *MQTT_TOPIC_MANAGEMENT_INTERVAL = MQTT_TOPIC_MANAGEMENT_INTERVAL_STR;
 
 const char *BROKER_IP;
 int BROKER_PORT;
 const char *DEVICE_NAME;
-const char *RX_TOPIC;
 
-void setup_mqtt(const char *MQTT_BROKER_IP, const int MQTT_BROKER_PORT, const char *DEV_NAME, const char *MANAGEMENT_TOPIC) {
+void setup_mqtt(const char *MQTT_BROKER_IP, const int MQTT_BROKER_PORT, const char *DEV_NAME) {
 
   assert(strlen(MQTT_TOPIC_MOISTURE) < MQTT_TOPIC_LENGTH_MAX);
   assert(strlen(MQTT_TOPIC_TEMPERATURE) < MQTT_TOPIC_LENGTH_MAX);
@@ -44,16 +43,15 @@ void setup_mqtt(const char *MQTT_BROKER_IP, const int MQTT_BROKER_PORT, const ch
   assert(strlen(MQTT_TOPIC_SUPPLY_VOLTAGE) < MQTT_TOPIC_LENGTH_MAX);
   assert(strlen(MQTT_TOPIC_ANALOG_PINS) < MQTT_TOPIC_LENGTH_MAX);
   assert(strlen(MQTT_TOPIC_UPTIME) < MQTT_TOPIC_LENGTH_MAX);
-  assert(strlen(MQTT_TOPIC_MANAGEMENT) < MQTT_TOPIC_LENGTH_MAX);
+  assert(strlen(MQTT_TOPIC_MANAGEMENT_INTERVAL) < MQTT_TOPIC_LENGTH_MAX);
 
   BROKER_IP = MQTT_BROKER_IP;
   BROKER_PORT = MQTT_BROKER_PORT;
   DEVICE_NAME = DEV_NAME;
-  RX_TOPIC = MANAGEMENT_TOPIC;
 
   client.setServer(BROKER_IP, BROKER_PORT);
 
-  client.setCallback(message_rx_callback);
+  client.setCallback(management_message_receive);
 
   return;
 }
@@ -86,7 +84,7 @@ void mqtt_reconnect() {
     if (client.connect(DEVICE_NAME)) {
       MY_DEBUG_PRINTLN("connected");
       // Subscribe
-      client.subscribe(RX_TOPIC);
+      client.subscribe(MQTT_TOPIC_MANAGEMENT_INTERVAL);
     } else {
       MY_DEBUG_PRINT("failed, rc=");
       MY_DEBUG_PRINT(client.state());
@@ -107,7 +105,7 @@ bool mqtt_reconnect_with_timeout(uint32_t timeout_ms) {
     
     if (client.connect(DEVICE_NAME)) {
       MY_DEBUG_PRINTLN("MQTT connected");
-      client.subscribe(RX_TOPIC);
+      client.subscribe(MQTT_TOPIC_MANAGEMENT_INTERVAL);
       return true;
     }
     
@@ -125,34 +123,26 @@ bool mqtt_reconnect_with_timeout(uint32_t timeout_ms) {
 }
 
 
-void message_rx_callback(char* topic, byte* message, unsigned int length) {
-  String messageTemp;
+void management_message_receive(char* topic, byte* message, unsigned int length) {
+  String receivedMessage;
 
   MY_DEBUG_PRINT("Message arrived on topic: ");
   MY_DEBUG_PRINT(topic);
   MY_DEBUG_PRINT(". Message: ");
 
-  
+  // Reassemble message
   for (int i = 0; i < length; i++) {
     MY_DEBUG_PRINT((char)message[i]);
     
-    messageTemp += (char)message[i];
+    receivedMessage += (char)message[i];
   }
   MY_DEBUG_PRINTLN("");
   
-  
-
-  // If a message is received on the topic esp32/output, you check if the message is either "on" or "off". 
-  // Changes the output state according to the message
-  // if (String(topic) == RX_TOPIC) {
-  //   MY_DEBUG_PRINT("Changing output to ");
-  //   if(messageTemp == "on"){
-  //     MY_DEBUG_PRINTLN("on");
-  //   }
-  //   else if(messageTemp == "off"){
-  //     MY_DEBUG_PRINTLN("off");
-  //   }
-  // }
+  // Check and set data interval
+  if (String(topic) == MQTT_TOPIC_MANAGEMENT_INTERVAL) { 
+    time_to_sleep = receivedMessage.toInt(); 
+    preferences.putULong(INTERVAL_KEY, time_to_sleep);
+  }
 
   return;
 }

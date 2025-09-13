@@ -20,7 +20,7 @@ void read_supply_voltage(transmit_data_t *voltage) {
 }
 
 float get_battery_voltage_calibrated() {
-    extern uint32_t time_to_sleep; // Access global sleep time
+    extern uint32_t time_to_sleep; // Access global sleep time - no longer needed?
     
     uint32_t raw_reading = readADCAveraged(SUPPLY_MON_ADC_PIN, BATTERY_ADC_SAMPLES);
     
@@ -33,18 +33,22 @@ float get_battery_voltage_calibrated() {
         MY_DEBUG_PRINTLN("LOW BATTERY WARNING!");
         MY_DEBUG_PRINT("Battery voltage: ");
         MY_DEBUG_PRINTLN(voltage);
-        
+        #ifdef ENABLE_POWER_SAVING_MODE_ON_LOW_BATTERY
         // Extend sleep time to conserve power
         if (time_to_sleep < VERY_LOW_BATTERY_SLEEP_TIME_SECONDS) {
             time_to_sleep = VERY_LOW_BATTERY_SLEEP_TIME_SECONDS;
             MY_DEBUG_PRINTLN("Extended sleep time due to low battery");
         }
+        #endif
     } else if (voltage < MODERATE_POWER_SAVE_THRESHOLD_V) {
         MY_DEBUG_PRINTLN("Battery getting low");
+
+        #ifdef ENABLE_POWER_SAVING_MODE_ON_LOW_BATTERY
         // Moderate power saving
         if (time_to_sleep < LOW_BATTERY_SLEEP_TIME_SECONDS) {
             time_to_sleep = LOW_BATTERY_SLEEP_TIME_SECONDS;
         }
+        #endif
     }
     
     return voltage;

@@ -10,4 +10,10 @@ void transmitTask_init();
 
 void transmitTask_run(transmit_data_entry_t transmitData[DATAPOINTS_NUM]);
 
-#endif
+// Check if enough time has passed since transmission to allow deep sleep
+bool transmitTask_isReadyForSleep();
+
+// Reset transmission state (call when waking up)
+void transmitTask_reset();
+
+#endif // TRANSMIT_TASK_HPP

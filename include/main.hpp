@@ -26,10 +26,18 @@ typedef enum data_points_e {
     DATAPOINTS_NUM
 } data_points_t;
 
+// State management
+typedef enum {
+    STATE_WAKE_UP,
+    STATE_WAITING_FOR_TRANSMISSION,
+    STATE_READY_TO_SLEEP
+} device_state_t;
+
 void upon_wake();
 void setup_watchdog();
 void pat_watchdog();
 void enter_deep_sleep();
+void load_config();
 
 inline void wake_led_on();
 inline void wake_led_off();

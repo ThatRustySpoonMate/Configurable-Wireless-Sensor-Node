@@ -16,9 +16,9 @@ extern const char *MQTT_TOPIC_ALTITUDE;         // Example: "home/outside/garden
 extern const char *MQTT_TOPIC_SUPPLY_VOLTAGE;   // Example: "home/outside/garden/supply-voltage";
 extern const char *MQTT_TOPIC_ANALOG_PINS;      // Example: "home/outside/garden/analog-pins";
 extern const char *MQTT_TOPIC_UPTIME;           // Example: "home/outside/garden/uptime";
-extern const char *MQTT_TOPIC_MANAGEMENT;       // Example: "manage/garden";
+extern const char *MQTT_TOPIC_MANAGEMENT_UPTIME;       // Example: "manage/garden";
 
-void setup_mqtt(const char *MQTT_BROKER_IP, const int MQTT_BROKER_PORT, const char *DEV_NAME, const char *MANAGE_PORT);
+void setup_mqtt(const char *MQTT_BROKER_IP, const int MQTT_BROKER_PORT, const char *DEV_NAME);
 
 void mqtt_transmit(const char *topic, const char *payload);
 
@@ -28,7 +28,7 @@ void mqtt_reconnect();
 
 bool mqtt_reconnect_with_timeout(uint32_t timeout_ms);
 
-void message_rx_callback(char* topic, byte* message, unsigned int length);
+void management_message_receive(char* topic, byte* message, unsigned int length);
 
 void mqtt_disconnect();
 

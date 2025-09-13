@@ -36,7 +36,7 @@ Supports a maximum of:
 
 # Configuration File
 
-## // ========== OUTPUT PACKET CONFIGURATION EXAMPLE ==========
+## OUTPUT PACKET CONFIGURATION EXAMPLE
 #if defined(DEVICE_BME280)<br>
 #define BME280_TEMPERATURE_ID 1<br>
 #define BME280_HUMIDITY_ID 1<br>

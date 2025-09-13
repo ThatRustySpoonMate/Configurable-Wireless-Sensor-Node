@@ -2,7 +2,7 @@
 #define CONFIGURATION_H
 
 // ========== SIMULATION MODE ==========
-#define SIMULATION_MODE true                   // Change to true to simulate connected devices (the ones you specify down below)
+#define SIMULATION_MODE false                   // Change to true to simulate connected devices (the ones you specify down below)
 
 // ========== POWER MANAGEMENT ==========
 #define DEFAULT_SLEEP_TIME_SECONDS 60           // Normal sleep time - time between readings
@@ -11,6 +11,7 @@
 #define CPU_FREQUENCY_MHZ 80                    // Lower frequency saves power
 
 // ========== BATTERY MONITORING ==========
+#define ENABLE_POWER_SAVING_MODE_ON_LOW_BATTERY // Enables the modification of sleep timer when battery crosses below thresholds
 #define MODERATE_POWER_SAVE_THRESHOLD_V 3.0f    // Voltage to trigger power saving
 #define AGGRESSIVE_POWER_SAVE_THRESHOLD_V 2.7f  // Voltage to trigger aggressive power saving
 #define BATTERY_ADC_SAMPLES 16                  // Number of ADC samples to average
@@ -23,9 +24,9 @@
 // ========== MQTT CONFIGURATION ==========
 #define MQTT_TOPIC_LOCATION_SLUG "home/downstairs/testing"
 #define MQTT_TOPIC_LENGTH_MAX 100
-#define MQTT_TRANSMIT_TIME_BUFFER 750           // Amount of time after queueing last message to be sent before disconnecting and sleeping
+#define MQTT_TRANSMIT_TIME_BUFFER 3000           // Amount of time after queueing last message to be sent before disconnecting and sleeping, this is also the window of time that you have to issue commands to the device over MQTT, decrease to increase battery life if you don't need to configure it once deployed. Increase if your MQTT messages are not reliably coming through (especially on slower networks)
 
-// MQTT Topic suffixes
+// MQTT Data topic suffixes - Transmit
 #define MOISTURE_TOPIC_SUFFIX "/moisture"
 #define TEMPERATURE_TOPIC_SUFFIX "/temperature"
 #define HUMIDITY_TOPIC_SUFFIX "/humidity"
@@ -34,21 +35,23 @@
 #define SUPPLY_VOLTAGE_TOPIC_SUFFIX "/supply-voltage"
 #define ANALOG_PINS_TOPIC_SUFFIX "/analog_pins"
 #define UPTIME_TOPIC_SUFFIX "/uptime"
-#define MANAGEMENT_TOPIC_SUFFIX "/manage/unconfigured"
+// MQTT Management topic suffixes - Receive
+#define MANAGEMENT_OUTPUT_INTERVAL_TOPIC_SUFFIX "/manage/interval"
 
 // ========== PREFERENCES (FLASH-EMULATED-EEPROM) CONFIGURATION ==========
 #define PREFS_NAMESPACE "device"
 #define UPTIME_KEY "uptime"
+#define INTERVAL_KEY "interval"
 
 
 // ========== DEVICE CONFIGURATION ==========
 // Uncomment the devices you have connected
 #define DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR
-#define DEVICE_BME280
+//#define DEVICE_BME280
 //#define DEVICE_AHT20
-//#define DEVICE_DHT11
+#define DEVICE_DHT11
 //#define DEVICE_DHT21
-#define DEVICE_DHT22
+//#define DEVICE_DHT22
 #define UPTIME_MONITORING            // Software feature
 #define WAKE_LED                     // Toggle an LED on during wake and off during sleep
 #define INTERNAL_SUPPLY_MONITORING   // Resistor divider from supply to ADC Pin
@@ -155,7 +158,7 @@
 
 // ========== DEBUG CONFIGURATION ==========
 #define SERIAL_BAUD_RATE 115200
-#define DEBUG_DEFAULT_STATE false              // Start with debug off
+#define DEBUG_DEFAULT_STATE true              // Start with debug off
 
 // ========== DERIVED CONFIGURATIONS ==========
 // These are calculated from the above settings

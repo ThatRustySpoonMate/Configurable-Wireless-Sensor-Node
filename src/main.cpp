@@ -15,7 +15,13 @@ uint32_t device_uptime = 0;
 // Data reading array to store sensor data and transmit it 
 transmit_data_entry_t transmitData[DATAPOINTS_NUM];
 
+static device_state_t current_state = STATE_WAKE_UP;
+
 void setup() {
+
+  #ifdef WAKE_LED
+  pinMode(WAKE_LED_PIN, OUTPUT);
+  #endif
 
   setCpuFrequencyMhz(CPU_FREQUENCY_MHZ);
   Serial.begin(SERIAL_BAUD_RATE);
@@ -34,19 +40,46 @@ void setup() {
   strcpy(transmitData[ANALOG_PINS_IDX].topic, MQTT_TOPIC_ANALOG_PINS);
   strcpy(transmitData[UPTIME_IDX].topic, MQTT_TOPIC_UPTIME);
 
+  load_config();
+
   transmitTask_init();
-  setup_mqtt(MQTT_BROKER_IP, MQTT_BROKER_PORT, DEVICE_ID, MQTT_TOPIC_MANAGEMENT);
+  setup_mqtt(MQTT_BROKER_IP, MQTT_BROKER_PORT, DEVICE_ID);
   sensorTask_init();
 
-  #ifdef WAKE_LED
-  pinMode(WAKE_LED_PIN, OUTPUT);
-  #endif
+  // Reset transmission state on startup
+  transmitTask_reset();
 }
 
 
 void loop() {
-  upon_wake();
-  enter_deep_sleep();
+  switch (current_state) {
+    case STATE_WAKE_UP:
+      upon_wake();
+      current_state = STATE_WAITING_FOR_TRANSMISSION;
+      break;
+        
+    case STATE_WAITING_FOR_TRANSMISSION:
+      pat_watchdog(); // Keep watchdog happy while waiting
+      
+      mqtt_keep_alive();
+
+      // Check if transmission buffer time has elapsed
+      if (transmitTask_isReadyForSleep()) {
+          MY_DEBUG_PRINTLN("Ready to enter deep sleep");
+          current_state = STATE_READY_TO_SLEEP;
+      }
+      
+      // Small delay to prevent tight polling loop
+      delay(10);
+      break;
+        
+    case STATE_READY_TO_SLEEP:
+      wake_led_off();
+      enter_deep_sleep();
+      // This point should never be reached as deep sleep resets the device
+      current_state = STATE_WAKE_UP; // Just in case
+      break;
+  }
 }
 
 
@@ -87,8 +120,6 @@ void upon_wake() {
   pat_watchdog();
 
   transmitTask_run(transmitData);
-
-  wake_led_off();
 
   return;
 }
@@ -143,4 +174,19 @@ inline void wake_led_off() {
   #ifdef WAKE_LED
   digitalWrite(WAKE_LED_PIN, LOW);
   #endif
+}
+
+
+void load_config() {
+  uint32_t interval_temp = preferences.getULong(INTERVAL_KEY, 0);
+
+  if(interval_temp != 0) {
+    // Interval has been stored in flash
+    time_to_sleep = interval_temp;
+  } else{
+    // No interval in flash (likely first boot)
+    preferences.putULong(INTERVAL_KEY, DEFAULT_SLEEP_TIME_SECONDS);
+  }
+
+
 }

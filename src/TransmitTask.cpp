@@ -1,5 +1,10 @@
 #include "TransmitTask.hpp"
 
+// Global variables for transmission timing
+static unsigned long transmission_start_time = 0;
+static bool transmission_in_progress = false;
+static bool ready_for_sleep = false;
+
 void transmitTask_init() {
     return;
 }
@@ -7,6 +12,11 @@ void transmitTask_init() {
 void transmitTask_run(transmit_data_entry_t transmitData[DATAPOINTS_NUM]) {
   static String readingStr;
   static String topicWithIndex;
+
+  // Record when we started transmission
+  transmission_start_time = millis();
+  transmission_in_progress = true;
+  ready_for_sleep = false;
   
   /* Convert readings to string objects then transmit them - only send data points for connected devices */
 
@@ -79,8 +89,38 @@ void transmitTask_run(transmit_data_entry_t transmitData[DATAPOINTS_NUM]) {
     }
   #endif
 
-  // Allow time to transmit message before disconnecting from MQTT
-  delay(MQTT_TRANSMIT_TIME_BUFFER);
-  mqtt_disconnect();
-  //wifi_disconnect();
+  MY_DEBUG_PRINTLN("All data queued for transmission");
+
+}
+
+// Check if enough time has passed since transmission started
+bool transmitTask_isReadyForSleep() {
+    if (!transmission_in_progress) {
+        return false; // Haven't started transmission yet
+    }
+    
+    if (ready_for_sleep) {
+        return true; // Already determined we're ready
+    }
+    
+    // Check if enough time has elapsed
+    unsigned long elapsed = millis() - transmission_start_time;
+    if (elapsed >= MQTT_TRANSMIT_TIME_BUFFER) {
+        MY_DEBUG_PRINTLN("Transmission buffer time elapsed");
+        ready_for_sleep = true;
+        
+        // Disconnect from MQTT now that we're ready to sleep
+        mqtt_disconnect();
+        
+        return true;
+    }
+    
+    return false;
+}
+
+// Reset transmission state (call this when waking up or starting new cycle)
+void transmitTask_reset() {
+    transmission_start_time = 0;
+    transmission_in_progress = false;
+    ready_for_sleep = false;
 }
