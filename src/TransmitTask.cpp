@@ -89,6 +89,11 @@ void transmitTask_run(transmit_data_entry_t transmitData[DATAPOINTS_NUM]) {
     }
   #endif
 
+  #ifdef WIFI_RSSI_MONITORING_CONNECTED
+  readingStr = String(transmitData[WIFI_RSSI_IDX].data.data_i8[0]);
+  mqtt_transmit(transmitData[WIFI_RSSI_IDX].topic, readingStr.c_str());
+  #endif
+
   MY_DEBUG_PRINTLN("All data queued for transmission");
 
 }

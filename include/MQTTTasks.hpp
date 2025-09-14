@@ -16,6 +16,7 @@ extern const char *MQTT_TOPIC_ALTITUDE;         // Example: "home/outside/garden
 extern const char *MQTT_TOPIC_SUPPLY_VOLTAGE;   // Example: "home/outside/garden/supply-voltage";
 extern const char *MQTT_TOPIC_ANALOG_PINS;      // Example: "home/outside/garden/analog-pins";
 extern const char *MQTT_TOPIC_UPTIME;           // Example: "home/outside/garden/uptime";
+extern const char *MQTT_TOPIC_WIFI_RSSI;
 extern const char *MQTT_TOPIC_MANAGEMENT_UPTIME;       // Example: "manage/garden";
 
 void setup_mqtt(const char *MQTT_BROKER_IP, const int MQTT_BROKER_PORT, const char *DEV_NAME);

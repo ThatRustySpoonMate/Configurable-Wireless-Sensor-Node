@@ -22,6 +22,7 @@ typedef enum data_points_e {
     SUPPLY_VOLTAGE_IDX,
     UPTIME_IDX,
     ANALOG_PINS_IDX,
+    WIFI_RSSI_IDX,
 
     DATAPOINTS_NUM
 } data_points_t;

@@ -56,3 +56,12 @@ void wifi_disconnect() {
 
   return;
 }
+
+
+int8_t wifi_get_rssi() {
+  if(WiFi.isConnected()) {
+    return WiFi.RSSI();
+  } else {
+    return 0;
+  }
+}

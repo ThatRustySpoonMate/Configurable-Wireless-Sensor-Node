@@ -1,6 +1,7 @@
 #include "SensorTasks.hpp"
 #include "main.hpp"
 #include "esp_sleep.h"
+#include "WifiTasks.hpp"
 
 
 // Include individual sensor headers
@@ -67,7 +68,7 @@ void sensorTask_init() {
 }
 
 // Stub function allows for testing without any connected sensors
-void stubReadSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *baroPres, transmit_data_t *altitude, transmit_data_t *supply_v, transmit_data_t *uptime, transmit_data_t *analog_pins) {
+void stubReadSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *baroPres, transmit_data_t *altitude, transmit_data_t *supply_v, transmit_data_t *uptime, transmit_data_t *analog_pins, transmit_data_t *wifi_rssi) {
   randomSeed(analogRead(0));
 
   /* Read values from DEVICE_BME280 */
@@ -121,11 +122,15 @@ void stubReadSensors(transmit_data_t *moistureReading, transmit_data_t *temp, tr
   uptime->data_u32[0] = device_uptime;
   #endif
 
+  #ifdef WIFI_RSSI
+  wifi_rssi->data_i8[0] = wifi_get_rssi();
+  #endif
+
   return;
 }
 
 // Function that calls the read function of all connected sensors and packs the data correctly into the given transmit_data struct pointers
-void readSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *baroPres, transmit_data_t *altitude, transmit_data_t *supply_v, transmit_data_t *uptime, transmit_data_t *analog_pins) {
+void readSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *baroPres, transmit_data_t *altitude, transmit_data_t *supply_v, transmit_data_t *uptime, transmit_data_t *analog_pins, transmit_data_t *wifi_rssi) {
 
   /* Read values from DEVICE_BME280 */
   #ifdef DEVICE_BME280
@@ -161,7 +166,11 @@ void readSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transm
   device_uptime += (millis() / 1000);
   uptime->data_u32[0] = device_uptime;
   #endif
-  
+
+  #ifdef WIFI_RSSI
+  wifi_rssi->data_i8[0] = wifi_get_rssi();
+  #endif
+
   return;
 }
 

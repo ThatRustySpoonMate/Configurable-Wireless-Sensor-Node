@@ -11,4 +11,6 @@ bool setup_wifi_with_timeout(const char *ssid, const char *password, uint32_t ti
 
 void wifi_disconnect();
 
+int8_t wifi_get_rssi();
+
 #endif

@@ -33,8 +33,9 @@
 #define PRESSURE_TOPIC_SUFFIX "/pressure"
 #define ALTITUDE_TOPIC_SUFFIX "/altitude"
 #define SUPPLY_VOLTAGE_TOPIC_SUFFIX "/supply-voltage"
-#define ANALOG_PINS_TOPIC_SUFFIX "/analog_pins"
+#define ANALOG_PINS_TOPIC_SUFFIX "/analog-pins"
 #define UPTIME_TOPIC_SUFFIX "/uptime"
+#define WIFI_RSSI_TOPIC_SUFFIX "/wifi-rssi"
 // MQTT Management topic suffixes - Receive
 #define MANAGEMENT_OUTPUT_INTERVAL_TOPIC_SUFFIX "/manage/interval"
 
@@ -52,10 +53,13 @@
 #define DEVICE_DHT11
 //#define DEVICE_DHT21
 //#define DEVICE_DHT22
-#define UPTIME_MONITORING            // Software feature
-#define WAKE_LED                     // Toggle an LED on during wake and off during sleep
 #define INTERNAL_SUPPLY_MONITORING   // Resistor divider from supply to ADC Pin
 //#define INTERNAL_ADC_SAMPLING 
+
+// Software Features
+#define UPTIME_MONITORING            // Software feature
+#define WAKE_LED                     // Toggle an LED on during wake and off during sleep
+#define WIFI_RSSI                    // Output the WiFi RSSI 
 
 
 // ========== SENSOR CONFIGURATION ==========
@@ -238,6 +242,10 @@
 
 #if defined(INTERNAL_ADC_SAMPLING)
 #define INTERNAL_ADC_CONNECTED
+#endif
+
+#if defined(WIFI_RSSI)
+#define WIFI_RSSI_MONITORING_CONNECTED
 #endif
 
 
