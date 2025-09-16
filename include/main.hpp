@@ -23,6 +23,10 @@ typedef enum data_points_e {
     UPTIME_IDX,
     ANALOG_PINS_IDX,
     WIFI_RSSI_IDX,
+    AQI_IDX,
+    TVOC_IDX,
+    ECO2_IDX,
+
 
     DATAPOINTS_NUM
 } data_points_t;

@@ -13,6 +13,10 @@
 #include "Sensors/aht20.hpp"
 #endif
 
+#ifdef DEVICE_ENS160
+#include "Sensors/ens160.hpp"
+#endif
+
 #if defined(DEVICE_DHT11) || defined(DEVICE_DHT21) || defined(DEVICE_DHT22)
 #include "Sensors/dht_family.hpp"
 #endif
@@ -48,6 +52,10 @@ void sensorTask_init() {
   init_aht20();
   #endif
 
+  #ifdef DEVICE_ENS160
+  init_ens160();
+  #endif
+
   #if defined(DEVICE_DHT11) ||  defined(DEVICE_DHT21) || defined(DEVICE_DHT22)
   init_dht_unified();
   #endif
@@ -68,7 +76,7 @@ void sensorTask_init() {
 }
 
 // Stub function allows for testing without any connected sensors
-void stubReadSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *baroPres, transmit_data_t *altitude, transmit_data_t *supply_v, transmit_data_t *uptime, transmit_data_t *analog_pins, transmit_data_t *wifi_rssi) {
+void stubReadSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *baroPres, transmit_data_t *altitude, transmit_data_t *supply_v, transmit_data_t *uptime, transmit_data_t *analog_pins, transmit_data_t *wifi_rssi, transmit_data_t *aqi, transmit_data_t *tvoc, transmit_data_t *eCO2) {
   randomSeed(analogRead(0));
 
   /* Read values from DEVICE_BME280 */
@@ -116,6 +124,13 @@ void stubReadSensors(transmit_data_t *moistureReading, transmit_data_t *temp, tr
   }
   #endif
 
+  // Read this sensor last as it has an optional dependency on temp/humidity data
+  #ifdef DEVICE_ENS160
+  aqi->data_u16[ENS160_AQI_ID] = random() % 65535;
+  tvoc->data_u16[ENS160_TVOC_ID] = random() % 65535;
+  eCO2->data_u16[ENS160_ECO2_ID] = random() % 65535;
+  #endif
+
   /* Get Uptime */
   #ifdef UPTIME_MONITORING
   device_uptime += (millis() / 1000);
@@ -130,7 +145,7 @@ void stubReadSensors(transmit_data_t *moistureReading, transmit_data_t *temp, tr
 }
 
 // Function that calls the read function of all connected sensors and packs the data correctly into the given transmit_data struct pointers
-void readSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *baroPres, transmit_data_t *altitude, transmit_data_t *supply_v, transmit_data_t *uptime, transmit_data_t *analog_pins, transmit_data_t *wifi_rssi) {
+void readSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *baroPres, transmit_data_t *altitude, transmit_data_t *supply_v, transmit_data_t *uptime, transmit_data_t *analog_pins, transmit_data_t *wifi_rssi, transmit_data_t *aqi, transmit_data_t *tvoc, transmit_data_t *eCO2) {
 
   /* Read values from DEVICE_BME280 */
   #ifdef DEVICE_BME280
@@ -159,6 +174,11 @@ void readSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transm
   // Allow time for startup of soil moisture sensor before taking reading
   #ifdef DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR
   read_capacitive_soil_moisture_sensor(moistureReading);
+  #endif
+
+  // Read this sensor last as it has an optional dependency on temp/humidity data
+  #ifdef DEVICE_ENS160
+  read_ens160(aqi, tvoc, eCO2, temp, humidity);
   #endif
 
   /* Get Uptime */

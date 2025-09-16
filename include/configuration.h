@@ -30,6 +30,9 @@
 #define MOISTURE_TOPIC_SUFFIX "/moisture"
 #define TEMPERATURE_TOPIC_SUFFIX "/temperature"
 #define HUMIDITY_TOPIC_SUFFIX "/humidity"
+#define AQI_TOPIC_SUFFIC "/aqi"
+#define TVOC_TOPIC_SUFFIC "/tvoc"
+#define ECO2_TOPIC_SUFFIC "/eCO2"
 #define PRESSURE_TOPIC_SUFFIX "/pressure"
 #define ALTITUDE_TOPIC_SUFFIX "/altitude"
 #define SUPPLY_VOLTAGE_TOPIC_SUFFIX "/supply-voltage"
@@ -50,7 +53,8 @@
 #define DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR
 //#define DEVICE_BME280
 //#define DEVICE_AHT20
-#define DEVICE_DHT11
+#define DEVICE_ENS160
+//#define DEVICE_DHT11
 //#define DEVICE_DHT21
 //#define DEVICE_DHT22
 #define INTERNAL_SUPPLY_MONITORING   // Resistor divider from supply to ADC Pin
@@ -102,6 +106,10 @@
 #define BME280_ADDR 0x76            // 0x76 or 0x77
 #endif
 
+// ENS160
+#ifdef DEVICE_ENS160
+#endif
+
 // DHT11 Sensor Configuration
 #ifdef DEVICE_DHT11
 #define DHT11_OUT_PIN 13            // Data Out pin of DHT11
@@ -130,6 +138,12 @@
 #if defined(DEVICE_AHT20)
 #define AHT20_TEMPERATURE_ID 0
 #define AHT20_HUMIDITY_ID 0
+#endif
+
+#if defined(DEVICE_ENS160)
+#define ENS160_AQI_ID 0
+#define ENS160_TVOC_ID 0
+#define ENS160_ECO2_ID 0
 #endif
 
 #if defined(DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR)
@@ -198,6 +212,15 @@
 #define HAS_AHT20 0
 #endif
 
+#if defined(DEVICE_ENS160)
+#define AQI_SENSOR_CONNECTED
+#define TVOC_SENSOR_CONNECTED
+#define ECO2_SENSOR_CONNECTED
+#define HAS_ENS160 1
+#else
+#define HAS_ENS160 0
+#endif
+
 #if defined(DEVICE_DHT11)
 #define TEMPERATURE_SENSOR_CONNECTED
 #define HUMIDITY_SENSOR_CONNECTED
@@ -250,12 +273,14 @@
 
 
 // ========== SENSOR COUNT CALCULATIONS ==========
-// Temperature sensors
 #define TEMPERATURE_SENSOR_COUNT (HAS_BME280 + HAS_AHT20 + HAS_DHT11 + HAS_DHT21 + HAS_DHT22)
 #define HUMIDITY_SENSOR_COUNT (HAS_BME280 + HAS_AHT20 + HAS_DHT11 + HAS_DHT21 + HAS_DHT22)
 #define PRESSURE_SENSOR_COUNT (HAS_BME280)
 #define ALTITUDE_SENSOR_COUNT (HAS_BME280)
 #define SOIL_MOISTURE_SENSOR_COUNT (HAS_CAPACITIVE_SOIL_MOISTURE)
 #define SUPPLY_MONITORING_SENSOR_COUNT (HAS_INTERNAL_SUPPLY_MONITORING)
+#define AQI_SENSOR_COUNT (HAS_ENS160)
+#define TVOC_SENSOR_COUNT (HAS_ENS160)
+#define ECO2_SENSOR_COUNT (HAS_ENS160)
 // Internal ADC count is derived from from number of pins
 #endif // CONFIGURATION_H
