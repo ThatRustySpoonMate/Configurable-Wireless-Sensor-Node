@@ -39,6 +39,7 @@
 #define ANALOG_PINS_TOPIC_SUFFIX "/analog-pins"
 #define UPTIME_TOPIC_SUFFIX "/uptime"
 #define WIFI_RSSI_TOPIC_SUFFIX "/wifi-rssi"
+#define ERRORS_TOPIC_SUFFIX "/errors"
 // MQTT Management topic suffixes - Receive
 #define MANAGEMENT_OUTPUT_INTERVAL_TOPIC_SUFFIX "/manage/interval"
 
@@ -52,7 +53,7 @@
 // Uncomment the devices you have connected
 #define DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR
 //#define DEVICE_BME280
-//#define DEVICE_AHT20
+#define DEVICE_AHT20
 #define DEVICE_ENS160
 //#define DEVICE_DHT11
 //#define DEVICE_DHT21
@@ -108,6 +109,7 @@
 
 // ENS160
 #ifdef DEVICE_ENS160
+#define ENS160_I2C_ADDRESS 0x53     // 0X52: ADDR low, 0x53: ADDR high
 #endif
 
 // DHT11 Sensor Configuration

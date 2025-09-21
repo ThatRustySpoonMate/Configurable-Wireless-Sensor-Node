@@ -16,6 +16,11 @@
         "configuration.h": "c",
         "sensortasks.hpp": "c",
         "aht20.h": "c",
-        "arduino.h": "c"
+        "arduino.h": "c",
+        "memory": "cpp",
+        "istream": "cpp",
+        "sstream": "cpp",
+        "streambuf": "cpp",
+        "typeinfo": "cpp"
     }
 }

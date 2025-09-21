@@ -43,6 +43,7 @@ void setup_watchdog();
 void pat_watchdog();
 void enter_deep_sleep();
 void load_config();
+void error_handler();
 
 inline void wake_led_on();
 inline void wake_led_off();

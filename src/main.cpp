@@ -48,6 +48,7 @@ void setup() {
 
   transmitTask_init();
   setup_mqtt(MQTT_BROKER_IP, MQTT_BROKER_PORT, DEVICE_ID);
+  //mqtt_log_error("Started Up.");
   sensorTask_init();
 
   // Reset transmission state on startup
@@ -80,6 +81,7 @@ void loop() {
     case STATE_READY_TO_SLEEP:
       wake_led_off();
       enter_deep_sleep();
+      //delay(30000);
       // This point should never be reached as deep sleep resets the device
       current_state = STATE_WAKE_UP; // Just in case
       break;
@@ -193,4 +195,16 @@ void load_config() {
   }
 
 
+}
+
+
+void error_handler() {
+  while(true){
+    delay(100);
+    wake_led_on();
+    delay(100);
+    wake_led_off();
+  }
+
+  return;
 }
