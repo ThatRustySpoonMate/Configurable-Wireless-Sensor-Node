@@ -6,7 +6,8 @@
 
 # Supported Sensors
  - BME280
- - AHT20
+ - ENS160
+ - AHT2x
  - DHT11
  - DHT21
  - DHT22

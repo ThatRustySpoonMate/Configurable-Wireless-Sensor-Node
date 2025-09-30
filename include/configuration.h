@@ -53,7 +53,7 @@
 // Uncomment the devices you have connected
 #define DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR
 //#define DEVICE_BME280
-#define DEVICE_AHT20
+#define DEVICE_AHT20 // Use this for all AHT2x sensors
 #define DEVICE_ENS160
 //#define DEVICE_DHT11
 //#define DEVICE_DHT21
