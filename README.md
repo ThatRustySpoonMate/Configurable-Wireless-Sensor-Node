@@ -13,6 +13,7 @@
  - DHT22
  - Internal ADC
  - Resistor-Divider Supply Voltage monitoring
+ - WiFi-RSSI
 
 
 Supports a maximum of:
@@ -20,10 +21,14 @@ Supports a maximum of:
  - Two Humidity Readings
  - Two Pressure Sensor Readings
  - Two Altitude Sensor Readings
+ - Four eCO2 Sensor Readings
+ - Four TVOC Sensor Readings
+ - Four AQI sensor Readings
  - Four Soil Moisture Sensor Readings
  - Four Analog Pin readings @ 16 bits per reading
  - One Uptime reading
  - One Supply reading
+ - One WiFi-RSSI reading
 
 
 # Connections
