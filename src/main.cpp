@@ -48,8 +48,6 @@ void setup() {
 
   transmitTask_init();
   setup_mqtt(MQTT_BROKER_IP, MQTT_BROKER_PORT, DEVICE_ID);
-  //mqtt_log_error("Started Up.");
-  sensorTask_init();
 
   // Reset transmission state on startup
   transmitTask_reset();
@@ -94,7 +92,7 @@ void upon_wake() {
   // LED On
   wake_led_on();
 
-  pat_watchdog(); 
+  pat_watchdog();
 
   // Connect to WIFI
   if (!setup_wifi_with_timeout(WIFI_SSID, WIFI_PASSWORD, WIFI_CONNECT_TIMEOUT_MS)) { // 30 second timeout
@@ -115,6 +113,9 @@ void upon_wake() {
   }
 
   pat_watchdog(); 
+
+  // Init sensors after WiFi and MQTT connections are made for logging purposes
+  sensorTask_init();
 
   // Read all connected sensors
   #if SIMULATION_MODE == true

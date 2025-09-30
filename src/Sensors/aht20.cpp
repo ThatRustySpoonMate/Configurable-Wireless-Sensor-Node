@@ -17,6 +17,7 @@ uint32_t init_aht20() {
         MY_DEBUG_PRINTLN("Could not find a valid AHT20 sensor, check wiring, address, sensor ID!");
         MY_DEBUG_PRINT("SensorID status: "); 
         MY_DEBUG_PRINTLN(aht20.getStatus());
+        mqtt_log_error("Error initializing AHT2x sensor.");
         return 0; // Fail
     }
 

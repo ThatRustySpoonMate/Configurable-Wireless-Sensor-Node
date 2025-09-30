@@ -16,6 +16,7 @@ uint32_t init_bme280() {
         MY_DEBUG_PRINTLN("Could not find a valid BME280 sensor, check wiring, address, sensor ID!");
         MY_DEBUG_PRINT("SensorID was: 0x"); 
         MY_DEBUG_PRINTLN(bme.sensorID());
+        mqtt_log_error("Error initializing BME280 sensor.");
         return 0; // Fail
     }
 
