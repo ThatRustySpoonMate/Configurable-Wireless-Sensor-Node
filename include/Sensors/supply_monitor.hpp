@@ -7,7 +7,7 @@
 #ifdef INTERNAL_SUPPLY_MONITORING
 
 // Function declarations
-uint32_t init_supply_monitoring();
+uint8_t init_supply_monitoring();
 void read_supply_voltage(transmit_data_t *voltage);
 float get_battery_voltage_calibrated();
 

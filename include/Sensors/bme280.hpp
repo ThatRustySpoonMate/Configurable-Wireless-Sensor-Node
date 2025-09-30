@@ -7,7 +7,7 @@
 #ifdef DEVICE_BME280
 
 // Function declarations
-uint32_t init_bme280();
+uint8_t init_bme280();
 void read_bme280(transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *baroPres, transmit_data_t *altitude);
 
 #endif // DEVICE_BME280

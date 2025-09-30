@@ -39,33 +39,46 @@ void setup_uptime();
 
 
 void sensorTask_init() {
-  
+  uint8_t sensorStatus = 0;
+
   #ifdef DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR
-  init_soil_sensor();
+  sensorStatus = init_soil_sensor();
   #endif
 
   #ifdef DEVICE_BME280
-  init_bme280();
+  sensorStatus = init_bme280();
+  if(0 == sensorStatus) {
+    mqtt_log_error("Error initializing BME280 sensor.");
+  }
   #endif
 
   #ifdef DEVICE_AHT20
-  init_aht20();
+  sensorStatus = init_aht20();
+  if(0 == sensorStatus) {
+    mqtt_log_error("Error initializing AHT2x sensor.");
+  }
   #endif
 
   #ifdef DEVICE_ENS160
-  init_ens160();
+  sensorStatus = init_ens160();
+  if(0 == sensorStatus) {
+    mqtt_log_error("Error initializing ENS160 sensor.");
+  }
   #endif
 
   #if defined(DEVICE_DHT11) ||  defined(DEVICE_DHT21) || defined(DEVICE_DHT22)
-  init_dht_unified();
+  sensorStatus = init_dht_unified();
+  if(0 == sensorStatus) {
+    mqtt_log_error("Error initializing DHT sensor.");
+  }
   #endif
 
   #ifdef INTERNAL_SUPPLY_MONITORING
-  init_supply_monitoring();
+  sensorStatus = init_supply_monitoring();
   #endif
 
   #ifdef INTERNAL_ADC_SAMPLING
-  init_internal_adc_sampling();
+  sensorStatus = init_internal_adc_sampling();
   #endif
 
   #ifdef UPTIME_MONITORING

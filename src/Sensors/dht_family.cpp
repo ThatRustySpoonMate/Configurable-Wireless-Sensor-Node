@@ -20,8 +20,8 @@ static DHT_Unified dht21(DHT21_OUT_PIN, DHT21);
 static DHT_Unified dht22(DHT22_OUT_PIN, DHT22);
 #endif
 
-uint32_t init_dht_unified() {
-    uint32_t status = 2; // Uninitialized
+uint8_t init_dht_unified() {
+    uint8_t status = 2; // Uninitialized
 
     #ifdef DEVICE_DHT11
     MY_DEBUG_PRINTLN("Detected DHT11");

@@ -4,7 +4,7 @@
 
 #include "main.hpp"
 
-uint32_t init_soil_sensor() {
+uint8_t init_soil_sensor() {
     MY_DEBUG_PRINTLN("Detected Soil Sensor");
 
     // Initialize soil moisture sensors

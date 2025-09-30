@@ -7,7 +7,7 @@
 #ifdef INTERNAL_ADC_SAMPLING
 
 // Function declarations
-uint32_t init_internal_adc_sampling();
+uint8_t init_internal_adc_sampling();
 void read_internal_adc_pins(transmit_data_t *analog_pins);
 
 #endif // INTERNAL_ADC_SAMPLING

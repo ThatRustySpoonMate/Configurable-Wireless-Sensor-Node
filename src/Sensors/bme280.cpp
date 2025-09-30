@@ -8,7 +8,7 @@
 // Global sensor instance
 static Adafruit_BME280 bme; // I2C
 
-uint32_t init_bme280() {
+uint8_t init_bme280() {
     MY_DEBUG_PRINTLN("Detected BME280");
     
     uint32_t status = bme.begin(BME280_ADDR);
@@ -16,7 +16,6 @@ uint32_t init_bme280() {
         MY_DEBUG_PRINTLN("Could not find a valid BME280 sensor, check wiring, address, sensor ID!");
         MY_DEBUG_PRINT("SensorID was: 0x"); 
         MY_DEBUG_PRINTLN(bme.sensorID());
-        mqtt_log_error("Error initializing BME280 sensor.");
         return 0; // Fail
     }
 

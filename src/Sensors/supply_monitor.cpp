@@ -4,7 +4,7 @@
 
 #include "main.hpp"
 
-uint32_t init_supply_monitoring() {
+uint8_t init_supply_monitoring() {
     pinMode(SUPPLY_MON_ADC_PIN, INPUT);
     analogReadResolution(12);
     return 1; // Success

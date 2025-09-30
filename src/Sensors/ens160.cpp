@@ -8,13 +8,12 @@
 // Sensor instance
 ScioSense_ENS160 ens160(ENS160_I2C_ADDRESS);
 
-uint32_t init_ens160() {
+uint8_t init_ens160() {
     MY_DEBUG_PRINTLN("Detected ens160");
     
     bool status = ens160.begin();
     if (!status) {
         MY_DEBUG_PRINTLN("Could not find a valid ENS160 sensor, check wiring or address");
-        mqtt_log_error("Error initializing ens160 sensor.");
         return 0; // Fail
     }
 

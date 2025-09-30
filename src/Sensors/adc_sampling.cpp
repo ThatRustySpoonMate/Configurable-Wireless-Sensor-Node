@@ -2,7 +2,7 @@
 
 #ifdef INTERNAL_ADC_SAMPLING
 
-uint32_t init_internal_adc_sampling() {
+uint8_t init_internal_adc_sampling() {
     uint8_t adc_pins[] = INTERNAL_ADC_PINS;
 
     // Set prescribed monitored pins to INPUT mode
