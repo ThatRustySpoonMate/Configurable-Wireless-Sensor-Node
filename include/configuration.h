@@ -146,7 +146,7 @@
 #define ENS160_AQI_ID 0
 #define ENS160_TVOC_ID 0
 #define ENS160_ECO2_ID 0
-#define ENS160_IDLE_AFTER_READING true // If true, will enter idle state after a reading is taken, this presumably lowers power consumption, but results in a longer startup time for next reading. Only set to true if you have a large value for DEFAULT_SLEEP_TIME_SECONDS (e.g. 10+ minutes)
+#define ENS160_IDLE_AFTER_READING false // If true, will enter idle state after a reading is taken, this presumably lowers power consumption, but results in a longer startup time for next reading. Only set to true if you have a large value for DEFAULT_SLEEP_TIME_SECONDS (e.g. 10+ minutes)
 #define ENS160_STATE_FIRST_STARTUP_POLL_INTERVAL 25000
 #define ENS160_STATE_WARMING_POLL_INTERVAL 3000
 #define ENS160_STATE_INVALID_POLL_INTERVAL 50
