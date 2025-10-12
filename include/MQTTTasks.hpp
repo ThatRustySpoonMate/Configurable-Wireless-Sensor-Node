@@ -22,6 +22,7 @@ extern const char *MQTT_TOPIC_UPTIME;           // Example: "home/outside/garden
 extern const char *MQTT_TOPIC_WIFI_RSSI;        // Example: "home/outside/garden/wifi-rssi"
 extern const char *MQTT_TOPIC_ERRORS;           // Example: "home/outside/garden/errors"
 extern const char *MQTT_TOPIC_MANAGEMENT_INTERVAL;       // Example: "home/outside/garden/manage/interval";
+extern const char *MQTT_TOPIC_MANAGEMENT_LOCATION;       // Example: "home/outside/garden/manage/location";
 
 void setup_mqtt(const char *MQTT_BROKER_IP, const int MQTT_BROKER_PORT, const char *DEV_NAME);
 
@@ -38,5 +39,7 @@ void management_message_receive(char* topic, byte* message, unsigned int length)
 void mqtt_log_error(const char* err_message);
 
 void mqtt_disconnect();
+
+void build_mqtt_topics();
 
 #endif

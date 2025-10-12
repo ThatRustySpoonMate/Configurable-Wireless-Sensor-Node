@@ -8,10 +8,13 @@
 #define MY_DEBUG_PRINT(_STRING_) if(debug_log) { Serial.print(_STRING_); }
 #define MY_DEBUG_PRINTLN(_STRING_) if(debug_log) { Serial.println(_STRING_); }
 
+#define LOCATION_SLUG_MAX_LENGTH 64
+
 extern bool debug_log;
 extern uint32_t time_to_sleep;
 extern uint32_t device_uptime;
 extern Preferences preferences;
+extern char location_slug[LOCATION_SLUG_MAX_LENGTH];
 
 typedef enum data_points_e {
     TEMPERATURE_IDX = 0,

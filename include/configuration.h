@@ -22,7 +22,7 @@
 #define WATCHDOG_TIMEOUT_SECONDS 30             // 30 seconds before watchdog triggers
 
 // ========== MQTT CONFIGURATION ==========
-#define MQTT_TOPIC_LOCATION_SLUG "home/downstairs/testing"
+#define MQTT_TOPIC_LOCATION_SLUG "home/portable/v3-test"  // Default location slug (can be changed via MQTT)
 #define MQTT_TOPIC_LENGTH_MAX 100
 #define MQTT_TRANSMIT_TIME_BUFFER 3000           // Amount of time after queueing last message to be sent before disconnecting and sleeping, this is also the window of time that you have to issue commands to the device over MQTT, decrease to increase battery life if you don't need to configure it once deployed. Increase if your MQTT messages are not reliably coming through (especially on slower networks)
 
@@ -42,11 +42,13 @@
 #define ERRORS_TOPIC_SUFFIX "/errors"
 // MQTT Management topic suffixes - Receive
 #define MANAGEMENT_OUTPUT_INTERVAL_TOPIC_SUFFIX "/manage/interval"
+#define MANAGEMENT_LOCATION_TOPIC_SUFFIX "/manage/location"
 
 // ========== PREFERENCES (FLASH-EMULATED-EEPROM) CONFIGURATION ==========
 #define PREFS_NAMESPACE "device"
 #define UPTIME_KEY "uptime"
 #define INTERVAL_KEY "interval"
+#define LOCATION_SLUG_KEY "location"
 
 
 // ========== DEVICE CONFIGURATION ==========

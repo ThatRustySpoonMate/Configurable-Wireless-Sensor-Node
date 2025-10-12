@@ -8,6 +8,7 @@
 
 uint32_t time_to_sleep = DEFAULT_SLEEP_TIME_SECONDS;    /* Time ESP32 will sleep for between readings (in seconds) */
 bool debug_log = DEBUG_DEFAULT_STATE;
+char location_slug[LOCATION_SLUG_MAX_LENGTH];
 
 Preferences preferences;
 uint32_t device_uptime = 0;
@@ -31,6 +32,12 @@ void setup() {
 
   setup_watchdog();
 
+  load_config();
+
+  transmitTask_init();
+  setup_mqtt(MQTT_BROKER_IP, MQTT_BROKER_PORT, DEVICE_ID);
+
+  // Build transmit data topics
   strcpy(transmitData[TEMPERATURE_IDX].topic, MQTT_TOPIC_TEMPERATURE);
   strcpy(transmitData[HUMIDITY_IDX].topic, MQTT_TOPIC_HUMIDITY);
   strcpy(transmitData[AQI_IDX].topic, MQTT_TOPIC_AQI);
@@ -43,11 +50,6 @@ void setup() {
   strcpy(transmitData[ANALOG_PINS_IDX].topic, MQTT_TOPIC_ANALOG_PINS);
   strcpy(transmitData[UPTIME_IDX].topic, MQTT_TOPIC_UPTIME);
   strcpy(transmitData[WIFI_RSSI_IDX].topic, MQTT_TOPIC_WIFI_RSSI);
-
-  load_config();
-
-  transmitTask_init();
-  setup_mqtt(MQTT_BROKER_IP, MQTT_BROKER_PORT, DEVICE_ID);
 
   // Reset transmission state on startup
   transmitTask_reset();
@@ -195,7 +197,23 @@ void load_config() {
     preferences.putULong(INTERVAL_KEY, DEFAULT_SLEEP_TIME_SECONDS);
   }
 
-
+  // Load location slug from preferences or use default
+  String stored_slug = preferences.getString(LOCATION_SLUG_KEY, "");
+  
+  if(stored_slug.length() > 0) {
+    // Location slug has been stored in flash
+    strncpy(location_slug, stored_slug.c_str(), LOCATION_SLUG_MAX_LENGTH - 1);
+    location_slug[LOCATION_SLUG_MAX_LENGTH - 1] = '\0'; // Ensure null termination
+    MY_DEBUG_PRINT("Loaded location slug from flash: ");
+    MY_DEBUG_PRINTLN(location_slug);
+  } else {
+    // No location slug in flash (likely first boot), use default
+    strncpy(location_slug, MQTT_TOPIC_LOCATION_SLUG, LOCATION_SLUG_MAX_LENGTH - 1);
+    location_slug[LOCATION_SLUG_MAX_LENGTH - 1] = '\0'; // Ensure null termination
+    preferences.putString(LOCATION_SLUG_KEY, location_slug);
+    MY_DEBUG_PRINT("Using default location slug: ");
+    MY_DEBUG_PRINTLN(location_slug);
+  }
 }
 
 
