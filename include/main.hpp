@@ -2,8 +2,9 @@
 #define MAIN_HPP
 
 #include <Arduino.h>
-#include "configuration.h"
 #include <Preferences.h>
+#include "configuration.h"
+#include "device.hpp"
 
 #define MY_DEBUG_PRINT(_STRING_) if(debug_log) { Serial.print(_STRING_); }
 #define MY_DEBUG_PRINTLN(_STRING_) if(debug_log) { Serial.println(_STRING_); }
