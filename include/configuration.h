@@ -40,9 +40,12 @@
 #define UPTIME_TOPIC_SUFFIX "/uptime"
 #define WIFI_RSSI_TOPIC_SUFFIX "/wifi-rssi"
 #define ERRORS_TOPIC_SUFFIX "/errors"
+#define FIRMWARE_VERSION_TOPIC_SUFFIX "/firmwareversion"
 // MQTT Management topic suffixes - Receive
 #define MANAGEMENT_OUTPUT_INTERVAL_TOPIC_SUFFIX "/manage/interval"
 #define MANAGEMENT_LOCATION_TOPIC_SUFFIX "/manage/location"
+// MQTT Query topic suffixes - Receive 
+#define QUERY_FIRMWARE_VERSION_TOPIC_SUFFIX "/query/firmwareversion"
 
 // ========== PREFERENCES (FLASH-EMULATED-EEPROM) CONFIGURATION ==========
 #define PREFS_NAMESPACE "device"
