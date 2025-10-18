@@ -1,5 +1,6 @@
 #include "MQTTTasks.hpp"
 #include "configuration.h"
+#include "commands.hpp"
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -202,32 +203,23 @@ void management_message_receive(char* topic, byte* message, unsigned int length)
   // Check and set data interval
   if (String(topic) == MQTT_TOPIC_MANAGEMENT_INTERVAL) { 
     time_to_sleep = receivedMessage.toInt(); 
-    preferences.putULong(INTERVAL_KEY, time_to_sleep);
-    MY_DEBUG_PRINT("Updated sleep interval to: ");
-    MY_DEBUG_PRINTLN(time_to_sleep);
+    commands_set_interval(time_to_sleep);
   }
   
   // Check and set location slug - will take effect on next wake from deep sleep
   if (String(topic) == MQTT_TOPIC_MANAGEMENT_LOCATION) {
     // Validate message length
     if (receivedMessage.length() > 0 && receivedMessage.length() < LOCATION_SLUG_MAX_LENGTH) {
-      // Save to flash - will be loaded on next wake
-      preferences.putString(LOCATION_SLUG_KEY, receivedMessage);
-      
-      MY_DEBUG_PRINT("Location slug saved to flash: ");
-      MY_DEBUG_PRINTLN(receivedMessage);
-      MY_DEBUG_PRINTLN("Will take effect on next wake from deep sleep");
+      commands_set_location(receivedMessage);
     } else {
+      mqtt_transmit(MQTT_TOPIC_ERRORS, "Invalid location slug length - ignoring");
       MY_DEBUG_PRINTLN("Invalid location slug length - ignoring");
     }
   }
 
   // Check for firmware version query
   if (String(topic) == MQTT_TOPIC_QUERY_FIRMWARE_VERSION) {
-    String version = String(FIRMWARE_VERSION_MAJOR) + "." + 
-                    String(FIRMWARE_VERSION_MINOR) + "." + 
-                    String(FIRMWARE_VERSION_MICRO);
-    mqtt_transmit(MQTT_TOPIC_FIRMWARE_VERSION, version.c_str());
+    commands_get_firmware_version();
   }
 
   return;
