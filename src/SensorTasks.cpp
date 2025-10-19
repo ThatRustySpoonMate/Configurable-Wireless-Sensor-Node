@@ -39,6 +39,7 @@ void setup_uptime();
 
 
 void sensorTask_init() {
+  
   uint8_t sensorStatus = 0;
 
   #ifdef DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR

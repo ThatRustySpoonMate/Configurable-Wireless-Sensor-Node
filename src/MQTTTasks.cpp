@@ -158,6 +158,10 @@ void mqtt_reconnect() {
 
 bool mqtt_reconnect_with_timeout(uint32_t timeout_ms) {
   uint32_t start_time = millis();
+
+  if(client.connected()) {
+    return true;
+  }
   
   while (!client.connected() && (millis() - start_time < timeout_ms)) {
     MY_DEBUG_PRINTLN("Attempting MQTT connection...");

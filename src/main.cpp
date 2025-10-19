@@ -141,6 +141,12 @@ void enter_deep_sleep() {
   preferences.putULong(UPTIME_KEY, device_uptime);
   #endif
 
+  // If interval is 0, then don't go to sleep
+  if(time_to_sleep == 0) {
+    current_state = STATE_WAKE_UP; // Just in case
+    return;
+  }
+
   // Close preferences to ensure pending writes are complete
   preferences.end();
 

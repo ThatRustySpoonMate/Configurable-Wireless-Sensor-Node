@@ -5,7 +5,7 @@
 #define SIMULATION_MODE false                   // Change to true to simulate connected devices (the ones you specify down below)
 
 // ========== POWER MANAGEMENT ==========
-#define DEFAULT_SLEEP_TIME_SECONDS 60           // Normal sleep time - time between readings
+#define DEFAULT_SLEEP_TIME_SECONDS 30           // Normal sleep time - time between readings
 #define LOW_BATTERY_SLEEP_TIME_SECONDS 300      // Sleep time when battery is low (5 minutes) - currently unimplemented
 #define VERY_LOW_BATTERY_SLEEP_TIME_SECONDS 600 // Sleep time when battery is very low (10 minutes) - currently unimplemented
 #define CPU_FREQUENCY_MHZ 80                    // Lower frequency saves power

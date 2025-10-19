@@ -25,6 +25,10 @@ bool setup_wifi_with_timeout(const char *ssid, const char *password, uint32_t ti
   MY_DEBUG_PRINT("Connecting to ");
   MY_DEBUG_PRINTLN(ssid);
 
+  if(WiFi.status() == WL_CONNECTED) {
+    return true;
+  }
+
   WiFi.begin(ssid, password);
   
   uint32_t start_time = millis();
