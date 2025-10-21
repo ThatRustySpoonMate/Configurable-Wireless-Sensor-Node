@@ -1,4 +1,5 @@
 #include "TransmitTask.hpp"
+#include "SerialTask.hpp"
 
 // Global variables for transmission timing
 static unsigned long transmission_start_time = 0;
@@ -19,10 +20,12 @@ void transmitTask_run(transmit_data_entry_t transmitData[DATAPOINTS_NUM]) {
   ready_for_sleep = false;
   
   /* Convert readings to string objects then transmit them - only send data points for connected devices */
+  serial_transmit_start(); // Add start of serial strings for json and csv
 
   #ifdef UPTIME_MONITORING
     readingStr = String(transmitData[UPTIME_IDX].data.data_u32[0]);
     mqtt_transmit(transmitData[UPTIME_IDX].topic, readingStr.c_str());
+    serial_transmit(transmitData[UPTIME_IDX].topic, readingStr.c_str());
   #endif
   
   #ifdef SUPPLY_MONITORING_CONNECTED
@@ -31,6 +34,7 @@ void transmitTask_run(transmit_data_entry_t transmitData[DATAPOINTS_NUM]) {
       readingStr = String(transmitData[SUPPLY_VOLTAGE_IDX].data.data_u16[i]);
       topicWithIndex = String(transmitData[SUPPLY_VOLTAGE_IDX].topic) + "/" + String(i);
       mqtt_transmit(topicWithIndex.c_str(), readingStr.c_str());
+      serial_transmit(transmitData[SUPPLY_VOLTAGE_IDX].topic, readingStr.c_str());
     }
   #endif
 
@@ -40,6 +44,7 @@ void transmitTask_run(transmit_data_entry_t transmitData[DATAPOINTS_NUM]) {
       readingStr = String(transmitData[SOIL_MOISTURE_IDX].data.data_u16[i]);
       topicWithIndex = String(transmitData[SOIL_MOISTURE_IDX].topic) + "/" + String(i);
       mqtt_transmit(topicWithIndex.c_str(), readingStr.c_str());
+      serial_transmit(transmitData[SOIL_MOISTURE_IDX].topic, readingStr.c_str());
     }
   #endif
 
@@ -49,6 +54,7 @@ void transmitTask_run(transmit_data_entry_t transmitData[DATAPOINTS_NUM]) {
       readingStr = String(transmitData[TEMPERATURE_IDX].data.data_f32[i]);
       topicWithIndex = String(transmitData[TEMPERATURE_IDX].topic) + "/" + String(i);
       mqtt_transmit(topicWithIndex.c_str(), readingStr.c_str());
+      serial_transmit(transmitData[TEMPERATURE_IDX].topic, readingStr.c_str());
     }
   #endif
 
@@ -58,6 +64,7 @@ void transmitTask_run(transmit_data_entry_t transmitData[DATAPOINTS_NUM]) {
       readingStr = String(transmitData[HUMIDITY_IDX].data.data_f32[i]);
       topicWithIndex = String(transmitData[HUMIDITY_IDX].topic) + "/" + String(i);
       mqtt_transmit(topicWithIndex.c_str(), readingStr.c_str());
+      serial_transmit(transmitData[HUMIDITY_IDX].topic, readingStr.c_str());
     }
   #endif
 
@@ -67,6 +74,7 @@ void transmitTask_run(transmit_data_entry_t transmitData[DATAPOINTS_NUM]) {
       readingStr = String(transmitData[AQI_IDX].data.data_u16[i]);
       topicWithIndex = String(transmitData[AQI_IDX].topic) + "/" + String(i);
       mqtt_transmit(topicWithIndex.c_str(), readingStr.c_str());
+      serial_transmit(transmitData[AQI_IDX].topic, readingStr.c_str());
     }
   #endif
 
@@ -76,6 +84,7 @@ void transmitTask_run(transmit_data_entry_t transmitData[DATAPOINTS_NUM]) {
       readingStr = String(transmitData[TVOC_IDX].data.data_u16[i]);
       topicWithIndex = String(transmitData[TVOC_IDX].topic) + "/" + String(i);
       mqtt_transmit(topicWithIndex.c_str(), readingStr.c_str());
+      serial_transmit(transmitData[TVOC_IDX].topic, readingStr.c_str());
     }
   #endif
 
@@ -85,6 +94,7 @@ void transmitTask_run(transmit_data_entry_t transmitData[DATAPOINTS_NUM]) {
       readingStr = String(transmitData[ECO2_IDX].data.data_u16[i]);
       topicWithIndex = String(transmitData[ECO2_IDX].topic) + "/" + String(i);
       mqtt_transmit(topicWithIndex.c_str(), readingStr.c_str());
+      serial_transmit(transmitData[ECO2_IDX].topic, readingStr.c_str());
     }
   #endif
 
@@ -94,6 +104,7 @@ void transmitTask_run(transmit_data_entry_t transmitData[DATAPOINTS_NUM]) {
       readingStr = String(transmitData[PRESSURE_IDX].data.data_f32[i]);
       topicWithIndex = String(transmitData[PRESSURE_IDX].topic) + "/" + String(i);
       mqtt_transmit(topicWithIndex.c_str(), readingStr.c_str());
+      serial_transmit(transmitData[PRESSURE_IDX].topic, readingStr.c_str());
     }
   #endif
 
@@ -103,6 +114,7 @@ void transmitTask_run(transmit_data_entry_t transmitData[DATAPOINTS_NUM]) {
       readingStr = String(transmitData[ALTITUDE_IDX].data.data_f32[i]);
       topicWithIndex = String(transmitData[ALTITUDE_IDX].topic) + "/" + String(i);
       mqtt_transmit(topicWithIndex.c_str(), readingStr.c_str());
+      serial_transmit(transmitData[ALTITUDE_IDX].topic, readingStr.c_str());
     }
   #endif
 
@@ -113,13 +125,17 @@ void transmitTask_run(transmit_data_entry_t transmitData[DATAPOINTS_NUM]) {
       readingStr = String(transmitData[ANALOG_PINS_IDX].data.data_u16[i]);
       topicWithIndex = String(transmitData[ANALOG_PINS_IDX].topic) + "/" + String(adc_pins[i]);
       mqtt_transmit(topicWithIndex.c_str(), readingStr.c_str());
+      serial_transmit(transmitData[ANALOG_PINS_IDX].topic, readingStr.c_str());
     }
   #endif
 
   #ifdef WIFI_RSSI_MONITORING_CONNECTED
-  readingStr = String(transmitData[WIFI_RSSI_IDX].data.data_i8[0]);
-  mqtt_transmit(transmitData[WIFI_RSSI_IDX].topic, readingStr.c_str());
+    readingStr = String(transmitData[WIFI_RSSI_IDX].data.data_i8[0]);
+    mqtt_transmit(transmitData[WIFI_RSSI_IDX].topic, readingStr.c_str());
+    serial_transmit(transmitData[WIFI_RSSI_IDX].topic, readingStr.c_str());
   #endif
+
+  serial_transmit_end(); // Terminate serial strings for json and csv
 
   MY_DEBUG_PRINTLN("All data queued for transmission");
 
@@ -127,27 +143,32 @@ void transmitTask_run(transmit_data_entry_t transmitData[DATAPOINTS_NUM]) {
 
 // Check if enough time has passed since transmission started
 bool transmitTask_isReadyForSleep() {
-    if (!transmission_in_progress) {
-        return false; // Haven't started transmission yet
-    }
-    
-    if (ready_for_sleep) {
-        return true; // Already determined we're ready
-    }
-    
-    // Check if enough time has elapsed
-    unsigned long elapsed = millis() - transmission_start_time;
-    if (elapsed >= MQTT_TRANSMIT_TIME_BUFFER) {
-        MY_DEBUG_PRINTLN("Transmission buffer time elapsed");
-        ready_for_sleep = true;
-        
-        // Disconnect from MQTT now that we're ready to sleep
-        mqtt_disconnect();
-        
-        return true;
-    }
-    
-    return false;
+  #ifndef DATA_OUTPUT_OVER_MQTT
+    MY_DEBUG_PRINTLN("Skipping waiting for MQTT to send.");
+    return true; // Skip waiting for MQTT to send
+  #endif
+
+  if (!transmission_in_progress) {
+      return false; // Haven't started transmission yet
+  }
+
+  if (ready_for_sleep) {
+      return true; // Already determined we're ready
+  }
+
+  // Check if enough time has elapsed
+  unsigned long elapsed = millis() - transmission_start_time;
+  if (elapsed >= MQTT_TRANSMIT_TIME_BUFFER) {
+      MY_DEBUG_PRINTLN("Transmission buffer time elapsed");
+      ready_for_sleep = true;
+      
+      // Disconnect from MQTT now that we're ready to sleep
+      mqtt_disconnect();
+      
+      return true;
+  }
+
+  return false;
 }
 
 // Reset transmission state (call this when waking up or starting new cycle)

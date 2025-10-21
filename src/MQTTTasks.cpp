@@ -75,6 +75,8 @@ void build_mqtt_topics() {
 
 void setup_mqtt(const char *MQTT_BROKER_IP, const int MQTT_BROKER_PORT, const char *DEV_NAME) {
 
+  #ifdef DATA_OUTPUT_OVER_MQTT
+
   // Build all MQTT topics from the location slug
   build_mqtt_topics();
 
@@ -104,36 +106,53 @@ void setup_mqtt(const char *MQTT_BROKER_IP, const int MQTT_BROKER_PORT, const ch
 
   client.setCallback(management_message_receive);
 
+  #endif
+
   return;
 }
 
 
 void mqtt_transmit(const char *topic, const char *payload) {
+  #ifdef DATA_OUTPUT_OVER_MQTT
+
   mqtt_keep_alive();
   client.publish(topic, payload);
+
+  #endif
 
   return;
 }
 
 
 void mqtt_keep_alive() {
+  #ifdef DATA_OUTPUT_OVER_MQTT
+
   if (!client.connected()) {
     mqtt_reconnect();
   }
 
   client.loop();
 
+  #endif
+
   return;
 }
 
 void mqtt_log_error(const char* err_message) {
+  #ifdef DATA_OUTPUT_OVER_MQTT
+
   mqtt_transmit(MQTT_TOPIC_ERRORS, err_message);
+
+  #endif
 
   return;
 }
 
 
 void mqtt_reconnect() {
+
+  #ifdef DATA_OUTPUT_OVER_MQTT
+
   // Loop until we're reconnected
   while (!client.connected()) {
     MY_DEBUG_PRINT("Attempting MQTT connection...");
@@ -153,10 +172,15 @@ void mqtt_reconnect() {
     }
   }
 
+  #endif
+
   return;
 }
 
 bool mqtt_reconnect_with_timeout(uint32_t timeout_ms) {
+
+  #ifdef DATA_OUTPUT_OVER_MQTT
+
   uint32_t start_time = millis();
 
   if(client.connected()) {
@@ -185,11 +209,22 @@ bool mqtt_reconnect_with_timeout(uint32_t timeout_ms) {
   }
   
   MY_DEBUG_PRINTLN("MQTT connection timeout");
+
+  #endif
+
+  #ifndef DATA_OUTPUT_OVER_MQTT
+    MY_DEBUG_PRINTLN("Skipping connecting to MQTT");
+    return true; // Skip MQTT setup
+  #endif
+
   return false; // Timeout reached
 }
 
 
 void management_message_receive(char* topic, byte* message, unsigned int length) {
+
+  #ifdef DATA_OUTPUT_OVER_MQTT
+
   String receivedMessage;
 
   MY_DEBUG_PRINT("Message arrived on topic: ");
@@ -226,12 +261,19 @@ void management_message_receive(char* topic, byte* message, unsigned int length)
     commands_get_firmware_version();
   }
 
+  #endif
+
   return;
 }
 
 
 void mqtt_disconnect() {
+
+  #ifdef DATA_OUTPUT_OVER_MQTT
+
   client.disconnect();
+
+  #endif
   
   return;
 }
