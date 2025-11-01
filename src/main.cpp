@@ -4,6 +4,7 @@
 #include "SensorTasks.hpp"
 #include "TransmitTask.hpp"
 #include "esp_task_wdt.h" 
+#include "SerialTask.hpp"
 
 
 uint32_t time_to_sleep = DEFAULT_SLEEP_TIME_SECONDS;    /* Time ESP32 will sleep for between readings (in seconds) */
@@ -25,7 +26,7 @@ void setup() {
   #endif
 
   setCpuFrequencyMhz(CPU_FREQUENCY_MHZ);
-  Serial.begin(SERIAL_BAUD_RATE);
+  serial_setup();
   Serial.println("Running");
 
   preferences.begin(PREFS_NAMESPACE, false); // false = read/write mode
@@ -140,6 +141,12 @@ void enter_deep_sleep() {
   device_uptime += time_to_sleep; // Convert to seconds
   preferences.putULong(UPTIME_KEY, device_uptime);
   #endif
+
+  // If interval is 0, then don't go to sleep
+  if(time_to_sleep == 0) {
+    current_state = STATE_WAKE_UP; // Just in case
+    return;
+  }
 
   // Close preferences to ensure pending writes are complete
   preferences.end();

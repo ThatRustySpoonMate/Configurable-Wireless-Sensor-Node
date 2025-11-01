@@ -75,6 +75,8 @@ void build_mqtt_topics() {
 
 void setup_mqtt(const char *MQTT_BROKER_IP, const int MQTT_BROKER_PORT, const char *DEV_NAME) {
 
+  #ifdef MQTT_REQUIRED
+
   // Build all MQTT topics from the location slug
   build_mqtt_topics();
 
@@ -104,36 +106,53 @@ void setup_mqtt(const char *MQTT_BROKER_IP, const int MQTT_BROKER_PORT, const ch
 
   client.setCallback(management_message_receive);
 
+  #endif
+
   return;
 }
 
 
 void mqtt_transmit(const char *topic, const char *payload) {
+  #ifdef MQTT_REQUIRED
+
   mqtt_keep_alive();
   client.publish(topic, payload);
+
+  #endif
 
   return;
 }
 
 
 void mqtt_keep_alive() {
+  #ifdef MQTT_REQUIRED
+
   if (!client.connected()) {
     mqtt_reconnect();
   }
 
   client.loop();
 
+  #endif
+
   return;
 }
 
 void mqtt_log_error(const char* err_message) {
+  #ifdef MQTT_REQUIRED
+
   mqtt_transmit(MQTT_TOPIC_ERRORS, err_message);
+
+  #endif
 
   return;
 }
 
 
 void mqtt_reconnect() {
+
+  #ifdef MQTT_REQUIRED
+
   // Loop until we're reconnected
   while (!client.connected()) {
     MY_DEBUG_PRINT("Attempting MQTT connection...");
@@ -153,11 +172,20 @@ void mqtt_reconnect() {
     }
   }
 
+  #endif
+
   return;
 }
 
 bool mqtt_reconnect_with_timeout(uint32_t timeout_ms) {
+
+  #ifdef MQTT_REQUIRED
+
   uint32_t start_time = millis();
+
+  if(client.connected()) {
+    return true;
+  }
   
   while (!client.connected() && (millis() - start_time < timeout_ms)) {
     MY_DEBUG_PRINTLN("Attempting MQTT connection...");
@@ -181,11 +209,22 @@ bool mqtt_reconnect_with_timeout(uint32_t timeout_ms) {
   }
   
   MY_DEBUG_PRINTLN("MQTT connection timeout");
+
+  #endif
+
+  #ifndef MQTT_REQUIRED
+    MY_DEBUG_PRINTLN("MQTT: Not Required");
+    return true; // Skip MQTT setup
+  #endif
+
   return false; // Timeout reached
 }
 
 
 void management_message_receive(char* topic, byte* message, unsigned int length) {
+
+  #ifdef MQTT_REQUIRED
+
   String receivedMessage;
 
   MY_DEBUG_PRINT("Message arrived on topic: ");
@@ -222,12 +261,19 @@ void management_message_receive(char* topic, byte* message, unsigned int length)
     commands_get_firmware_version();
   }
 
+  #endif
+
   return;
 }
 
 
 void mqtt_disconnect() {
+
+  #ifdef MQTT_REQUIRED
+
   client.disconnect();
+
+  #endif
   
   return;
 }

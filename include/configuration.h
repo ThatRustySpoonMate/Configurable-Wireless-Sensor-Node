@@ -5,7 +5,7 @@
 #define SIMULATION_MODE false                   // Change to true to simulate connected devices (the ones you specify down below)
 
 // ========== POWER MANAGEMENT ==========
-#define DEFAULT_SLEEP_TIME_SECONDS 60           // Normal sleep time - time between readings
+#define DEFAULT_SLEEP_TIME_SECONDS 30           // Normal sleep time - time between readings
 #define LOW_BATTERY_SLEEP_TIME_SECONDS 300      // Sleep time when battery is low (5 minutes) - currently unimplemented
 #define VERY_LOW_BATTERY_SLEEP_TIME_SECONDS 600 // Sleep time when battery is very low (10 minutes) - currently unimplemented
 #define CPU_FREQUENCY_MHZ 80                    // Lower frequency saves power
@@ -16,15 +16,24 @@
 #define AGGRESSIVE_POWER_SAVE_THRESHOLD_V 2.7f  // Voltage to trigger aggressive power saving
 #define BATTERY_ADC_SAMPLES 16                  // Number of ADC samples to average
 
+// ========== CONNECTION TYPES ==========
+#define DATA_OUTPUT_OVER_MQTT                   // ENABLE DATA OUT OVER MQTT
+//#define DATA_OUTPUT_OVER_SERIAL                 // ENABLE DATA OUT OVER SERIAL
+
+#ifdef DATA_OUTPUT_OVER_MQTT 
+    #define WIFI_REQUIRED
+    #define MQTT_REQUIRED
+#endif
+
 // ========== CONNECTION TIMEOUTS ==========
 #define WIFI_CONNECT_TIMEOUT_MS 30000           // 30 seconds
 #define MQTT_CONNECT_TIMEOUT_MS 10000           // 10 seconds
 #define WATCHDOG_TIMEOUT_SECONDS 30             // 30 seconds before watchdog triggers
 
 // ========== MQTT CONFIGURATION ==========
-#define MQTT_TOPIC_LOCATION_SLUG "home/portable/v3-test"  // Default location slug (can be changed via MQTT)
+#define MQTT_TOPIC_LOCATION_SLUG "home/new-device"  // Default location slug (can be changed via MQTT)
 #define MQTT_TOPIC_LENGTH_MAX 100
-#define MQTT_TRANSMIT_TIME_BUFFER 3000           // Amount of time after queueing last message to be sent before disconnecting and sleeping, this is also the window of time that you have to issue commands to the device over MQTT, decrease to increase battery life if you don't need to configure it once deployed. Increase if your MQTT messages are not reliably coming through (especially on slower networks)
+#define MQTT_TRANSMIT_TIME_BUFFER 3000                    // Amount of time after queueing last message to be sent before disconnecting and sleeping, this is also the window of time that you have to issue commands to the device over MQTT, decrease to increase battery life if you don't need to configure it once deployed. Increase if your MQTT messages are not reliably coming through (especially on slower networks)
 
 // MQTT Data topic suffixes - Transmit
 #define MOISTURE_TOPIC_SUFFIX "/moisture"
@@ -47,6 +56,13 @@
 // MQTT Query topic suffixes - Receive 
 #define QUERY_FIRMWARE_VERSION_TOPIC_SUFFIX "/query/firmwareversion"
 
+// ========== SERIAL CONFIGURATION ==========
+#define SERIAL_BAUD_RATE 115200
+#define DEBUG_DEFAULT_STATE true           // Start with debug off
+#define SERIAL_DATA_OUT_FORMAT_CSV          // RECCOMEND SELECTING 1
+//#define SERIAL_DATA_OUT_FORMAT_JSON         // RECCOMEND SELECTING 1
+//#define SERIAL_DATA_OUT_FORMAT_HUMAN        // RECCOMEND SELECTING 1
+
 // ========== PREFERENCES (FLASH-EMULATED-EEPROM) CONFIGURATION ==========
 #define PREFS_NAMESPACE "device"
 #define UPTIME_KEY "uptime"
@@ -58,12 +74,13 @@
 // Uncomment the devices you have connected
 #define DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR
 //#define DEVICE_BME280
-#define DEVICE_AHT20 // Use this for all AHT2x sensors
-#define DEVICE_ENS160
+#define DEVICE_SCD4X
+//#define DEVICE_AHT20                    // Use this for all AHT2x sensors
+//#define DEVICE_ENS160
 //#define DEVICE_DHT11
 //#define DEVICE_DHT21
 //#define DEVICE_DHT22
-#define INTERNAL_SUPPLY_MONITORING   // Resistor divider from supply to ADC Pin
+#define INTERNAL_SUPPLY_MONITORING      // Resistor divider from supply to ADC Pin
 //#define INTERNAL_ADC_SAMPLING 
 
 // Software Features
@@ -72,8 +89,10 @@
 #define WIFI_RSSI                    // Output the WiFi RSSI 
 
 
-// ========== SENSOR CONFIGURATION ==========
+// ========== SENSOR CONSTANTS ==========
 #define SEALEVELPRESSURE_HPA 1013.25f          // Standard sea level pressure hPa
+#define SENSOR_ALTITUDE 17                     // Metres above sea level
+
 
 // Soil Moisture Sensor
 #ifdef DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR
@@ -146,6 +165,12 @@
 #define BME280_ALTITUDE_ID 0
 #endif
 
+#if defined(DEVICE_SCD4X)
+#define SCD4X_ECO2_ID 0
+#define SCD4X_TEMPERATURE_ID 0
+#define SCD4X_HUMIDITY_ID 0
+#endif
+
 #if defined(DEVICE_AHT20)
 #define AHT20_TEMPERATURE_ID 0
 #define AHT20_HUMIDITY_ID 0
@@ -184,11 +209,6 @@
 #define DHT22_HUMIDITY_ID 1
 #endif
 
-
-// ========== DEBUG CONFIGURATION ==========
-#define SERIAL_BAUD_RATE 115200
-#define DEBUG_DEFAULT_STATE false              // Start with debug off
-
 // ========== DERIVED CONFIGURATIONS ==========
 // These are calculated from the above settings
 
@@ -214,6 +234,14 @@
 #define HAS_BME280 0
 #endif
 
+#if defined(DEVICE_SCD4X)
+#define TEMPERATURE_SENSOR_CONNECTED
+#define HUMIDITY_SENSOR_CONNECTED
+#define ECO2_SENSOR_CONNECTED
+#define HAS_SCD4X 1
+#else
+#define HAS_SCD4X 0
+#endif
 
 #if defined(DEVICE_AHT20)
 #define TEMPERATURE_SENSOR_CONNECTED
@@ -284,14 +312,14 @@
 
 
 // ========== SENSOR COUNT CALCULATIONS ==========
-#define TEMPERATURE_SENSOR_COUNT (HAS_BME280 + HAS_AHT20 + HAS_DHT11 + HAS_DHT21 + HAS_DHT22)
-#define HUMIDITY_SENSOR_COUNT (HAS_BME280 + HAS_AHT20 + HAS_DHT11 + HAS_DHT21 + HAS_DHT22)
+#define TEMPERATURE_SENSOR_COUNT (HAS_BME280 + HAS_AHT20 + HAS_DHT11 + HAS_DHT21 + HAS_DHT22 + HAS_SCD4X)
+#define HUMIDITY_SENSOR_COUNT (HAS_BME280 + HAS_AHT20 + HAS_DHT11 + HAS_DHT21 + HAS_DHT22 + HAS_SCD4X)
 #define PRESSURE_SENSOR_COUNT (HAS_BME280)
 #define ALTITUDE_SENSOR_COUNT (HAS_BME280)
 #define SOIL_MOISTURE_SENSOR_COUNT (HAS_CAPACITIVE_SOIL_MOISTURE)
 #define SUPPLY_MONITORING_SENSOR_COUNT (HAS_INTERNAL_SUPPLY_MONITORING)
 #define AQI_SENSOR_COUNT (HAS_ENS160)
 #define TVOC_SENSOR_COUNT (HAS_ENS160)
-#define ECO2_SENSOR_COUNT (HAS_ENS160)
+#define ECO2_SENSOR_COUNT (HAS_ENS160 + HAS_SCD4X)
 // Internal ADC count is derived from from number of pins
 #endif // CONFIGURATION_H
