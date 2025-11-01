@@ -28,16 +28,6 @@ uint8_t init_scd4x() {
         MY_DEBUG_PRINTLN("measureSingleShot failed. Are you sure you have a SCD41 connected?");
     }
 
-    // if (scd4x.stopPeriodicMeasurement() == true)
-    // {
-    //     MY_DEBUG_PRINTLN("Periodic measurement is disabled!");
-    // }  
-
-    // if (scd4x.startLowPowerPeriodicMeasurement() == true)
-    // {
-    //     MY_DEBUG_PRINTLN("Low power mode enabled!");
-    // }
-
     MY_DEBUG_PRINTLN("SCD4X successfully Initialized");
     return 1; // Success
 }
