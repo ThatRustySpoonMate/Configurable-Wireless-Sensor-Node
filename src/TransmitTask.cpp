@@ -88,13 +88,13 @@ void transmitTask_run(transmit_data_entry_t transmitData[DATAPOINTS_NUM]) {
     }
   #endif
 
-  #ifdef ECO2_SENSOR_CONNECTED
-    // Transmit all eCO2 sensor readings
-    for (int i = 0; i < ECO2_SENSOR_COUNT; i++) {
-      readingStr = String(transmitData[ECO2_IDX].data.data_u16[i]);
-      topicWithIndex = String(transmitData[ECO2_IDX].topic) + "/" + String(i);
+  #ifdef CO2_SENSOR_CONNECTED
+    // Transmit all CO2 sensor readings
+    for (int i = 0; i < CO2_SENSOR_COUNT; i++) {
+      readingStr = String(transmitData[CO2_IDX].data.data_u16[i]);
+      topicWithIndex = String(transmitData[CO2_IDX].topic) + "/" + String(i);
       mqtt_transmit(topicWithIndex.c_str(), readingStr.c_str());
-      serial_transmit(transmitData[ECO2_IDX].topic, readingStr.c_str());
+      serial_transmit(transmitData[CO2_IDX].topic, readingStr.c_str());
     }
   #endif
 

@@ -43,7 +43,7 @@ void setup() {
   strcpy(transmitData[HUMIDITY_IDX].topic, MQTT_TOPIC_HUMIDITY);
   strcpy(transmitData[AQI_IDX].topic, MQTT_TOPIC_AQI);
   strcpy(transmitData[TVOC_IDX].topic, MQTT_TOPIC_TVOC);
-  strcpy(transmitData[ECO2_IDX].topic, MQTT_TOPIC_ECO2);
+  strcpy(transmitData[CO2_IDX].topic, MQTT_TOPIC_CO2);
   strcpy(transmitData[PRESSURE_IDX].topic, MQTT_TOPIC_PRESSURE);
   strcpy(transmitData[ALTITUDE_IDX].topic, MQTT_TOPIC_ALTITUDE);
   strcpy(transmitData[SOIL_MOISTURE_IDX].topic, MQTT_TOPIC_MOISTURE);
@@ -122,9 +122,9 @@ void upon_wake() {
 
   // Read all connected sensors
   #if SIMULATION_MODE == true
-  stubReadSensors(&(transmitData[SOIL_MOISTURE_IDX].data), &(transmitData[TEMPERATURE_IDX].data), &(transmitData[HUMIDITY_IDX].data), &(transmitData[PRESSURE_IDX].data), &(transmitData[ALTITUDE_IDX].data), &(transmitData[SUPPLY_VOLTAGE_IDX].data), &(transmitData[UPTIME_IDX].data), &(transmitData[ANALOG_PINS_IDX].data), &(transmitData[WIFI_RSSI_IDX].data), &(transmitData[AQI_IDX].data), &(transmitData[TVOC_IDX].data), &(transmitData[ECO2_IDX].data) );
+  stubReadSensors(&(transmitData[SOIL_MOISTURE_IDX].data), &(transmitData[TEMPERATURE_IDX].data), &(transmitData[HUMIDITY_IDX].data), &(transmitData[PRESSURE_IDX].data), &(transmitData[ALTITUDE_IDX].data), &(transmitData[SUPPLY_VOLTAGE_IDX].data), &(transmitData[UPTIME_IDX].data), &(transmitData[ANALOG_PINS_IDX].data), &(transmitData[WIFI_RSSI_IDX].data), &(transmitData[AQI_IDX].data), &(transmitData[TVOC_IDX].data), &(transmitData[CO2_IDX].data) );
   #else
-  readSensors(&(transmitData[SOIL_MOISTURE_IDX].data), &(transmitData[TEMPERATURE_IDX].data), &(transmitData[HUMIDITY_IDX].data), &(transmitData[PRESSURE_IDX].data), &(transmitData[ALTITUDE_IDX].data), &(transmitData[SUPPLY_VOLTAGE_IDX].data), &(transmitData[UPTIME_IDX].data), &(transmitData[ANALOG_PINS_IDX].data), &(transmitData[WIFI_RSSI_IDX].data), &(transmitData[AQI_IDX].data), &(transmitData[TVOC_IDX].data), &(transmitData[ECO2_IDX].data));
+  readSensors(&(transmitData[SOIL_MOISTURE_IDX].data), &(transmitData[TEMPERATURE_IDX].data), &(transmitData[HUMIDITY_IDX].data), &(transmitData[PRESSURE_IDX].data), &(transmitData[ALTITUDE_IDX].data), &(transmitData[SUPPLY_VOLTAGE_IDX].data), &(transmitData[UPTIME_IDX].data), &(transmitData[ANALOG_PINS_IDX].data), &(transmitData[WIFI_RSSI_IDX].data), &(transmitData[AQI_IDX].data), &(transmitData[TVOC_IDX].data), &(transmitData[CO2_IDX].data));
   #endif
 
   pat_watchdog();

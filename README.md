@@ -6,6 +6,7 @@
 
 # Supported Sensors
  - BME280
+ - SCD4X
  - ENS160
  - AHT2x
  - DHT11
@@ -21,7 +22,7 @@ Supports a maximum of:
  - Two Humidity Readings
  - Two Pressure Sensor Readings
  - Two Altitude Sensor Readings
- - Four eCO2 Sensor Readings
+ - Four CO2 Sensor Readings
  - Four TVOC Sensor Readings
  - Four AQI sensor Readings
  - Four Soil Moisture Sensor Readings

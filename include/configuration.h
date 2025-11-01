@@ -41,7 +41,7 @@
 #define HUMIDITY_TOPIC_SUFFIX "/humidity"
 #define AQI_TOPIC_SUFFIC "/aqi"
 #define TVOC_TOPIC_SUFFIC "/tvoc"
-#define ECO2_TOPIC_SUFFIC "/eCO2"
+#define CO2_TOPIC_SUFFIC "/CO2"
 #define PRESSURE_TOPIC_SUFFIX "/pressure"
 #define ALTITUDE_TOPIC_SUFFIX "/altitude"
 #define SUPPLY_VOLTAGE_TOPIC_SUFFIX "/supply-voltage"
@@ -166,7 +166,7 @@
 #endif
 
 #if defined(DEVICE_SCD4X)
-#define SCD4X_ECO2_ID 0
+#define SCD4X_CO2_ID 0
 #define SCD4X_TEMPERATURE_ID 0
 #define SCD4X_HUMIDITY_ID 0
 #endif
@@ -179,7 +179,7 @@
 #if defined(DEVICE_ENS160)
 #define ENS160_AQI_ID 0
 #define ENS160_TVOC_ID 0
-#define ENS160_ECO2_ID 0
+#define ENS160_CO2_ID 0
 #endif
 
 #if defined(DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR)
@@ -237,7 +237,7 @@
 #if defined(DEVICE_SCD4X)
 #define TEMPERATURE_SENSOR_CONNECTED
 #define HUMIDITY_SENSOR_CONNECTED
-#define ECO2_SENSOR_CONNECTED
+#define CO2_SENSOR_CONNECTED
 #define HAS_SCD4X 1
 #else
 #define HAS_SCD4X 0
@@ -254,7 +254,7 @@
 #if defined(DEVICE_ENS160)
 #define AQI_SENSOR_CONNECTED
 #define TVOC_SENSOR_CONNECTED
-#define ECO2_SENSOR_CONNECTED
+#define CO2_SENSOR_CONNECTED
 #define HAS_ENS160 1
 #else
 #define HAS_ENS160 0
@@ -320,6 +320,6 @@
 #define SUPPLY_MONITORING_SENSOR_COUNT (HAS_INTERNAL_SUPPLY_MONITORING)
 #define AQI_SENSOR_COUNT (HAS_ENS160)
 #define TVOC_SENSOR_COUNT (HAS_ENS160)
-#define ECO2_SENSOR_COUNT (HAS_ENS160 + HAS_SCD4X)
+#define CO2_SENSOR_COUNT (HAS_ENS160 + HAS_SCD4X)
 // Internal ADC count is derived from from number of pins
 #endif // CONFIGURATION_H

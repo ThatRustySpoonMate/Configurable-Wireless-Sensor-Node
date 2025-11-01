@@ -23,7 +23,7 @@ uint8_t init_ens160() {
     return 1; // Success
 }
 
-void read_ens160(transmit_data_t *aqi, transmit_data_t *tvoc, transmit_data_t *eCO2, transmit_data_t *temp, transmit_data_t *humidity) {
+void read_ens160(transmit_data_t *aqi, transmit_data_t *tvoc, transmit_data_t *CO2, transmit_data_t *temp, transmit_data_t *humidity) {
     uint16_t new_AQI;
     uint16_t new_TVOC;
     uint16_t new_eCO2;
@@ -103,7 +103,7 @@ void read_ens160(transmit_data_t *aqi, transmit_data_t *tvoc, transmit_data_t *e
     // Update the transmit data structures
     aqi->data_u16[ENS160_AQI_ID] = new_AQI;
     tvoc->data_u16[ENS160_TVOC_ID] = new_TVOC;
-    eCO2->data_u16[ENS160_ECO2_ID] = new_eCO2;
+    CO2->data_u16[ENS160_CO2_ID] = new_eCO2;
 
     if(ENS160_IDLE_AFTER_READING){
         ens160.setOperatingMode(SFE_ENS160_IDLE);

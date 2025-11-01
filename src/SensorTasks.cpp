@@ -101,7 +101,7 @@ void sensorTask_init() {
 }
 
 // Stub function allows for testing without any connected sensors
-void stubReadSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *baroPres, transmit_data_t *altitude, transmit_data_t *supply_v, transmit_data_t *uptime, transmit_data_t *analog_pins, transmit_data_t *wifi_rssi, transmit_data_t *aqi, transmit_data_t *tvoc, transmit_data_t *eCO2) {
+void stubReadSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *baroPres, transmit_data_t *altitude, transmit_data_t *supply_v, transmit_data_t *uptime, transmit_data_t *analog_pins, transmit_data_t *wifi_rssi, transmit_data_t *aqi, transmit_data_t *tvoc, transmit_data_t *CO2) {
   randomSeed(analogRead(0));
 
   /* Read values from DEVICE_BME280 */
@@ -115,7 +115,7 @@ void stubReadSensors(transmit_data_t *moistureReading, transmit_data_t *temp, tr
   #ifdef DEVICE_SCD4X
   temp->data_f32[SCD4X_TEMPERATURE_ID] = random() % 65535;
   humidity->data_f32[SCD4X_HUMIDITY_ID] = random() % 65535;
-  baroPres->data_f32[SCD4X_ECO2_ID] = random() % 65535;
+  baroPres->data_f32[SCD4X_CO2_ID] = random() % 65535;
   #endif
 
   /* Read values from DEVICE_AHT20 */
@@ -159,7 +159,7 @@ void stubReadSensors(transmit_data_t *moistureReading, transmit_data_t *temp, tr
   #ifdef DEVICE_ENS160
   aqi->data_u16[ENS160_AQI_ID] = random() % 65535;
   tvoc->data_u16[ENS160_TVOC_ID] = random() % 65535;
-  eCO2->data_u16[ENS160_ECO2_ID] = random() % 65535;
+  CO2->data_u16[ENS160_CO2_ID] = random() % 65535;
   #endif
 
   /* Get Uptime */
@@ -176,7 +176,7 @@ void stubReadSensors(transmit_data_t *moistureReading, transmit_data_t *temp, tr
 }
 
 // Function that calls the read function of all connected sensors and packs the data correctly into the given transmit_data struct pointers
-void readSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *baroPres, transmit_data_t *altitude, transmit_data_t *supply_v, transmit_data_t *uptime, transmit_data_t *analog_pins, transmit_data_t *wifi_rssi, transmit_data_t *aqi, transmit_data_t *tvoc, transmit_data_t *eCO2) {
+void readSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *baroPres, transmit_data_t *altitude, transmit_data_t *supply_v, transmit_data_t *uptime, transmit_data_t *analog_pins, transmit_data_t *wifi_rssi, transmit_data_t *aqi, transmit_data_t *tvoc, transmit_data_t *CO2) {
 
   /* Read values from DEVICE_BME280 */
   #ifdef DEVICE_BME280
@@ -184,7 +184,7 @@ void readSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transm
   #endif
 
   #ifdef DEVICE_SCD4X
-  read_scd4x(temp, humidity, eCO2, baroPres); // Needs to be called before barometric pressure (pascals) is measured
+  read_scd4x(temp, humidity, CO2, baroPres); // Needs to be called before barometric pressure (pascals) is measured
   #endif
 
   /* Read values from DEVICE_AHT20 */
@@ -213,7 +213,7 @@ void readSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transm
 
   // Read this sensor last as it has an optional dependency on temp/humidity data
   #ifdef DEVICE_ENS160
-  read_ens160(aqi, tvoc, eCO2, temp, humidity); // Needs to be called before temperature and humidity is measured
+  read_ens160(aqi, tvoc, CO2, temp, humidity); // Needs to be called before temperature and humidity is measured
   #endif
 
   /* Get Uptime */

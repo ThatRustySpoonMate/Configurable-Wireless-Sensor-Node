@@ -25,9 +25,9 @@ typedef struct transmit_data_entry_s {
 
 void sensorTask_init();
 
-void stubReadSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *baroPres, transmit_data_t *altitude, transmit_data_t *supply_v, transmit_data_t *uptime, transmit_data_t *analog_pins, transmit_data_t *wifi_rssi, transmit_data_t *aqi, transmit_data_t *tvoc, transmit_data_t *eCO2);
+void stubReadSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *baroPres, transmit_data_t *altitude, transmit_data_t *supply_v, transmit_data_t *uptime, transmit_data_t *analog_pins, transmit_data_t *wifi_rssi, transmit_data_t *aqi, transmit_data_t *tvoc, transmit_data_t *CO2);
 
-void readSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *baroPres, transmit_data_t *altitude, transmit_data_t *supply_v, transmit_data_t *uptime, transmit_data_t *analog_pins, transmit_data_t *wifi_rssi, transmit_data_t *aqi, transmit_data_t *tvoc, transmit_data_t *eCO2);
+void readSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *baroPres, transmit_data_t *altitude, transmit_data_t *supply_v, transmit_data_t *uptime, transmit_data_t *analog_pins, transmit_data_t *wifi_rssi, transmit_data_t *aqi, transmit_data_t *tvoc, transmit_data_t *CO2);
 
 uint16_t readADCAveraged(uint8_t adc_pin, uint8_t samples);
 
