@@ -9,6 +9,10 @@
 #include "Sensors/bme280.hpp"
 #endif
 
+#ifdef DEVICE_SCD4X
+#include "Sensors/scd4x.hpp"
+#endif
+
 #ifdef DEVICE_AHT20
 #include "Sensors/aht20.hpp"
 #endif
@@ -50,6 +54,13 @@ void sensorTask_init() {
   sensorStatus = init_bme280();
   if(0 == sensorStatus) {
     mqtt_log_error("Error initializing BME280 sensor.");
+  }
+  #endif
+
+  #ifdef DEVICE_SCD4X
+  sensorStatus = init_scd4x();
+  if(0 == sensorStatus) {
+    mqtt_log_error("Error initializing SCD4X sensor.");
   }
   #endif
 
@@ -99,6 +110,12 @@ void stubReadSensors(transmit_data_t *moistureReading, transmit_data_t *temp, tr
   humidity->data_f32[BME280_HUMIDITY_ID] = random() % 65535;
   baroPres->data_f32[BME280_PRESSURE_ID] = random() % 65535;
   altitude->data_f32[BME280_ALTITUDE_ID] = random() % 65535;
+  #endif
+
+  #ifdef DEVICE_SCD4X
+  temp->data_f32[SCD4X_TEMPERATURE_ID] = random() % 65535;
+  humidity->data_f32[SCD4X_HUMIDITY_ID] = random() % 65535;
+  baroPres->data_f32[SCD4X_ECO2_ID] = random() % 65535;
   #endif
 
   /* Read values from DEVICE_AHT20 */
@@ -164,6 +181,10 @@ void readSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transm
   /* Read values from DEVICE_BME280 */
   #ifdef DEVICE_BME280
   read_bme280(temp, humidity, baroPres, altitude);
+  #endif
+
+  #ifdef DEVICE_SCD4X
+  read_scd4x(temp, humidity, eCO2);
   #endif
 
   /* Read values from DEVICE_AHT20 */
