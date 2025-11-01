@@ -2,6 +2,7 @@
 
 
 void setup_wifi(const char *ssid, const char *password) {
+  #ifdef WIFI_REQUIRED
   // We start by connecting to a WiFi network
   MY_DEBUG_PRINTLN();
   MY_DEBUG_PRINT("Connecting to ");
@@ -18,9 +19,14 @@ void setup_wifi(const char *ssid, const char *password) {
   MY_DEBUG_PRINTLN("WiFi connected");
   MY_DEBUG_PRINTLN("IP address: ");
   MY_DEBUG_PRINTLN(WiFi.localIP());
+
+  #endif
 }
 
 bool setup_wifi_with_timeout(const char *ssid, const char *password, uint32_t timeout_ms) {
+
+  #ifdef WIFI_REQUIRED
+
   MY_DEBUG_PRINTLN();
   MY_DEBUG_PRINT("Connecting to ");
   MY_DEBUG_PRINTLN(ssid);
@@ -53,19 +59,31 @@ bool setup_wifi_with_timeout(const char *ssid, const char *password, uint32_t ti
     MY_DEBUG_PRINTLN("WiFi connection timeout");
     return false;
   }
+
+  #else
+    MY_DEBUG_PRINT("Wifi: Not Required ");
+    return 1;
+  #endif
 }
 
 void wifi_disconnect() {
+  #ifdef WIFI_REQUIRED
+
   WiFi.disconnect();
 
+  #endif
   return;
 }
 
 
 int8_t wifi_get_rssi() {
+  #ifdef WIFI_REQUIRED
+  
   if(WiFi.isConnected()) {
     return WiFi.RSSI();
   } else {
     return 0;
   }
+
+  #endif
 }

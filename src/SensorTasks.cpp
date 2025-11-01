@@ -184,7 +184,7 @@ void readSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transm
   #endif
 
   #ifdef DEVICE_SCD4X
-  read_scd4x(temp, humidity, eCO2);
+  read_scd4x(temp, humidity, eCO2, baroPres); // Needs to be called before barometric pressure (pascals) is measured
   #endif
 
   /* Read values from DEVICE_AHT20 */
@@ -213,7 +213,7 @@ void readSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transm
 
   // Read this sensor last as it has an optional dependency on temp/humidity data
   #ifdef DEVICE_ENS160
-  read_ens160(aqi, tvoc, eCO2, temp, humidity);
+  read_ens160(aqi, tvoc, eCO2, temp, humidity); // Needs to be called before temperature and humidity is measured
   #endif
 
   /* Get Uptime */

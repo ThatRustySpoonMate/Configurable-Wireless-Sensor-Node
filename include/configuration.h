@@ -18,10 +18,11 @@
 
 // ========== CONNECTION TYPES ==========
 #define DATA_OUTPUT_OVER_MQTT                   // ENABLE DATA OUT OVER MQTT
-#define DATA_OUTPUT_OVER_SERIAL                 // ENABLE DATA OUT OVER SERIAL
+//#define DATA_OUTPUT_OVER_SERIAL                 // ENABLE DATA OUT OVER SERIAL
 
 #ifdef DATA_OUTPUT_OVER_MQTT 
     #define WIFI_REQUIRED
+    #define MQTT_REQUIRED
 #endif
 
 // ========== CONNECTION TIMEOUTS ==========
@@ -58,7 +59,7 @@
 // ========== SERIAL CONFIGURATION ==========
 #define SERIAL_BAUD_RATE 115200
 #define DEBUG_DEFAULT_STATE true           // Start with debug off
-//#define SERIAL_DATA_OUT_FORMAT_CSV          // RECCOMEND SELECTING 1
+#define SERIAL_DATA_OUT_FORMAT_CSV          // RECCOMEND SELECTING 1
 //#define SERIAL_DATA_OUT_FORMAT_JSON         // RECCOMEND SELECTING 1
 //#define SERIAL_DATA_OUT_FORMAT_HUMAN        // RECCOMEND SELECTING 1
 
@@ -88,8 +89,10 @@
 #define WIFI_RSSI                    // Output the WiFi RSSI 
 
 
-// ========== SENSOR CONFIGURATION ==========
+// ========== SENSOR CONSTANTS ==========
 #define SEALEVELPRESSURE_HPA 1013.25f          // Standard sea level pressure hPa
+#define SENSOR_ALTITUDE 17                     // Metres above sea level
+
 
 // Soil Moisture Sensor
 #ifdef DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR

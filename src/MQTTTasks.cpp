@@ -75,7 +75,7 @@ void build_mqtt_topics() {
 
 void setup_mqtt(const char *MQTT_BROKER_IP, const int MQTT_BROKER_PORT, const char *DEV_NAME) {
 
-  #ifdef DATA_OUTPUT_OVER_MQTT
+  #ifdef MQTT_REQUIRED
 
   // Build all MQTT topics from the location slug
   build_mqtt_topics();
@@ -113,7 +113,7 @@ void setup_mqtt(const char *MQTT_BROKER_IP, const int MQTT_BROKER_PORT, const ch
 
 
 void mqtt_transmit(const char *topic, const char *payload) {
-  #ifdef DATA_OUTPUT_OVER_MQTT
+  #ifdef MQTT_REQUIRED
 
   mqtt_keep_alive();
   client.publish(topic, payload);
@@ -125,7 +125,7 @@ void mqtt_transmit(const char *topic, const char *payload) {
 
 
 void mqtt_keep_alive() {
-  #ifdef DATA_OUTPUT_OVER_MQTT
+  #ifdef MQTT_REQUIRED
 
   if (!client.connected()) {
     mqtt_reconnect();
@@ -139,7 +139,7 @@ void mqtt_keep_alive() {
 }
 
 void mqtt_log_error(const char* err_message) {
-  #ifdef DATA_OUTPUT_OVER_MQTT
+  #ifdef MQTT_REQUIRED
 
   mqtt_transmit(MQTT_TOPIC_ERRORS, err_message);
 
@@ -151,7 +151,7 @@ void mqtt_log_error(const char* err_message) {
 
 void mqtt_reconnect() {
 
-  #ifdef DATA_OUTPUT_OVER_MQTT
+  #ifdef MQTT_REQUIRED
 
   // Loop until we're reconnected
   while (!client.connected()) {
@@ -179,7 +179,7 @@ void mqtt_reconnect() {
 
 bool mqtt_reconnect_with_timeout(uint32_t timeout_ms) {
 
-  #ifdef DATA_OUTPUT_OVER_MQTT
+  #ifdef MQTT_REQUIRED
 
   uint32_t start_time = millis();
 
@@ -212,8 +212,8 @@ bool mqtt_reconnect_with_timeout(uint32_t timeout_ms) {
 
   #endif
 
-  #ifndef DATA_OUTPUT_OVER_MQTT
-    MY_DEBUG_PRINTLN("Skipping connecting to MQTT");
+  #ifndef MQTT_REQUIRED
+    MY_DEBUG_PRINTLN("MQTT: Not Required");
     return true; // Skip MQTT setup
   #endif
 
@@ -223,7 +223,7 @@ bool mqtt_reconnect_with_timeout(uint32_t timeout_ms) {
 
 void management_message_receive(char* topic, byte* message, unsigned int length) {
 
-  #ifdef DATA_OUTPUT_OVER_MQTT
+  #ifdef MQTT_REQUIRED
 
   String receivedMessage;
 
@@ -269,7 +269,7 @@ void management_message_receive(char* topic, byte* message, unsigned int length)
 
 void mqtt_disconnect() {
 
-  #ifdef DATA_OUTPUT_OVER_MQTT
+  #ifdef MQTT_REQUIRED
 
   client.disconnect();
 
