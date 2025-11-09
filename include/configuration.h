@@ -58,8 +58,8 @@
 
 // ========== SERIAL CONFIGURATION ==========
 #define SERIAL_BAUD_RATE 115200
-#define DEBUG_DEFAULT_STATE true           // Start with debug off
-#define SERIAL_DATA_OUT_FORMAT_CSV          // RECCOMEND SELECTING 1
+#define DEBUG_DEFAULT_STATE false           // Start with debug off
+//#define SERIAL_DATA_OUT_FORMAT_CSV          // RECCOMEND SELECTING 1
 //#define SERIAL_DATA_OUT_FORMAT_JSON         // RECCOMEND SELECTING 1
 //#define SERIAL_DATA_OUT_FORMAT_HUMAN        // RECCOMEND SELECTING 1
 
@@ -80,12 +80,12 @@
 //#define DEVICE_DHT11
 //#define DEVICE_DHT21
 //#define DEVICE_DHT22
-#define INTERNAL_SUPPLY_MONITORING      // Resistor divider from supply to ADC Pin
+//#define INTERNAL_SUPPLY_MONITORING      // Resistor divider from supply to ADC Pin
 //#define INTERNAL_ADC_SAMPLING 
 
 // Software Features
 #define UPTIME_MONITORING            // Software feature
-#define WAKE_LED                     // Toggle an LED on during wake and off during sleep
+//#define WAKE_LED                     // Toggle an LED on during wake and off during sleep
 #define WIFI_RSSI                    // Output the WiFi RSSI 
 
 
