@@ -19,15 +19,25 @@ uint8_t init_bme280() {
         return 0; // Fail
     }
 
+    bme.setSampling(Adafruit_BME280::MODE_FORCED,
+                Adafruit_BME280::SAMPLING_X16,
+                Adafruit_BME280::SAMPLING_X16,
+                Adafruit_BME280::SAMPLING_X16,
+                Adafruit_BME280::FILTER_OFF);
+
     MY_DEBUG_PRINTLN("BME280 successfully Initialized");
     return 1; // Success
 }
 
 void read_bme280(transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *baroPres, transmit_data_t *altitude) {
+    bme.takeForcedMeasurement();
+    
     temp->data_f32[BME280_TEMPERATURE_ID] = bme.readTemperature();
     humidity->data_f32[BME280_HUMIDITY_ID] = bme.readHumidity();
     baroPres->data_f32[BME280_PRESSURE_ID] = bme.readPressure();
     altitude->data_f32[BME280_ALTITUDE_ID] = bme.readAltitude(SEALEVELPRESSURE_HPA);
+    
+    //bme.setSampling(Adafruit_BME280::MODE_SLEEP);
 }
 
 #endif // DEVICE_BME280
