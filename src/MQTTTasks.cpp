@@ -25,6 +25,8 @@ char mqtt_topic_management_interval[MQTT_TOPIC_LENGTH_MAX];
 char mqtt_topic_management_location[MQTT_TOPIC_LENGTH_MAX];
 // Queries
 char mqtt_topic_query_firmware_version[MQTT_TOPIC_LENGTH_MAX];
+// Acknowledge
+char mqtt_topic_acknowledge[MQTT_TOPIC_LENGTH_MAX];
 
 // Pointers to the topics (for compatibility with existing code)
 const char *MQTT_TOPIC_MOISTURE = mqtt_topic_moisture;
@@ -46,6 +48,8 @@ const char *MQTT_TOPIC_MANAGEMENT_INTERVAL = mqtt_topic_management_interval;
 const char *MQTT_TOPIC_MANAGEMENT_LOCATION = mqtt_topic_management_location;
 // Queries
 const char *MQTT_TOPIC_QUERY_FIRMWARE_VERSION = mqtt_topic_query_firmware_version;
+// Acknowledge
+const char *MQTT_TOPIC_ACKNOWLEDGE = mqtt_topic_acknowledge;
 
 const char *BROKER_IP;
 int BROKER_PORT;
@@ -71,6 +75,7 @@ void build_mqtt_topics() {
   snprintf(mqtt_topic_management_interval, MQTT_TOPIC_LENGTH_MAX, "%s%s", location_slug, MANAGEMENT_OUTPUT_INTERVAL_TOPIC_SUFFIX);
   snprintf(mqtt_topic_management_location, MQTT_TOPIC_LENGTH_MAX, "%s%s", location_slug, MANAGEMENT_LOCATION_TOPIC_SUFFIX);
   snprintf(mqtt_topic_query_firmware_version, MQTT_TOPIC_LENGTH_MAX, "%s%s", location_slug, QUERY_FIRMWARE_VERSION_TOPIC_SUFFIX);
+  snprintf(mqtt_topic_acknowledge, MQTT_TOPIC_LENGTH_MAX, "%s%s", location_slug, ACKNOWLEDGE_TOPIC_SUFFIX);
 }
 
 void setup_mqtt(const char *MQTT_BROKER_IP, const int MQTT_BROKER_PORT, const char *DEV_NAME) {
@@ -97,6 +102,7 @@ void setup_mqtt(const char *MQTT_BROKER_IP, const int MQTT_BROKER_PORT, const ch
   assert(strlen(MQTT_TOPIC_MANAGEMENT_INTERVAL) < MQTT_TOPIC_LENGTH_MAX);
   assert(strlen(MQTT_TOPIC_MANAGEMENT_LOCATION) < MQTT_TOPIC_LENGTH_MAX);
   assert(strlen(MQTT_TOPIC_QUERY_FIRMWARE_VERSION) < MQTT_TOPIC_LENGTH_MAX);
+  assert(strlen(MQTT_TOPIC_ACKNOWLEDGE) < MQTT_TOPIC_LENGTH_MAX);
 
   BROKER_IP = MQTT_BROKER_IP;
   BROKER_PORT = MQTT_BROKER_PORT;
@@ -142,6 +148,16 @@ void mqtt_log_error(const char* err_message) {
   #ifdef MQTT_REQUIRED
 
   mqtt_transmit(MQTT_TOPIC_ERRORS, err_message);
+
+  #endif
+
+  return;
+}
+
+void mqtt_ack(const char* acknowledgement) {
+  #ifdef MQTT_REQUIRED
+
+  mqtt_transmit(MQTT_TOPIC_ACKNOWLEDGE, acknowledgement);
 
   #endif
 
@@ -243,6 +259,7 @@ void management_message_receive(char* topic, byte* message, unsigned int length)
   if (String(topic) == MQTT_TOPIC_MANAGEMENT_INTERVAL) { 
     time_to_sleep = receivedMessage.toInt(); 
     commands_set_interval(time_to_sleep);
+    mqtt_ack(("Interval set to: " + String(time_to_sleep)).c_str());
   }
   
   // Check and set location slug - will take effect on next wake from deep sleep
@@ -250,6 +267,7 @@ void management_message_receive(char* topic, byte* message, unsigned int length)
     // Validate message length
     if (receivedMessage.length() > 0 && receivedMessage.length() < LOCATION_SLUG_MAX_LENGTH) {
       commands_set_location(receivedMessage);
+      mqtt_ack(("Location set to: " + receivedMessage).c_str());
     } else {
       mqtt_transmit(MQTT_TOPIC_ERRORS, "Invalid location slug length - ignoring");
       MY_DEBUG_PRINTLN("Invalid location slug length - ignoring");

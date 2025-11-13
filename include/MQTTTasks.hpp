@@ -40,6 +40,8 @@ void management_message_receive(char* topic, byte* message, unsigned int length)
 
 void mqtt_log_error(const char* err_message);
 
+void mqtt_ack(const char* acknowledgement);
+
 void mqtt_disconnect();
 
 void build_mqtt_topics();

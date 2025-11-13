@@ -55,6 +55,8 @@
 #define MANAGEMENT_LOCATION_TOPIC_SUFFIX "/manage/location"
 // MQTT Query topic suffixes - Receive 
 #define QUERY_FIRMWARE_VERSION_TOPIC_SUFFIX "/query/firmwareversion"
+// MQTT Acknowledge topic suffix
+#define ACKNOWLEDGE_TOPIC_SUFFIX "/acknowledge"
 
 // ========== SERIAL CONFIGURATION ==========
 #define SERIAL_BAUD_RATE 115200
@@ -74,18 +76,18 @@
 // Uncomment the devices you have connected
 #define DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR
 //#define DEVICE_BME280
-#define DEVICE_SCD4X
-//#define DEVICE_AHT20                    // Use this for all AHT2x sensors
+//#define DEVICE_SCD4X
+#define DEVICE_AHT20                    // Use this for all AHT2x sensors
 //#define DEVICE_ENS160
 //#define DEVICE_DHT11
 //#define DEVICE_DHT21
 //#define DEVICE_DHT22
-//#define INTERNAL_SUPPLY_MONITORING      // Resistor divider from supply to ADC Pin
+#define INTERNAL_SUPPLY_MONITORING      // Resistor divider from supply to ADC Pin
 //#define INTERNAL_ADC_SAMPLING 
 
 // Software Features
 #define UPTIME_MONITORING            // Software feature
-//#define WAKE_LED                     // Toggle an LED on during wake and off during sleep
+#define WAKE_LED                     // Toggle an LED on during wake and off during sleep
 #define WIFI_RSSI                    // Output the WiFi RSSI 
 
 
@@ -134,10 +136,11 @@
 // ENS160
 #ifdef DEVICE_ENS160
 #define ENS160_I2C_ADDRESS 0x53     // 0X52: ADDR low, 0x53: ADDR high
-#define ENS160_IDLE_AFTER_READING false // If true, will enter idle state after a reading is taken, this presumably lowers power consumption, but results in a longer startup time for next reading. Only set to true if you have a large value for DEFAULT_SLEEP_TIME_SECONDS (e.g. 10+ minutes)
-#define ENS160_STATE_FIRST_STARTUP_POLL_INTERVAL 25000
-#define ENS160_STATE_WARMING_POLL_INTERVAL 3000
-#define ENS160_STATE_INVALID_POLL_INTERVAL 50
+#define ENS160_IDLE_AFTER_READING false // Set to false to disable. If true, will enter idle state after a reading is taken, this presumably lowers power consumption, but results in a longer startup time for next reading (~3m from my testing). Only set to true if you have a large value for DEFAULT_SLEEP_TIME_SECONDS (e.g. 10+ minutes)
+#define ENS160_SLEEP_AFTER_READING true // Set to false to disable. If true, will enter sleep state after a reading is taken, this lowers power consumption, but results in a longer startup time for next reading. Only set to true if you have a large value for DEFAULT_SLEEP_TIME_SECONDS (e.g. 10+ minutes)
+#define ENS160_STATE_FIRST_STARTUP_POLL_INTERVAL 25000 // ms
+#define ENS160_STATE_WARMING_POLL_INTERVAL 3000 // ms
+#define ENS160_STATE_INVALID_POLL_INTERVAL 50 // ms
 #endif
 
 // DHT11 Sensor Configuration
@@ -205,8 +208,8 @@
 #endif
 
 #if defined(DEVICE_DHT22)
-#define DHT22_TEMPERATURE_ID 1
-#define DHT22_HUMIDITY_ID 1
+#define DHT22_TEMPERATURE_ID 0
+#define DHT22_HUMIDITY_ID 0
 #endif
 
 // ========== DERIVED CONFIGURATIONS ==========
