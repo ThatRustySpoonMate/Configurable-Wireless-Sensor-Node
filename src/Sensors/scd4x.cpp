@@ -32,7 +32,7 @@ uint8_t init_scd4x() {
     return 1; // Success
 }
 
-void read_scd4x(transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *CO2, transmit_data_t *baroPres) {
+void read_scd4x(transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *CO2, transmit_data_t *baroPres, uint8_t initSkipped) {
 
     // Give it first barometric pressure reading
     #ifdef PRESSURE_SENSOR_CONNECTED
@@ -40,6 +40,10 @@ void read_scd4x(transmit_data_t *temp, transmit_data_t *humidity, transmit_data_
         scd4x.setAmbientPressure(baroPres->data_f32[0]);
     }
     #endif
+
+    if(initSkipped){
+        scd4x.measureSingleShot();
+    }
 
     while(!scd4x.readMeasurement()){
         MY_DEBUG_PRINTLN("Waiting for SCD4X");

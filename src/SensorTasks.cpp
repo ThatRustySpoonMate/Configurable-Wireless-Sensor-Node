@@ -41,8 +41,13 @@
 void setup_uptime();
 #endif
 
+uint8_t sensorsInitPreviously = 0;
 
 void sensorTask_init() {
+
+  if(sensorsInitPreviously == 1) {
+    return;
+  }
   
   uint8_t sensorStatus = 0;
 
@@ -96,6 +101,8 @@ void sensorTask_init() {
   #ifdef UPTIME_MONITORING
   setup_uptime();
   #endif
+
+  sensorsInitPreviously = 1; // Avoid re-initing sensors if continuously polling (i.e. time_to_sleep is 0)
 
   return;
 }
@@ -184,7 +191,7 @@ void readSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transm
   #endif
 
   #ifdef DEVICE_SCD4X
-  read_scd4x(temp, humidity, CO2, baroPres); // Needs to be called before barometric pressure (pascals) is measured
+  read_scd4x(temp, humidity, CO2, baroPres, sensorsInitPreviously); // Needs to be called before barometric pressure (pascals) is measured
   #endif
 
   /* Read values from DEVICE_AHT20 */

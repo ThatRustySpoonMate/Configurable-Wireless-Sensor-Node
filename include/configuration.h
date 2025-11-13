@@ -137,7 +137,7 @@
 #ifdef DEVICE_ENS160
 #define ENS160_I2C_ADDRESS 0x53     // 0X52: ADDR low, 0x53: ADDR high
 #define ENS160_IDLE_AFTER_READING false // Set to false to disable. If true, will enter idle state after a reading is taken, this presumably lowers power consumption, but results in a longer startup time for next reading (~3m from my testing). Only set to true if you have a large value for DEFAULT_SLEEP_TIME_SECONDS (e.g. 10+ minutes)
-#define ENS160_SLEEP_AFTER_READING true // Set to false to disable. If true, will enter sleep state after a reading is taken, this lowers power consumption, but results in a longer startup time for next reading. Only set to true if you have a large value for DEFAULT_SLEEP_TIME_SECONDS (e.g. 10+ minutes)
+#define ENS160_SLEEP_AFTER_READING false // Set to false to disable. If true, will enter sleep state after a reading is taken, this lowers power consumption, but results in a longer startup time for next reading (~3m from my testing). Only set to true if you have a large value for DEFAULT_SLEEP_TIME_SECONDS (e.g. 10+ minutes)
 #define ENS160_STATE_FIRST_STARTUP_POLL_INTERVAL 25000 // ms
 #define ENS160_STATE_WARMING_POLL_INTERVAL 3000 // ms
 #define ENS160_STATE_INVALID_POLL_INTERVAL 50 // ms
