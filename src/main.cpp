@@ -198,15 +198,17 @@ inline void wake_led_off() {
   #endif
 }
 
-
-
-
 void error_handler() {
   while(true){
+    wake_led_on();
+    delay(100);
+    wake_led_off();
     delay(100);
     wake_led_on();
     delay(100);
     wake_led_off();
+    delay(500);
+
   }
 
   return;
