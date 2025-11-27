@@ -23,6 +23,7 @@ char mqtt_topic_errors[MQTT_TOPIC_LENGTH_MAX];
 // Management
 char mqtt_topic_management_interval[MQTT_TOPIC_LENGTH_MAX];
 char mqtt_topic_management_location[MQTT_TOPIC_LENGTH_MAX];
+char mqtt_topic_management_factoryreset[MQTT_TOPIC_LENGTH_MAX];
 // Queries
 char mqtt_topic_query_firmware_version[MQTT_TOPIC_LENGTH_MAX];
 // Acknowledge
@@ -46,6 +47,7 @@ const char *MQTT_TOPIC_ERRORS = mqtt_topic_errors;
 // Management
 const char *MQTT_TOPIC_MANAGEMENT_INTERVAL = mqtt_topic_management_interval;
 const char *MQTT_TOPIC_MANAGEMENT_LOCATION = mqtt_topic_management_location;
+const char *MQTT_TOPIC_MANAGEMENT_FACTORYRESET = mqtt_topic_management_factoryreset;
 // Queries
 const char *MQTT_TOPIC_QUERY_FIRMWARE_VERSION = mqtt_topic_query_firmware_version;
 // Acknowledge
@@ -53,7 +55,7 @@ const char *MQTT_TOPIC_ACKNOWLEDGE = mqtt_topic_acknowledge;
 
 const char *BROKER_IP;
 int BROKER_PORT;
-const char *DEVICE_NAME;
+const char *MQTT_DEVICE_NAME;
 
 void build_mqtt_topics() {
   extern char location_slug[];
@@ -74,6 +76,7 @@ void build_mqtt_topics() {
   snprintf(mqtt_topic_errors, MQTT_TOPIC_LENGTH_MAX, "%s%s", location_slug, ERRORS_TOPIC_SUFFIX);
   snprintf(mqtt_topic_management_interval, MQTT_TOPIC_LENGTH_MAX, "%s%s", location_slug, MANAGEMENT_OUTPUT_INTERVAL_TOPIC_SUFFIX);
   snprintf(mqtt_topic_management_location, MQTT_TOPIC_LENGTH_MAX, "%s%s", location_slug, MANAGEMENT_LOCATION_TOPIC_SUFFIX);
+  snprintf(mqtt_topic_management_factoryreset, MQTT_TOPIC_LENGTH_MAX, "%s%s", location_slug, MANAGEMENT_FACTORYRESET_TOPIC_SUFFIX);
   snprintf(mqtt_topic_query_firmware_version, MQTT_TOPIC_LENGTH_MAX, "%s%s", location_slug, QUERY_FIRMWARE_VERSION_TOPIC_SUFFIX);
   snprintf(mqtt_topic_acknowledge, MQTT_TOPIC_LENGTH_MAX, "%s%s", location_slug, ACKNOWLEDGE_TOPIC_SUFFIX);
 }
@@ -101,12 +104,13 @@ void setup_mqtt(const char *MQTT_BROKER_IP, const int MQTT_BROKER_PORT, const ch
   assert(strlen(MQTT_TOPIC_ERRORS) < MQTT_TOPIC_LENGTH_MAX);
   assert(strlen(MQTT_TOPIC_MANAGEMENT_INTERVAL) < MQTT_TOPIC_LENGTH_MAX);
   assert(strlen(MQTT_TOPIC_MANAGEMENT_LOCATION) < MQTT_TOPIC_LENGTH_MAX);
+  assert(strlen(MQTT_TOPIC_MANAGEMENT_FACTORYRESET) < MQTT_TOPIC_LENGTH_MAX);
   assert(strlen(MQTT_TOPIC_QUERY_FIRMWARE_VERSION) < MQTT_TOPIC_LENGTH_MAX);
   assert(strlen(MQTT_TOPIC_ACKNOWLEDGE) < MQTT_TOPIC_LENGTH_MAX);
 
   BROKER_IP = MQTT_BROKER_IP;
   BROKER_PORT = MQTT_BROKER_PORT;
-  DEVICE_NAME = DEV_NAME;
+  MQTT_DEVICE_NAME = DEV_NAME;
 
   client.setServer(BROKER_IP, BROKER_PORT);
 
@@ -173,12 +177,13 @@ void mqtt_reconnect() {
   while (!client.connected()) {
     MY_DEBUG_PRINT("Attempting MQTT connection...");
     // Attempt to connect
-    if (client.connect(DEVICE_NAME)) {
+    if (client.connect(MQTT_DEVICE_NAME)) {
       MY_DEBUG_PRINTLN("connected");
       // Subscribe to management topics
       client.subscribe(MQTT_TOPIC_MANAGEMENT_INTERVAL);
       client.subscribe(MQTT_TOPIC_MANAGEMENT_LOCATION);
       client.subscribe(MQTT_TOPIC_QUERY_FIRMWARE_VERSION);
+      client.subscribe(MQTT_TOPIC_MANAGEMENT_FACTORYRESET);
     } else {
       MY_DEBUG_PRINT("failed, rc=");
       MY_DEBUG_PRINT(client.state());
@@ -206,12 +211,13 @@ bool mqtt_reconnect_with_timeout(uint32_t timeout_ms) {
   while (!client.connected() && (millis() - start_time < timeout_ms)) {
     MY_DEBUG_PRINTLN("Attempting MQTT connection...");
     
-    if (client.connect(DEVICE_NAME)) {
+    if (client.connect(MQTT_DEVICE_NAME)) {
       MY_DEBUG_PRINTLN("MQTT connected");
       // Subscribe to management topics
       client.subscribe(MQTT_TOPIC_MANAGEMENT_INTERVAL);
       client.subscribe(MQTT_TOPIC_MANAGEMENT_LOCATION);
       client.subscribe(MQTT_TOPIC_QUERY_FIRMWARE_VERSION);
+      client.subscribe(MQTT_TOPIC_MANAGEMENT_FACTORYRESET);
       return true;
     }
     
@@ -277,6 +283,12 @@ void management_message_receive(char* topic, byte* message, unsigned int length)
   // Check for firmware version query
   if (String(topic) == MQTT_TOPIC_QUERY_FIRMWARE_VERSION) {
     commands_get_firmware_version();
+  }
+
+  // Check for factory reset command
+  if(String(topic) == MQTT_TOPIC_MANAGEMENT_FACTORYRESET) {
+    commands_factory_reset();
+    mqtt_ack(("Factory reset initiated."));
   }
 
   #endif

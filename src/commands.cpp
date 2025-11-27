@@ -21,7 +21,7 @@ uint8_t commands_set_location(String location) {
     
     MY_DEBUG_PRINT("Location slug saved to flash: ");
     MY_DEBUG_PRINTLN(location);
-    MY_DEBUG_PRINTLN("Will take effect on next wake from deep sleep");
+    MY_DEBUG_PRINTLN("Will take effect on next wake from deep sleep.");
 
     return status;
 }
@@ -35,6 +35,17 @@ uint8_t commands_get_firmware_version() {
                     String(FIRMWARE_VERSION_MICRO);
     
     mqtt_transmit(MQTT_TOPIC_FIRMWARE_VERSION, version.c_str());
+
+    return status;
+}
+
+uint8_t commands_factory_reset() {
+    uint8_t status = 0;
+
+    preferences.putBool(FIRST_SETUP_KEY, false);
+    
+    MY_DEBUG_PRINT("Factory reset command received.");
+    MY_DEBUG_PRINTLN("Will take effect on next wake from deep sleep.");
 
     return status;
 }

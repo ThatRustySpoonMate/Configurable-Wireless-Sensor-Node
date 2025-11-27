@@ -11,4 +11,6 @@ uint8_t commands_set_location(String location);
 
 uint8_t commands_get_firmware_version();
 
+uint8_t commands_factory_reset();
+
 #endif // COMMANDS_HPP
