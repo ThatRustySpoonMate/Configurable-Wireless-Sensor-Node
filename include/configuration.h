@@ -334,3 +334,4 @@
 #define CO2_SENSOR_COUNT (HAS_ENS160 + HAS_SCD4X)
 // Internal ADC count is derived from from number of pins
 #endif // CONFIGURATION_H
+
