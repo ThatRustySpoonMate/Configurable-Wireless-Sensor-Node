@@ -5,6 +5,7 @@
 #include "TransmitTask.hpp"
 #include "esp_task_wdt.h" 
 #include "SerialTask.hpp"
+#include "dev_config.hpp"
 
 
 uint32_t time_to_sleep = DEFAULT_SLEEP_TIME_SECONDS;    /* Time ESP32 will sleep for between readings (in seconds) */
@@ -13,11 +14,15 @@ char location_slug[LOCATION_SLUG_MAX_LENGTH];
 
 Preferences preferences;
 uint32_t device_uptime = 0;
+String WIFI_SSID, WIFI_PASSWORD, MQTT_BROKER_IP, DEVICE_NAME;
+uint16_t MQTT_BROKER_PORT;
 
 // Data reading array to store sensor data and transmit it 
 transmit_data_entry_t transmitData[DATAPOINTS_NUM];
 
 static device_state_t current_state = STATE_WAKE_UP;
+
+void first_time_setup();
 
 void setup() {
 
@@ -28,15 +33,16 @@ void setup() {
   setCpuFrequencyMhz(CPU_FREQUENCY_MHZ);
   serial_setup();
   Serial.println("Running");
+  Serial.flush();
 
   preferences.begin(PREFS_NAMESPACE, false); // false = read/write mode
 
+  load_config(&DEVICE_NAME, &time_to_sleep, &WIFI_SSID, &WIFI_PASSWORD, &MQTT_BROKER_IP, &MQTT_BROKER_PORT);
+
   setup_watchdog();
 
-  load_config();
-
   transmitTask_init();
-  setup_mqtt(MQTT_BROKER_IP, MQTT_BROKER_PORT, DEVICE_ID);
+  setup_mqtt(MQTT_BROKER_IP.c_str(), MQTT_BROKER_PORT, DEVICE_NAME.c_str());
 
   // Build transmit data topics
   strcpy(transmitData[TEMPERATURE_IDX].topic, MQTT_TOPIC_TEMPERATURE);
@@ -98,7 +104,7 @@ void upon_wake() {
   pat_watchdog();
 
   // Connect to WIFI
-  if (!setup_wifi_with_timeout(WIFI_SSID, WIFI_PASSWORD, WIFI_CONNECT_TIMEOUT_MS)) { // 30 second timeout
+  if (!setup_wifi_with_timeout(WIFI_SSID.c_str(), WIFI_PASSWORD.c_str(), WIFI_CONNECT_TIMEOUT_MS)) { // 30 second timeout
     MY_DEBUG_PRINTLN("WiFi connection failed - entering deep sleep");
     wake_led_off();
     enter_deep_sleep();
@@ -193,35 +199,6 @@ inline void wake_led_off() {
 }
 
 
-void load_config() {
-  uint32_t interval_temp = preferences.getULong(INTERVAL_KEY, 0);
-
-  if(interval_temp != 0) {
-    // Interval has been stored in flash
-    time_to_sleep = interval_temp;
-  } else{
-    // No interval in flash (likely first boot)
-    preferences.putULong(INTERVAL_KEY, DEFAULT_SLEEP_TIME_SECONDS);
-  }
-
-  // Load location slug from preferences or use default
-  String stored_slug = preferences.getString(LOCATION_SLUG_KEY, "");
-  
-  if(stored_slug.length() > 0) {
-    // Location slug has been stored in flash
-    strncpy(location_slug, stored_slug.c_str(), LOCATION_SLUG_MAX_LENGTH - 1);
-    location_slug[LOCATION_SLUG_MAX_LENGTH - 1] = '\0'; // Ensure null termination
-    MY_DEBUG_PRINT("Loaded location slug from flash: ");
-    MY_DEBUG_PRINTLN(location_slug);
-  } else {
-    // No location slug in flash (likely first boot), use default
-    strncpy(location_slug, MQTT_TOPIC_LOCATION_SLUG, LOCATION_SLUG_MAX_LENGTH - 1);
-    location_slug[LOCATION_SLUG_MAX_LENGTH - 1] = '\0'; // Ensure null termination
-    preferences.putString(LOCATION_SLUG_KEY, location_slug);
-    MY_DEBUG_PRINT("Using default location slug: ");
-    MY_DEBUG_PRINTLN(location_slug);
-  }
-}
 
 
 void error_handler() {

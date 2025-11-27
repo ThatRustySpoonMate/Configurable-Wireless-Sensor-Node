@@ -53,6 +53,7 @@
 // MQTT Management topic suffixes - Receive
 #define MANAGEMENT_OUTPUT_INTERVAL_TOPIC_SUFFIX "/manage/interval"
 #define MANAGEMENT_LOCATION_TOPIC_SUFFIX "/manage/location"
+#define MANAGEMENT_FACTORYRESET_TOPIC_SUFFIX "/manage/factory-reset"
 // MQTT Query topic suffixes - Receive 
 #define QUERY_FIRMWARE_VERSION_TOPIC_SUFFIX "/query/firmwareversion"
 // MQTT Acknowledge topic suffix
@@ -60,16 +61,22 @@
 
 // ========== SERIAL CONFIGURATION ==========
 #define SERIAL_BAUD_RATE 115200
-#define DEBUG_DEFAULT_STATE false           // Start with debug off
-//#define SERIAL_DATA_OUT_FORMAT_CSV          // RECCOMEND SELECTING 1
-//#define SERIAL_DATA_OUT_FORMAT_JSON         // RECCOMEND SELECTING 1
-//#define SERIAL_DATA_OUT_FORMAT_HUMAN        // RECCOMEND SELECTING 1
+#define DEBUG_DEFAULT_STATE true           // Start with debug off
+//#define SERIAL_DATA_OUT_FORMAT_CSV          // RECCOMEND SELECTING ONLY 1
+//#define SERIAL_DATA_OUT_FORMAT_JSON         // RECCOMEND SELECTING ONLY 1
+//#define SERIAL_DATA_OUT_FORMAT_HUMAN        // RECCOMEND SELECTING ONLY 1
 
 // ========== PREFERENCES (FLASH-EMULATED-EEPROM) CONFIGURATION ==========
 #define PREFS_NAMESPACE "device"
-#define UPTIME_KEY "uptime"
-#define INTERVAL_KEY "interval"
-#define LOCATION_SLUG_KEY "location"
+#define UPTIME_KEY "uptime"                // Int - Device uptime
+#define INTERVAL_KEY "interval"            // Int - Time between wakeup and sensor readings
+#define LOCATION_SLUG_KEY "location"       // String - MQTT Location Slug
+#define DEVICE_NAME_KEY "device-name"      // String - Name of device
+#define WIFI_SSID_KEY "wifi-ssid"          // String - WiFi SSID
+#define WIFI_PWD_KEY "wifi-pwd"            // String - WiFi Password
+#define FIRST_SETUP_KEY "first-setup" // Bool - Whether first time setup has been done or not
+#define MQTT_BROKER_IP_KEY "mqtt-broker-ip"    // String - MQTT Broker IP Address
+#define MQTT_BROKER_PORT_KEY "mqtt-broker-port" // Int - MQTT Broker Port
 
 
 // ========== DEVICE CONFIGURATION ==========
@@ -327,3 +334,4 @@
 #define CO2_SENSOR_COUNT (HAS_ENS160 + HAS_SCD4X)
 // Internal ADC count is derived from from number of pins
 #endif // CONFIGURATION_H
+
