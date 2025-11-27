@@ -101,9 +101,17 @@ void read_ens160(transmit_data_t *aqi, transmit_data_t *tvoc, transmit_data_t *C
     new_AQI = ens160.getAQI();
 
     // Update the transmit data structures
-    aqi->data_u16[ENS160_AQI_ID] = new_AQI;
-    tvoc->data_u16[ENS160_TVOC_ID] = new_TVOC;
-    CO2->data_u16[ENS160_CO2_ID] = new_eCO2;
+    if(ENS160_AQI_ID != -1) {
+        aqi->data_u16[ENS160_AQI_ID] = new_AQI;
+    }
+
+    if(ENS160_TVOC_ID != -1) {
+        tvoc->data_u16[ENS160_TVOC_ID] = new_TVOC;
+    }
+
+    if(ENS160_CO2_ID != -1) {
+        CO2->data_u16[ENS160_CO2_ID] = new_eCO2;
+    }
 
     if(ENS160_IDLE_AFTER_READING) {
         ens160.setOperatingMode(SFE_ENS160_IDLE);

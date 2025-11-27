@@ -28,8 +28,13 @@ void read_aht20(transmit_data_t *temp, transmit_data_t *humidity) {
     sensors_event_t humidityEvent, tempEvent;
     aht20.getEvent(&humidityEvent, &tempEvent);
     
-    temp->data_f32[AHT20_TEMPERATURE_ID] = tempEvent.temperature;
-    humidity->data_f32[AHT20_HUMIDITY_ID] = humidityEvent.relative_humidity;
+    if(AHT20_TEMPERATURE_ID != -1) {
+        temp->data_f32[AHT20_TEMPERATURE_ID] = tempEvent.temperature;
+    }
+
+    if(AHT20_HUMIDITY_ID != -1) {
+        humidity->data_f32[AHT20_HUMIDITY_ID] = humidityEvent.relative_humidity;
+    }
 }
 
 #endif // DEVICE_AHT20

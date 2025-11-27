@@ -161,6 +161,7 @@
 // ========== OUTPUT PACKET CONFIGURATION ==========
 // YOU MUST GIVE ALL DEVICES A UNIQUE PACKET ID FOR EACH DATA CLASS THEY PROVIDE (INCREMENT IN 1's)
 // These will be the values you see in the MQTT topic outputs (e.g. .../temperature/0)
+// You can enter -1 to discard the reading
 #if defined(DEVICE_BME280)
 #define BME280_TEMPERATURE_ID 0
 #define BME280_HUMIDITY_ID 0

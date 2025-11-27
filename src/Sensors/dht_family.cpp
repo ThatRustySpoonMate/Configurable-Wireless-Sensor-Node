@@ -55,14 +55,20 @@ void read_dht_unified(transmit_data_t *temp, transmit_data_t *humidity) {
     if (isnan(event.temperature)) {
         MY_DEBUG_PRINTLN(F("Error reading temperature from DHT11!"));
     } else {
-        temp->data_f32[DHT11_TEMPERATURE_ID] = event.temperature;
+
+        if(DHT11_TEMPERATURE_ID != -1) {
+            temp->data_f32[DHT11_TEMPERATURE_ID] = event.temperature;
+        }
     }
 
     dht11.humidity().getEvent(&event);
     if (isnan(event.relative_humidity)) {
         MY_DEBUG_PRINTLN(F("Error reading humidity from DHT11!"));
     } else {
-        humidity->data_f32[DHT11_HUMIDITY_ID] = event.relative_humidity;
+
+        if(DHT11_HUMIDITY_ID != -1) {
+            humidity->data_f32[DHT11_HUMIDITY_ID] = event.relative_humidity;
+        }
     }
     #endif
 
@@ -71,14 +77,20 @@ void read_dht_unified(transmit_data_t *temp, transmit_data_t *humidity) {
     if (isnan(event.temperature)) {
         MY_DEBUG_PRINTLN(F("Error reading temperature from DHT21!"));
     } else {
-        temp->data_f32[DHT21_TEMPERATURE_ID] = event.temperature;
+
+        if(DHT21_TEMPERATURE_ID != -1) {
+            temp->data_f32[DHT21_TEMPERATURE_ID] = event.temperature;
+        }
     }
 
     dht21.humidity().getEvent(&event);
     if (isnan(event.relative_humidity)) {
         MY_DEBUG_PRINTLN(F("Error reading humidity from DHT21!"));
     } else {
-        humidity->data_f32[DHT21_HUMIDITY_ID] = event.relative_humidity;
+
+        if(DHT21_HUMIDITY_ID != -1) {
+            humidity->data_f32[DHT21_HUMIDITY_ID] = event.relative_humidity;
+        }
     }
     #endif
 
@@ -87,14 +99,20 @@ void read_dht_unified(transmit_data_t *temp, transmit_data_t *humidity) {
     if (isnan(event.temperature)) {
         MY_DEBUG_PRINTLN(F("Error reading temperature from DHT22!"));
     } else {
-        temp->data_f32[DHT22_TEMPERATURE_ID] = event.temperature;
+
+        if(DHT22_TEMPERATURE_ID != -1) {
+            temp->data_f32[DHT22_TEMPERATURE_ID] = event.temperature;
+        }
     }
 
     dht22.humidity().getEvent(&event);
     if (isnan(event.relative_humidity)) {
         MY_DEBUG_PRINTLN(F("Error reading humidity from DHT22!"));
     } else {
-        humidity->data_f32[DHT22_HUMIDITY_ID] = event.relative_humidity;
+
+        if(DHT22_HUMIDITY_ID != -1) {
+            humidity->data_f32[DHT22_HUMIDITY_ID] = event.relative_humidity;
+        }
     }
     #endif
 }

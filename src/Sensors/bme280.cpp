@@ -32,10 +32,21 @@ uint8_t init_bme280() {
 void read_bme280(transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *baroPres, transmit_data_t *altitude) {
     bme.takeForcedMeasurement();
     
-    temp->data_f32[BME280_TEMPERATURE_ID] = bme.readTemperature();
-    humidity->data_f32[BME280_HUMIDITY_ID] = bme.readHumidity();
-    baroPres->data_f32[BME280_PRESSURE_ID] = bme.readPressure();
-    altitude->data_f32[BME280_ALTITUDE_ID] = bme.readAltitude(SEALEVELPRESSURE_HPA);
+    if(BME280_TEMPERATURE_ID != -1) {
+        temp->data_f32[BME280_TEMPERATURE_ID] = bme.readTemperature();
+    }
+
+    if(BME280_HUMIDITY_ID != -1) {
+        humidity->data_f32[BME280_HUMIDITY_ID] = bme.readHumidity();
+    }
+
+    if(BME280_PRESSURE_ID != -1) {
+        baroPres->data_f32[BME280_PRESSURE_ID] = bme.readPressure();
+    }
+
+    if(BME280_ALTITUDE_ID != -1) {
+        altitude->data_f32[BME280_ALTITUDE_ID] = bme.readAltitude(SEALEVELPRESSURE_HPA);
+    }
     
     //bme.setSampling(Adafruit_BME280::MODE_SLEEP);
 }
