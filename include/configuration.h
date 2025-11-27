@@ -5,7 +5,7 @@
 #define SIMULATION_MODE false                   // Change to true to simulate connected devices (the ones you specify down below)
 
 // ========== POWER MANAGEMENT ==========
-#define DEFAULT_SLEEP_TIME_SECONDS 30           // Normal sleep time - time between readings
+#define DEFAULT_SLEEP_TIME_SECONDS_BACKUP 60    // Backup sleep time - time between readings
 #define LOW_BATTERY_SLEEP_TIME_SECONDS 300      // Sleep time when battery is low (5 minutes) - currently unimplemented
 #define VERY_LOW_BATTERY_SLEEP_TIME_SECONDS 600 // Sleep time when battery is very low (10 minutes) - currently unimplemented
 #define CPU_FREQUENCY_MHZ 80                    // Lower frequency saves power
@@ -31,7 +31,7 @@
 #define WATCHDOG_TIMEOUT_SECONDS 30             // 30 seconds before watchdog triggers
 
 // ========== MQTT CONFIGURATION ==========
-#define MQTT_TOPIC_LOCATION_SLUG "home/new-device"  // Default location slug (can be changed via MQTT)
+#define MQTT_TOPIC_LOCATION_SLUG_BACKUP "home/new-device"  // Backup location slug (can be changed via MQTT)
 #define MQTT_TOPIC_LENGTH_MAX 100
 #define MQTT_TRANSMIT_TIME_BUFFER 3000                    // Amount of time after queueing last message to be sent before disconnecting and sleeping, this is also the window of time that you have to issue commands to the device over MQTT, decrease to increase battery life if you don't need to configure it once deployed. Increase if your MQTT messages are not reliably coming through (especially on slower networks)
 

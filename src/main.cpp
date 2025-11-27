@@ -7,22 +7,21 @@
 #include "SerialTask.hpp"
 #include "dev_config.hpp"
 
-
-uint32_t time_to_sleep = DEFAULT_SLEEP_TIME_SECONDS;    /* Time ESP32 will sleep for between readings (in seconds) */
 bool debug_log = DEBUG_DEFAULT_STATE;
-char location_slug[LOCATION_SLUG_MAX_LENGTH];
 
 Preferences preferences;
-uint32_t device_uptime = 0;
-String WIFI_SSID, WIFI_PASSWORD, MQTT_BROKER_IP, DEVICE_NAME;
-uint16_t MQTT_BROKER_PORT;
+
+// These variables are set during first time setup and can be reconfigured later
+char location_slug[LOCATION_SLUG_MAX_LENGTH]; /* MQTT Location slug that prefixes all topics*/
+uint32_t time_to_sleep = 0;    /* Time ESP32 will sleep for between readings (in seconds) */
+uint32_t device_uptime = 0;    /* Ongoing uptime calculation between deep-sleeps */
+String WIFI_SSID, WIFI_PASSWORD, MQTT_BROKER_IP, DEVICE_NAME; /* Credentials */
+uint16_t MQTT_BROKER_PORT; /* Credentials */
 
 // Data reading array to store sensor data and transmit it 
 transmit_data_entry_t transmitData[DATAPOINTS_NUM];
 
 static device_state_t current_state = STATE_WAKE_UP;
-
-void first_time_setup();
 
 void setup() {
 

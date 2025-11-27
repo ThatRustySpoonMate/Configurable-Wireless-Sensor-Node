@@ -1,5 +1,6 @@
 #include "dev_config.hpp"
 #include "main.hpp"
+#include "configuration.h"
 
 
 String readLineFromSerial() {
@@ -139,28 +140,19 @@ extern char location_slug[];
   MY_DEBUG_PRINTLN(*DEVICE_NAME);
 
   // Load interval
-  uint32_t interval_temp = preferences.getULong(INTERVAL_KEY, 0);
+  uint32_t interval_temp = preferences.getULong(INTERVAL_KEY, DEFAULT_SLEEP_TIME_SECONDS_BACKUP);
   MY_DEBUG_PRINT("Loaded interval from flash: ");
   MY_DEBUG_PRINTLN(interval_temp);
   *time_to_sleep = interval_temp;
   
   // Load location slug from preferences or use default
-  String stored_slug = preferences.getString(LOCATION_SLUG_KEY, "");
+  String stored_slug = preferences.getString(LOCATION_SLUG_KEY, MQTT_TOPIC_LOCATION_SLUG_BACKUP);
   
-  if(stored_slug.length() > 0) {
-    // Location slug has been stored in flash
-    strncpy(location_slug, stored_slug.c_str(), LOCATION_SLUG_MAX_LENGTH - 1);
-    location_slug[LOCATION_SLUG_MAX_LENGTH - 1] = '\0'; // Ensure null termination
-    MY_DEBUG_PRINT("Loaded location slug from flash: ");
-    MY_DEBUG_PRINTLN(location_slug);
-  } else {
-    // No location slug in flash (likely first boot), use default
-    strncpy(location_slug, MQTT_TOPIC_LOCATION_SLUG, LOCATION_SLUG_MAX_LENGTH - 1);
-    location_slug[LOCATION_SLUG_MAX_LENGTH - 1] = '\0'; // Ensure null termination
-    preferences.putString(LOCATION_SLUG_KEY, location_slug);
-    MY_DEBUG_PRINT("Using default location slug: ");
-    MY_DEBUG_PRINTLN(location_slug);
-  }
+  // Location slug has been stored in flash
+  strncpy(location_slug, stored_slug.c_str(), LOCATION_SLUG_MAX_LENGTH - 1);
+  location_slug[LOCATION_SLUG_MAX_LENGTH - 1] = '\0'; // Ensure null termination
+  MY_DEBUG_PRINT("Loaded location slug from flash: ");
+  MY_DEBUG_PRINTLN(location_slug);
 
   // Load WiFI Credentials
   *WIFI_SSID = preferences.getString(WIFI_SSID_KEY, "");
