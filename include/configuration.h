@@ -74,7 +74,7 @@
 
 // ========== SERIAL CONFIGURATION ==========
 #define SERIAL_BAUD_RATE 115200
-#define DEBUG_DEFAULT_STATE true           // Start with debug off
+#define DEBUG_DEFAULT_STATE false           // Start with debug off
 //#define SERIAL_DATA_OUT_FORMAT_CSV          // RECCOMEND SELECTING ONLY 1
 //#define SERIAL_DATA_OUT_FORMAT_JSON         // RECCOMEND SELECTING ONLY 1
 //#define SERIAL_DATA_OUT_FORMAT_HUMAN        // RECCOMEND SELECTING ONLY 1
