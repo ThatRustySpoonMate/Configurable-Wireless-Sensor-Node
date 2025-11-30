@@ -23,10 +23,19 @@ transmit_data_entry_t transmitData[DATAPOINTS_NUM];
 
 static device_state_t current_state = STATE_WAKE_UP;
 
+volatile bool factoryResetRequested = false;
+void IRAM_ATTR factoryResetSignalled();
+
 void setup() {
 
   #ifdef WAKE_LED
   pinMode(WAKE_LED_PIN, OUTPUT);
+  #endif
+
+  #ifdef HARDWARE_FACTORY_RESET
+  pinMode(FACTORY_RESET_PIN, INPUT_PULLDOWN);
+  delay(50);
+  attachInterrupt(digitalPinToInterrupt(FACTORY_RESET_PIN), factoryResetSignalled, RISING);
   #endif
 
   setCpuFrequencyMhz(CPU_FREQUENCY_MHZ);
@@ -63,6 +72,15 @@ void setup() {
 
 
 void loop() {
+  if(factoryResetRequested) {
+    preferences.putBool(FIRST_SETUP_KEY, false);
+    preferences.end();
+    MY_DEBUG_PRINTLN("Factory Reset Initialized.")
+    Serial.flush();
+
+    ESP.restart();
+  }
+
   switch (current_state) {
     case STATE_WAKE_UP:
       upon_wake();
@@ -209,6 +227,13 @@ void error_handler() {
     delay(500);
 
   }
+
+  return;
+}
+
+// Interrupt that is called when a factory reset is commanded via shorting GPIO pin high
+void IRAM_ATTR factoryResetSignalled() {
+  factoryResetRequested = true;
 
   return;
 }

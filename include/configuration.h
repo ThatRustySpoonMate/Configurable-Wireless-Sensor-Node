@@ -84,18 +84,19 @@
 #define DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR
 //#define DEVICE_BME280
 //#define DEVICE_SCD4X
-#define DEVICE_AHT20                    // Use this for all AHT2x sensors
+//#define DEVICE_AHT20                    // Use this for all AHT2x sensors
 //#define DEVICE_ENS160
 //#define DEVICE_DHT11
 //#define DEVICE_DHT21
 //#define DEVICE_DHT22
-#define INTERNAL_SUPPLY_MONITORING      // Resistor divider from supply to ADC Pin
+//#define INTERNAL_SUPPLY_MONITORING      // Resistor divider from supply to ADC Pin
 //#define INTERNAL_ADC_SAMPLING 
 
 // Software Features
 #define UPTIME_MONITORING            // Software feature
 #define WAKE_LED                     // Toggle an LED on during wake and off during sleep
 #define WIFI_RSSI                    // Output the WiFi RSSI 
+#define HARDWARE_FACTORY_RESET       // Enables watching GPIO for short to 3v3
 
 
 // ========== SENSOR CONSTANTS ==========
@@ -105,8 +106,8 @@
 
 // Soil Moisture Sensor
 #ifdef DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR
-#define CAPACITIVE_SOIL_MOISTURE_SENS_VCC_PIN 7
-#define CAPACITIVE_SOIL_MOISTURE_SENS_DIN_PIN 8           // ADC1_CH4 for WEMOS S2 Mini
+#define CAPACITIVE_SOIL_MOISTURE_SENS_VCC_PIN GPIO_NUM_7
+#define CAPACITIVE_SOIL_MOISTURE_SENS_DIN_PIN GPIO_NUM_8           // ADC1_CH4 for WEMOS S2 Mini
 #define CAPACITIVE_SOIL_MOISTURE_SETTLE_TIME_MS 1000      // Time to wait for sensor to stabilize
 #define CAPACITIVE_SOIL_MOISTURE_SAMPLES_TO_AVERAGE 4
 #endif
@@ -126,6 +127,11 @@
 // Wake LED configuration
 #ifdef WAKE_LED
 #define WAKE_LED_PIN LED_BUILTIN
+#endif
+
+// Factory reset configuration
+#ifdef HARDWARE_FACTORY_RESET
+#define FACTORY_RESET_PIN GPIO_NUM_2            // Short this pin to 3v3 to initiate factory reset
 #endif
 
 // Internal ADC configuration
