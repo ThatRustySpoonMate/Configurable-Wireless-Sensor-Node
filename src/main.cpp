@@ -222,7 +222,14 @@ void pat_watchdog() {
   esp_task_wdt_reset();
 }
 
-void error_handler() {
+void error_handler(String reason) {
+  mqtt_log_error(("Unrecoverable error encountered, state is: " + String(device_state.current_state) + " Reason: " + reason).c_str());
+  MY_DEBUG_PRINTLN("Unrecoverable error encountered, state is: " + String(device_state.current_state) + " Reason: " + reason);
+
+  if(RESTART_ON_ERROR) {
+    ESP.restart();
+  }
+
   while(true){
     MY_STATE_LED_TOGGLE();
     delay(ERROR_STATE_LED_DURATION);

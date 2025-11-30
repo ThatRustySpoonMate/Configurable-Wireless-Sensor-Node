@@ -23,6 +23,7 @@
 #define CONFIG_STATE_LED_ON_TIME 150       // 2* this     - should add up to 1000ms
 #define CONFIG_STATE_LED_BETWEEN_TIME 50   // 1* this     - should add up to 1000ms
 #define CONFIG_STATE_LED_OFF_TIME 650      // off time    - should add up to 1000ms
+#define RESTART_ON_ERROR true              // If error handler is reached, should we restart and try again?  
 // ========== CONNECTION TYPES ==========
 #define DATA_OUTPUT_OVER_MQTT                   // ENABLE DATA OUT OVER MQTT
 //#define DATA_OUTPUT_OVER_SERIAL                 // ENABLE DATA OUT OVER SERIAL
