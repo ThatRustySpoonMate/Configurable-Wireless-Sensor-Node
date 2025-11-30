@@ -19,13 +19,17 @@ char mqtt_topic_analog_pins[MQTT_TOPIC_LENGTH_MAX];
 char mqtt_topic_uptime[MQTT_TOPIC_LENGTH_MAX];
 char mqtt_topic_wifi_rssi[MQTT_TOPIC_LENGTH_MAX];
 char mqtt_topic_firmware_version[MQTT_TOPIC_LENGTH_MAX];
+char mqtt_topic_device_name[MQTT_TOPIC_LENGTH_MAX];
 char mqtt_topic_errors[MQTT_TOPIC_LENGTH_MAX];
 // Management
 char mqtt_topic_management_interval[MQTT_TOPIC_LENGTH_MAX];
 char mqtt_topic_management_location[MQTT_TOPIC_LENGTH_MAX];
 char mqtt_topic_management_factoryreset[MQTT_TOPIC_LENGTH_MAX];
+char mqtt_topic_management_identify[MQTT_TOPIC_LENGTH_MAX];
+char mqtt_topic_management_debug[MQTT_TOPIC_LENGTH_MAX];
 // Queries
 char mqtt_topic_query_firmware_version[MQTT_TOPIC_LENGTH_MAX];
+char mqtt_topic_query_device_name[MQTT_TOPIC_LENGTH_MAX];
 // Acknowledge
 char mqtt_topic_acknowledge[MQTT_TOPIC_LENGTH_MAX];
 
@@ -43,13 +47,18 @@ const char *MQTT_TOPIC_ANALOG_PINS = mqtt_topic_analog_pins;
 const char *MQTT_TOPIC_UPTIME = mqtt_topic_uptime;
 const char *MQTT_TOPIC_WIFI_RSSI = mqtt_topic_wifi_rssi;
 const char *MQTT_TOPIC_FIRMWARE_VERSION = mqtt_topic_firmware_version;
+const char *MQTT_TOPIC_DEVICE_NAME = mqtt_topic_device_name;
 const char *MQTT_TOPIC_ERRORS = mqtt_topic_errors;
 // Management
 const char *MQTT_TOPIC_MANAGEMENT_INTERVAL = mqtt_topic_management_interval;
 const char *MQTT_TOPIC_MANAGEMENT_LOCATION = mqtt_topic_management_location;
 const char *MQTT_TOPIC_MANAGEMENT_FACTORYRESET = mqtt_topic_management_factoryreset;
+const char *MQTT_TOPIC_MANAGEMENT_IDENTIFY = mqtt_topic_management_identify;
+const char *MQTT_TOPIC_MANAGEMENT_DEBUG = mqtt_topic_management_debug;
+
 // Queries
 const char *MQTT_TOPIC_QUERY_FIRMWARE_VERSION = mqtt_topic_query_firmware_version;
+const char *MQTT_TOPIC_QUERY_DEVICE_NAME = mqtt_topic_query_device_name;
 // Acknowledge
 const char *MQTT_TOPIC_ACKNOWLEDGE = mqtt_topic_acknowledge;
 
@@ -73,11 +82,15 @@ void build_mqtt_topics() {
   snprintf(mqtt_topic_uptime, MQTT_TOPIC_LENGTH_MAX, "%s%s", location_slug, UPTIME_TOPIC_SUFFIX);
   snprintf(mqtt_topic_wifi_rssi, MQTT_TOPIC_LENGTH_MAX, "%s%s", location_slug, WIFI_RSSI_TOPIC_SUFFIX);
   snprintf(mqtt_topic_firmware_version, MQTT_TOPIC_LENGTH_MAX, "%s%s", location_slug, FIRMWARE_VERSION_TOPIC_SUFFIX);
+  snprintf(mqtt_topic_device_name, MQTT_TOPIC_LENGTH_MAX, "%s%s", location_slug, DEVICE_NAME_TOPIC_SUFFIX);
   snprintf(mqtt_topic_errors, MQTT_TOPIC_LENGTH_MAX, "%s%s", location_slug, ERRORS_TOPIC_SUFFIX);
   snprintf(mqtt_topic_management_interval, MQTT_TOPIC_LENGTH_MAX, "%s%s", location_slug, MANAGEMENT_OUTPUT_INTERVAL_TOPIC_SUFFIX);
   snprintf(mqtt_topic_management_location, MQTT_TOPIC_LENGTH_MAX, "%s%s", location_slug, MANAGEMENT_LOCATION_TOPIC_SUFFIX);
   snprintf(mqtt_topic_management_factoryreset, MQTT_TOPIC_LENGTH_MAX, "%s%s", location_slug, MANAGEMENT_FACTORYRESET_TOPIC_SUFFIX);
+  snprintf(mqtt_topic_management_identify, MQTT_TOPIC_LENGTH_MAX, "%s%s", location_slug, MANAGEMENT_IDENTIFY_TOPIC_SUFFIX);
+  snprintf(mqtt_topic_management_debug, MQTT_TOPIC_LENGTH_MAX, "%s%s", location_slug, MANAGEMENT_DEBUG_MODE_TOPIC_SUFFIX);
   snprintf(mqtt_topic_query_firmware_version, MQTT_TOPIC_LENGTH_MAX, "%s%s", location_slug, QUERY_FIRMWARE_VERSION_TOPIC_SUFFIX);
+  snprintf(mqtt_topic_query_device_name, MQTT_TOPIC_LENGTH_MAX, "%s%s", location_slug, QUERY_DEVICE_NAME_TOPIC_SUFFIX);
   snprintf(mqtt_topic_acknowledge, MQTT_TOPIC_LENGTH_MAX, "%s%s", location_slug, ACKNOWLEDGE_TOPIC_SUFFIX);
 }
 
@@ -101,11 +114,15 @@ void setup_mqtt(const char *MQTT_BROKER_IP, const int MQTT_BROKER_PORT, const ch
   assert(strlen(MQTT_TOPIC_UPTIME) < MQTT_TOPIC_LENGTH_MAX);
   assert(strlen(MQTT_TOPIC_WIFI_RSSI) < MQTT_TOPIC_LENGTH_MAX);
   assert(strlen(MQTT_TOPIC_FIRMWARE_VERSION) < MQTT_TOPIC_LENGTH_MAX);
+  assert(strlen(MQTT_TOPIC_DEVICE_NAME) < MQTT_TOPIC_LENGTH_MAX);
   assert(strlen(MQTT_TOPIC_ERRORS) < MQTT_TOPIC_LENGTH_MAX);
   assert(strlen(MQTT_TOPIC_MANAGEMENT_INTERVAL) < MQTT_TOPIC_LENGTH_MAX);
   assert(strlen(MQTT_TOPIC_MANAGEMENT_LOCATION) < MQTT_TOPIC_LENGTH_MAX);
   assert(strlen(MQTT_TOPIC_MANAGEMENT_FACTORYRESET) < MQTT_TOPIC_LENGTH_MAX);
+  assert(strlen(MQTT_TOPIC_MANAGEMENT_IDENTIFY) < MQTT_TOPIC_LENGTH_MAX);
+  assert(strlen(MQTT_TOPIC_MANAGEMENT_DEBUG) < MQTT_TOPIC_LENGTH_MAX);
   assert(strlen(MQTT_TOPIC_QUERY_FIRMWARE_VERSION) < MQTT_TOPIC_LENGTH_MAX);
+  assert(strlen(MQTT_TOPIC_QUERY_DEVICE_NAME) < MQTT_TOPIC_LENGTH_MAX);
   assert(strlen(MQTT_TOPIC_ACKNOWLEDGE) < MQTT_TOPIC_LENGTH_MAX);
 
   BROKER_IP = MQTT_BROKER_IP;
@@ -182,8 +199,12 @@ void mqtt_reconnect() {
       // Subscribe to management topics
       client.subscribe(MQTT_TOPIC_MANAGEMENT_INTERVAL);
       client.subscribe(MQTT_TOPIC_MANAGEMENT_LOCATION);
-      client.subscribe(MQTT_TOPIC_QUERY_FIRMWARE_VERSION);
       client.subscribe(MQTT_TOPIC_MANAGEMENT_FACTORYRESET);
+      client.subscribe(MQTT_TOPIC_MANAGEMENT_IDENTIFY);
+      client.subscribe(MQTT_TOPIC_MANAGEMENT_DEBUG);
+      client.subscribe(MQTT_TOPIC_QUERY_FIRMWARE_VERSION);
+      client.subscribe(MQTT_TOPIC_QUERY_DEVICE_NAME);
+      
     } else {
       MY_DEBUG_PRINT("failed, rc=");
       MY_DEBUG_PRINT(client.state());
@@ -216,8 +237,12 @@ bool mqtt_reconnect_with_timeout(uint32_t timeout_ms) {
       // Subscribe to management topics
       client.subscribe(MQTT_TOPIC_MANAGEMENT_INTERVAL);
       client.subscribe(MQTT_TOPIC_MANAGEMENT_LOCATION);
-      client.subscribe(MQTT_TOPIC_QUERY_FIRMWARE_VERSION);
       client.subscribe(MQTT_TOPIC_MANAGEMENT_FACTORYRESET);
+      client.subscribe(MQTT_TOPIC_MANAGEMENT_IDENTIFY);
+      client.subscribe(MQTT_TOPIC_MANAGEMENT_DEBUG);
+      client.subscribe(MQTT_TOPIC_QUERY_FIRMWARE_VERSION);
+      client.subscribe(MQTT_TOPIC_QUERY_DEVICE_NAME);
+
       return true;
     }
     
@@ -263,9 +288,9 @@ void management_message_receive(char* topic, byte* message, unsigned int length)
   
   // Check and set data interval
   if (String(topic) == MQTT_TOPIC_MANAGEMENT_INTERVAL) { 
-    time_to_sleep = receivedMessage.toInt(); 
-    commands_set_interval(time_to_sleep);
-    mqtt_ack(("Interval set to: " + String(time_to_sleep)).c_str());
+    commands_set_interval(receivedMessage.toInt());
+    mqtt_ack(("Interval set to: " + String(device_state.time_to_sleep)).c_str());
+    return;
   }
   
   // Check and set location slug - will take effect on next wake from deep sleep
@@ -275,21 +300,53 @@ void management_message_receive(char* topic, byte* message, unsigned int length)
       commands_set_location(receivedMessage);
       mqtt_ack(("Location set to: " + receivedMessage).c_str());
     } else {
-      mqtt_transmit(MQTT_TOPIC_ERRORS, "Invalid location slug length - ignoring");
-      MY_DEBUG_PRINTLN("Invalid location slug length - ignoring");
+      mqtt_log_error("Invalid location slug length - ignoring message");
+      MY_DEBUG_PRINTLN("Invalid location slug length - ignoring message");
     }
-  }
-
-  // Check for firmware version query
-  if (String(topic) == MQTT_TOPIC_QUERY_FIRMWARE_VERSION) {
-    commands_get_firmware_version();
+    return;
   }
 
   // Check for factory reset command
   if(String(topic) == MQTT_TOPIC_MANAGEMENT_FACTORYRESET) {
     commands_factory_reset();
     mqtt_ack(("Factory reset initiated."));
+    return;
   }
+
+  // Check for identify command
+  if (String(topic) == MQTT_TOPIC_MANAGEMENT_IDENTIFY) {
+    uint32_t duration = receivedMessage.toInt() * 1000; // convert to millis
+    commands_identify_mode(duration);
+    mqtt_ack("Identify mode started.");
+
+    return;
+  }
+
+  // Check for debug command
+  if (String(topic) == MQTT_TOPIC_MANAGEMENT_DEBUG) {
+    uint32_t state = receivedMessage.toInt();
+    commands_debug_mode(state);
+    mqtt_ack(("Debug mode " + String(state == 1 ? "enabled" : "disabled")).c_str());
+
+    return;
+  }
+
+  // Check for firmware version query
+  if (String(topic) == MQTT_TOPIC_QUERY_FIRMWARE_VERSION) {
+    commands_get_firmware_version();
+    return;
+  }
+
+  // Check for device name query
+  if (String(topic) == MQTT_TOPIC_QUERY_DEVICE_NAME) {
+    commands_get_device_name();
+    return;
+  }
+
+
+
+
+
 
   #endif
 

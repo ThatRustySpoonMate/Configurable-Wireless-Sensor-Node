@@ -16,6 +16,13 @@
 #define AGGRESSIVE_POWER_SAVE_THRESHOLD_V 2.7f  // Voltage to trigger aggressive power saving
 #define BATTERY_ADC_SAMPLES 16                  // Number of ADC samples to average
 
+// ========== STATE HANDLING ==========
+#define STATEFUL_LED                       // Enable LED blinking in Config/Error/Identify states
+#define IDENTIFY_STATE_LED_DURATION 250    // Slow blinking
+#define ERROR_STATE_LED_DURATION 50        // Rapid blinking
+#define CONFIG_STATE_LED_ON_TIME 150       // 2* this     - should add up to 1000ms
+#define CONFIG_STATE_LED_BETWEEN_TIME 50   // 1* this     - should add up to 1000ms
+#define CONFIG_STATE_LED_OFF_TIME 650      // off time    - should add up to 1000ms
 // ========== CONNECTION TYPES ==========
 #define DATA_OUTPUT_OVER_MQTT                   // ENABLE DATA OUT OVER MQTT
 //#define DATA_OUTPUT_OVER_SERIAL                 // ENABLE DATA OUT OVER SERIAL
@@ -49,19 +56,24 @@
 #define UPTIME_TOPIC_SUFFIX "/uptime"
 #define WIFI_RSSI_TOPIC_SUFFIX "/wifi-rssi"
 #define ERRORS_TOPIC_SUFFIX "/errors"
-#define FIRMWARE_VERSION_TOPIC_SUFFIX "/firmwareversion"
+#define FIRMWARE_VERSION_TOPIC_SUFFIX "/firmware-version"
+#define DEVICE_NAME_TOPIC_SUFFIX "/device-name"
 // MQTT Management topic suffixes - Receive
 #define MANAGEMENT_OUTPUT_INTERVAL_TOPIC_SUFFIX "/manage/interval"
 #define MANAGEMENT_LOCATION_TOPIC_SUFFIX "/manage/location"
 #define MANAGEMENT_FACTORYRESET_TOPIC_SUFFIX "/manage/factory-reset"
+#define MANAGEMENT_IDENTIFY_TOPIC_SUFFIX "/manage/identify"
+#define MANAGEMENT_DEBUG_MODE_TOPIC_SUFFIX "/manage/debug"
 // MQTT Query topic suffixes - Receive 
-#define QUERY_FIRMWARE_VERSION_TOPIC_SUFFIX "/query/firmwareversion"
+#define QUERY_FIRMWARE_VERSION_TOPIC_SUFFIX "/query/firmware-version"
+#define QUERY_DEVICE_NAME_TOPIC_SUFFIX "/query/device-name"
+
 // MQTT Acknowledge topic suffix
 #define ACKNOWLEDGE_TOPIC_SUFFIX "/acknowledge"
 
 // ========== SERIAL CONFIGURATION ==========
 #define SERIAL_BAUD_RATE 115200
-#define DEBUG_DEFAULT_STATE false           // Start with debug off
+#define DEBUG_DEFAULT_STATE true           // Start with debug off
 //#define SERIAL_DATA_OUT_FORMAT_CSV          // RECCOMEND SELECTING ONLY 1
 //#define SERIAL_DATA_OUT_FORMAT_JSON         // RECCOMEND SELECTING ONLY 1
 //#define SERIAL_DATA_OUT_FORMAT_HUMAN        // RECCOMEND SELECTING ONLY 1
@@ -77,6 +89,7 @@
 #define FIRST_SETUP_KEY "first-setup" // Bool - Whether first time setup has been done or not
 #define MQTT_BROKER_IP_KEY "mqtt-broker-ip"    // String - MQTT Broker IP Address
 #define MQTT_BROKER_PORT_KEY "mqtt-broker-port" // Int - MQTT Broker Port
+#define DEBUG_MODE_KEY "debug" // bool
 
 
 // ========== DEVICE CONFIGURATION ==========
@@ -124,9 +137,9 @@
 #define ESP32_ADC_REFERENCE_VOLTAGE 3.3f
 #endif
 
-// Wake LED configuration
-#ifdef WAKE_LED
-#define WAKE_LED_PIN LED_BUILTIN
+// LED configuration
+#if defined(WAKE_LED) || defined(STATEFUL_LED)
+#define LED_PIN LED_BUILTIN
 #endif
 
 // Factory reset configuration

@@ -4,7 +4,7 @@
 
 //extern HardwareSerial Serial;
 
-extern bool debug_log;
+extern device_state_t device_state;
 static bool isFirstReading;
 
 
@@ -13,6 +13,8 @@ void serial_setup() {
     Serial.begin(SERIAL_BAUD_RATE);
 
     MY_DEBUG_PRINTLN("Serial output initialized");
+
+    Serial.flush();
 
     return;
 }
@@ -31,12 +33,12 @@ void serial_handleInput() {
 
         if( strcmp(usrCmd, "show") == 0) {
             Serial.println("Enabled debug logs");
-            debug_log = true;
+            device_state.debug_log = true;
         }
         
         if (strcmp(usrCmd, "hide") == 0) {
             Serial.println("Disabled debug logs");
-            debug_log = false;
+            device_state.debug_log = false;
         }
 
 

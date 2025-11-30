@@ -7,29 +7,30 @@
 #include "SerialTask.hpp"
 #include "dev_config.hpp"
 
-bool debug_log = DEBUG_DEFAULT_STATE;
+
 
 Preferences preferences;
 
 // These variables are set during first time setup and can be reconfigured later
-char location_slug[LOCATION_SLUG_MAX_LENGTH]; /* MQTT Location slug that prefixes all topics*/
-uint32_t time_to_sleep = 0;    /* Time ESP32 will sleep for between readings (in seconds) */
-uint32_t device_uptime = 0;    /* Ongoing uptime calculation between deep-sleeps */
+char location_slug[LOCATION_SLUG_MAX_LENGTH]; /* MQTT Location slug that prefixes all topics*/ 
 String WIFI_SSID, WIFI_PASSWORD, MQTT_BROKER_IP, DEVICE_NAME; /* Credentials */
 uint16_t MQTT_BROKER_PORT; /* Credentials */
 
 // Data reading array to store sensor data and transmit it 
 transmit_data_entry_t transmitData[DATAPOINTS_NUM];
 
-static device_state_t current_state = STATE_WAKE_UP;
+// Stateful device information
+device_state_t device_state;
 
 volatile bool factoryResetRequested = false;
 void IRAM_ATTR factoryResetSignalled();
 
 void setup() {
+  device_state.current_state = STATE_WAKE_UP;
+  device_state.debug_log = DEBUG_DEFAULT_STATE;
 
-  #ifdef WAKE_LED
-  pinMode(WAKE_LED_PIN, OUTPUT);
+  #ifdef LED_PIN
+  pinMode(LED_PIN, OUTPUT);
   #endif
 
   #ifdef HARDWARE_FACTORY_RESET
@@ -40,12 +41,10 @@ void setup() {
 
   setCpuFrequencyMhz(CPU_FREQUENCY_MHZ);
   serial_setup();
-  Serial.println("Running");
-  Serial.flush();
 
   preferences.begin(PREFS_NAMESPACE, false); // false = read/write mode
 
-  load_config(&DEVICE_NAME, &time_to_sleep, &WIFI_SSID, &WIFI_PASSWORD, &MQTT_BROKER_IP, &MQTT_BROKER_PORT);
+  load_config(&DEVICE_NAME, &(device_state.time_to_sleep), &WIFI_SSID, &WIFI_PASSWORD, &MQTT_BROKER_IP, &MQTT_BROKER_PORT);
 
   setup_watchdog();
 
@@ -81,10 +80,10 @@ void loop() {
     ESP.restart();
   }
 
-  switch (current_state) {
+  switch (device_state.current_state) {
     case STATE_WAKE_UP:
       upon_wake();
-      current_state = STATE_WAITING_FOR_TRANSMISSION;
+      device_state.current_state = STATE_WAITING_FOR_TRANSMISSION;
       break;
         
     case STATE_WAITING_FOR_TRANSMISSION:
@@ -95,7 +94,7 @@ void loop() {
       // Check if transmission buffer time has elapsed
       if (transmitTask_isReadyForSleep()) {
           MY_DEBUG_PRINTLN("Ready to enter deep sleep");
-          current_state = STATE_READY_TO_SLEEP;
+          device_state.current_state = STATE_READY_TO_SLEEP;
       }
       
       // Small delay to prevent tight polling loop
@@ -103,11 +102,29 @@ void loop() {
       break;
         
     case STATE_READY_TO_SLEEP:
-      wake_led_off();
+      MY_WAKE_LED_OFF();
       enter_deep_sleep();
       //delay(30000);
       // This point should never be reached as deep sleep resets the device
-      current_state = STATE_WAKE_UP; // Just in case
+      device_state.current_state = STATE_WAKE_UP; // Just in case
+      break;
+    
+    case STATE_IDENTIFY:
+      // Leave once configured time is up
+      if(millis() - device_state.identify_entered_time > device_state.identify_duration){
+        MY_DEBUG_PRINTLN("Identify state ended.");
+        device_state.current_state = STATE_READY_TO_SLEEP;
+        return;
+      }
+      
+      pat_watchdog(); // Keep watchdog happy while waiting
+      mqtt_keep_alive();
+      
+      MY_STATE_LED_TOGGLE();
+      delay(IDENTIFY_STATE_LED_DURATION);
+
+      
+
       break;
   }
 }
@@ -116,14 +133,14 @@ void loop() {
 void upon_wake() {
 
   // LED On
-  wake_led_on();
+  MY_WAKE_LED_ON();
 
   pat_watchdog();
 
   // Connect to WIFI
   if (!setup_wifi_with_timeout(WIFI_SSID.c_str(), WIFI_PASSWORD.c_str(), WIFI_CONNECT_TIMEOUT_MS)) { // 30 second timeout
     MY_DEBUG_PRINTLN("WiFi connection failed - entering deep sleep");
-    wake_led_off();
+    MY_WAKE_LED_OFF();
     enter_deep_sleep();
     return;
   }
@@ -133,7 +150,7 @@ void upon_wake() {
   // Connect to MQTT
   if (!mqtt_reconnect_with_timeout(MQTT_CONNECT_TIMEOUT_MS)) { // 10 second timeouts
     MY_DEBUG_PRINTLN("MQTT connection failed - entering deep sleep");
-    wake_led_off();
+    MY_WAKE_LED_OFF();
     enter_deep_sleep();
     return;
   }
@@ -161,13 +178,15 @@ void enter_deep_sleep() {
 
   // Record when we're going to sleep
   #ifdef UPTIME_MONITORING
-  device_uptime += time_to_sleep; // Convert to seconds
-  preferences.putULong(UPTIME_KEY, device_uptime);
+
+  device_state.device_uptime += (millis() / 1000);
+  device_state.device_uptime += device_state.time_to_sleep; // Convert to seconds
+  preferences.putULong(UPTIME_KEY, device_state.device_uptime);
   #endif
 
   // If interval is 0, then don't go to sleep
-  if(time_to_sleep == 0) {
-    current_state = STATE_WAKE_UP; // Just in case
+  if(device_state.time_to_sleep == 0) {
+    device_state.current_state = STATE_WAKE_UP; // Just in case
     return;
   }
 
@@ -180,7 +199,7 @@ void enter_deep_sleep() {
   btStop();
   
   // Configure wake sources
-  esp_sleep_enable_timer_wakeup(time_to_sleep * uS_TO_S_FACTOR);
+  esp_sleep_enable_timer_wakeup(device_state.time_to_sleep * uS_TO_S_FACTOR);
   
   // Power down peripherals to save battery
   esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_OFF);
@@ -203,29 +222,10 @@ void pat_watchdog() {
   esp_task_wdt_reset();
 }
 
-inline void wake_led_on() {
-  #ifdef WAKE_LED
-  digitalWrite(WAKE_LED_PIN, HIGH);
-  #endif
-}
-
-inline void wake_led_off() {
-  #ifdef WAKE_LED
-  digitalWrite(WAKE_LED_PIN, LOW);
-  #endif
-}
-
 void error_handler() {
   while(true){
-    wake_led_on();
-    delay(100);
-    wake_led_off();
-    delay(100);
-    wake_led_on();
-    delay(100);
-    wake_led_off();
-    delay(500);
-
+    MY_STATE_LED_TOGGLE();
+    delay(ERROR_STATE_LED_DURATION);
   }
 
   return;

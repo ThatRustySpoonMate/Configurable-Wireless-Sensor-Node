@@ -5,26 +5,29 @@
 #include <PubSubClient.h>
 #include "main.hpp"
 
-#define MQTT_TOPIC_LENGTH_MAX 100
-
 // Declarations
-extern const char *MQTT_TOPIC_MOISTURE;         // Example: "home/outside/garden/moisture";
-extern const char *MQTT_TOPIC_TEMPERATURE;      // Example: "home/outside/garden/temperature";
-extern const char *MQTT_TOPIC_HUMIDITY;         // Example: "home/outside/garden/humidity"; 
-extern const char *MQTT_TOPIC_AQI;              // Example: "home/outside/garden/aqi"; 
-extern const char *MQTT_TOPIC_TVOC;             // Example: "home/outside/garden/tvoc"; 
-extern const char *MQTT_TOPIC_CO2;             // Example: "home/outside/garden/CO2"; 
-extern const char *MQTT_TOPIC_PRESSURE;         // Example: "home/outside/garden/pressure"; 
-extern const char *MQTT_TOPIC_ALTITUDE;         // Example: "home/outside/garden/altitude";
-extern const char *MQTT_TOPIC_SUPPLY_VOLTAGE;   // Example: "home/outside/garden/supply-voltage";
-extern const char *MQTT_TOPIC_ANALOG_PINS;      // Example: "home/outside/garden/analog-pins";
-extern const char *MQTT_TOPIC_UPTIME;           // Example: "home/outside/garden/uptime";
-extern const char *MQTT_TOPIC_WIFI_RSSI;        // Example: "home/outside/garden/wifi-rssi"
-extern const char *MQTT_TOPIC_FIRMWARE_VERSION; // Example: "home/outside/garden/firmwareversion"
-extern const char *MQTT_TOPIC_ERRORS;           // Example: "home/outside/garden/errors"
-extern const char *MQTT_TOPIC_MANAGEMENT_INTERVAL;       // Example: "home/outside/garden/manage/interval";
-extern const char *MQTT_TOPIC_MANAGEMENT_LOCATION;       // Example: "home/outside/garden/manage/location";
-extern const char *MQTT_TOPIC_QUERY_FIRMWARE_VERSION;    // Example: "home/outside/garden/query/firmwareversion";
+extern const char *MQTT_TOPIC_MOISTURE;                     // Example: "home/outside/garden/moisture";
+extern const char *MQTT_TOPIC_TEMPERATURE;                  // Example: "home/outside/garden/temperature";
+extern const char *MQTT_TOPIC_HUMIDITY;                     // Example: "home/outside/garden/humidity"; 
+extern const char *MQTT_TOPIC_AQI;                          // Example: "home/outside/garden/aqi"; 
+extern const char *MQTT_TOPIC_TVOC;                         // Example: "home/outside/garden/tvoc"; 
+extern const char *MQTT_TOPIC_CO2;                          // Example: "home/outside/garden/CO2"; 
+extern const char *MQTT_TOPIC_PRESSURE;                     // Example: "home/outside/garden/pressure"; 
+extern const char *MQTT_TOPIC_ALTITUDE;                     // Example: "home/outside/garden/altitude";
+extern const char *MQTT_TOPIC_SUPPLY_VOLTAGE;               // Example: "home/outside/garden/supply-voltage";
+extern const char *MQTT_TOPIC_ANALOG_PINS;                  // Example: "home/outside/garden/analog-pins";
+extern const char *MQTT_TOPIC_UPTIME;                       // Example: "home/outside/garden/uptime";
+extern const char *MQTT_TOPIC_WIFI_RSSI;                    // Example: "home/outside/garden/wifi-rssi"
+extern const char *MQTT_TOPIC_FIRMWARE_VERSION;             // Example: "home/outside/garden/firmwareversion" - response topic
+extern const char *MQTT_TOPIC_DEVICE_NAME;                  // Example: "home/outside/garden/device-name" - response topic
+extern const char *MQTT_TOPIC_ERRORS;                       // Example: "home/outside/garden/errors"
+extern const char *MQTT_TOPIC_MANAGEMENT_INTERVAL;          // Example: "home/outside/garden/manage/interval";
+extern const char *MQTT_TOPIC_MANAGEMENT_LOCATION;          // Example: "home/outside/garden/manage/location";
+extern const char *MQTT_TOPIC_MANAGEMENT_FACTORYRESET;      // Example: "home/outside/garden/manage/factory-reset";
+extern const char *MQTT_TOPIC_MANAGEMENT_IDENTIFY;          // Example: "home/outside/garden/manage/identify";
+extern const char *MQTT_TOPIC_MANAGEMENT_DEBUG;             // Example: "home/outside/garden/manage/debug";
+extern const char *MQTT_TOPIC_QUERY_FIRMWARE_VERSION;       // Example: "home/outside/garden/query/firmwareversion";
+extern const char *MQTT_TOPIC_QUERY_DEVICE_NAME;            // Example: "home/outside/garden/query/device-name";
 
 void setup_mqtt(const char *MQTT_BROKER_IP, const int MQTT_BROKER_PORT, const char *DEV_NAME);
 

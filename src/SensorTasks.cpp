@@ -171,8 +171,7 @@ void stubReadSensors(transmit_data_t *moistureReading, transmit_data_t *temp, tr
 
   /* Get Uptime */
   #ifdef UPTIME_MONITORING
-  device_uptime += (millis() / 1000);
-  uptime->data_u32[0] = device_uptime;
+  uptime->data_u32[0] = device_state.device_uptime + (millis() / 1000);
   #endif
 
   #ifdef WIFI_RSSI
@@ -225,8 +224,7 @@ void readSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transm
 
   /* Get Uptime */
   #ifdef UPTIME_MONITORING
-  device_uptime += (millis() / 1000);
-  uptime->data_u32[0] = device_uptime;
+  uptime->data_u32[0] = device_state.device_uptime + (millis() / 1000);
   #endif
 
   #ifdef WIFI_RSSI
@@ -254,14 +252,14 @@ void setup_uptime() {
       reset_reason == ESP_RST_EXT ||
       (wakeup_cause != ESP_SLEEP_WAKEUP_TIMER && wakeup_cause != ESP_SLEEP_WAKEUP_EXT0 && wakeup_cause != ESP_SLEEP_WAKEUP_EXT1)) {
     // This is a power-on reset, brownout, or external reset - reset uptime
-    device_uptime = 0;
+    device_state.device_uptime = 0;
     preferences.putULong(UPTIME_KEY, 0);
     MY_DEBUG_PRINTLN("Power-on reset detected - uptime reset to 0");
   } else {
     // This is a wake from deep sleep - load saved uptime
-    device_uptime = preferences.getULong(UPTIME_KEY, 0);
+    device_state.device_uptime = preferences.getULong(UPTIME_KEY, 0);
     MY_DEBUG_PRINT("Wake from deep sleep - loaded uptime: ");
-    MY_DEBUG_PRINT(device_uptime);
+    MY_DEBUG_PRINT(device_state.device_uptime);
     MY_DEBUG_PRINTLN(" seconds");
   }
 }

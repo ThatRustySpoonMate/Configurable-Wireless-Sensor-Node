@@ -3,29 +3,77 @@
 #include "configuration.h"
 
 
+void updateHeartbeatLED() {
+  static unsigned long lastLedChange = 0;
+  static int ledPhase = 0; // 0=first on, 1=between, 2=second on, 3=off
+  static bool initialized = false;
+  
+  if (!initialized) {
+    MY_STATE_LED_ON();
+    lastLedChange = millis();
+    initialized = true;
+  }
+  
+  unsigned long currentMillis = millis();
+  unsigned long elapsed = currentMillis - lastLedChange;
+  
+  switch(ledPhase) {
+    case 0: // First ON pulse
+      if (elapsed >= CONFIG_STATE_LED_ON_TIME) {
+        MY_STATE_LED_OFF();
+        lastLedChange = currentMillis;
+        ledPhase = 1;
+      }
+      break;
+    case 1: // Between pulses (off)
+      if (elapsed >= CONFIG_STATE_LED_BETWEEN_TIME) {
+        MY_STATE_LED_ON();
+        lastLedChange = currentMillis;
+        ledPhase = 2;
+      }
+      break;
+    case 2: // Second ON pulse
+      if (elapsed >= CONFIG_STATE_LED_ON_TIME) {
+        MY_STATE_LED_OFF();
+        lastLedChange = currentMillis;
+        ledPhase = 3;
+      }
+      break;
+    case 3: // Long OFF period
+      if (elapsed >= CONFIG_STATE_LED_OFF_TIME) {
+        MY_STATE_LED_ON();
+        lastLedChange = currentMillis;
+        ledPhase = 0;
+      }
+      break;
+  }
+}
+
 String readLineFromSerial() {
   while (Serial.available()) {
     Serial.read(); // Clear any leftover data
   }
 
   String input = "";
+  
   while (true) {
     if (Serial.available()) {
       char c = Serial.read();
       if (c == '\n' || c == '\r') {
         break;
       }
-
       input += c;
     }
-    delay(100);
-    digitalWrite(WAKE_LED_PIN, !digitalRead(WAKE_LED_PIN));
+    
+    updateHeartbeatLED();
+    delay(10); // Small delay to prevent tight loop
   }
+  
   return input;
 }
 
 void first_time_setup() {
-  digitalWrite(WAKE_LED_PIN, HIGH);
+  MY_STATE_LED_ON();
   delay(5000); // Give time for serial monitor to connect
 
 
@@ -104,12 +152,12 @@ void first_time_setup() {
   if (input == "y" || input == "yes") {
     // Flag first-time-setup complete - we can skip this function on future startup
     preferences.putBool(FIRST_SETUP_KEY, true);
-    digitalWrite(WAKE_LED_PIN, LOW);
+    MY_STATE_LED_OFF();
     Serial.println("\n=== Setup Complete! ===");
   } else {
     // Clear the preferences and restart
     Serial.println("\n=== Restarting setup... ===");
-    digitalWrite(WAKE_LED_PIN, LOW);
+    MY_STATE_LED_OFF();
     delay(1000);
     ESP.restart();
   }
@@ -129,6 +177,11 @@ extern char location_slug[];
   } else {
     MY_DEBUG_PRINT("Skipping first time setup.");
   }
+
+  // Load Debug State
+  device_state.debug_log = preferences.getBool(DEBUG_MODE_KEY, false);
+  MY_DEBUG_PRINT("Loaded debug state: ");
+  MY_DEBUG_PRINTLN(device_state.debug_log);
 
   // Load fts
   MY_DEBUG_PRINT("Loaded first time setup from flash: ");
@@ -169,6 +222,9 @@ extern char location_slug[];
   *MQTT_BROKER_PORT = preferences.getUShort(MQTT_BROKER_PORT_KEY, 1883);
   MY_DEBUG_PRINT("Loaded MQTT Broker Port from flash: ");
   MY_DEBUG_PRINTLN(*MQTT_BROKER_PORT);
+
+  
+
 
   return;
 
