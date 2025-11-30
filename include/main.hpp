@@ -73,6 +73,6 @@ void upon_wake();
 void setup_watchdog();
 void pat_watchdog();
 void enter_deep_sleep();
-void error_handler();
+void error_handler(String reason);
 
 #endif
