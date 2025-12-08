@@ -49,70 +49,112 @@ uint8_t init_dht_unified() {
 
 void read_dht_unified(transmit_data_t *temp, transmit_data_t *humidity) {
     sensors_event_t event;
+    uint8_t tempSuccess = 0;
+    uint8_t humiditySuccess = 0;
 
     #ifdef DEVICE_DHT11
-    dht11.temperature().getEvent(&event);
-    if (isnan(event.temperature)) {
-        MY_DEBUG_PRINTLN(F("Error reading temperature from DHT11!"));
-    } else {
-
-        if(DHT11_TEMPERATURE_ID != -1) {
-            temp->data_f32[DHT11_TEMPERATURE_ID] = event.temperature;
+    tempSuccess = 0;
+    humiditySuccess = 0;
+    for (uint8_t i = 0; i < DHT11_OVERSAMPLING_RATIO; i ++) {
+        dht11.temperature().getEvent(&event);
+        if (isnan(event.temperature)) {
+            MY_DEBUG_PRINTLN(F("Error reading temperature from DHT11!"));
+        } else {
+            if(DHT11_TEMPERATURE_ID != -1) {
+                temp->data_f32[DHT11_TEMPERATURE_ID] = event.temperature;
+            }
+            tempSuccess += 1;
         }
+
+        dht11.humidity().getEvent(&event);
+        if (isnan(event.relative_humidity)) {
+            MY_DEBUG_PRINTLN(F("Error reading humidity from DHT11!"));
+        } else {
+            if(DHT11_HUMIDITY_ID != -1) {
+                humidity->data_f32[DHT11_HUMIDITY_ID] = event.relative_humidity;
+            }
+            humiditySuccess += 1;
+        }
+    
     }
 
-    dht11.humidity().getEvent(&event);
-    if (isnan(event.relative_humidity)) {
-        MY_DEBUG_PRINTLN(F("Error reading humidity from DHT11!"));
-    } else {
+    // Scale back down oversampling
+    if(DHT11_TEMPERATURE_ID != -1) {
+        temp->data_f32[DHT11_TEMPERATURE_ID] /= DHT11_OVERSAMPLING_RATIO;
+    }
 
-        if(DHT11_HUMIDITY_ID != -1) {
-            humidity->data_f32[DHT11_HUMIDITY_ID] = event.relative_humidity;
-        }
+    if(DHT11_HUMIDITY_ID != -1) {
+        humidity->data_f32[DHT11_HUMIDITY_ID] /= DHT11_OVERSAMPLING_RATIO;
     }
     #endif
 
     #ifdef DEVICE_DHT21
-    dht21.temperature().getEvent(&event);
-    if (isnan(event.temperature)) {
-        MY_DEBUG_PRINTLN(F("Error reading temperature from DHT21!"));
-    } else {
+    tempSuccess = 0;
+    humiditySuccess = 0;
+    for (uint8_t i = 0; i < DHT21_OVERSAMPLING_RATIO; i ++) {
+        dht21.temperature().getEvent(&event);
+        if (isnan(event.temperature)) {
+            MY_DEBUG_PRINTLN(F("Error reading temperature from DHT21!"));
+        } else {
+            if(DHT21_TEMPERATURE_ID != -1) {
+                temp->data_f32[DHT21_TEMPERATURE_ID] = event.temperature;
+            }
+            tempSuccess += 1;
+        }
 
-        if(DHT21_TEMPERATURE_ID != -1) {
-            temp->data_f32[DHT21_TEMPERATURE_ID] = event.temperature;
+        dht21.humidity().getEvent(&event);
+        if (isnan(event.relative_humidity)) {
+            MY_DEBUG_PRINTLN(F("Error reading humidity from DHT21!"));
+        } else {
+            if(DHT21_HUMIDITY_ID != -1) {
+                humidity->data_f32[DHT21_HUMIDITY_ID] = event.relative_humidity;
+            }
+            humiditySuccess += 1;
         }
     }
 
-    dht21.humidity().getEvent(&event);
-    if (isnan(event.relative_humidity)) {
-        MY_DEBUG_PRINTLN(F("Error reading humidity from DHT21!"));
-    } else {
+    // Scale back down oversampling
+    if(DHT21_TEMPERATURE_ID != -1) {
+        temp->data_f32[DHT21_TEMPERATURE_ID] /= DHT21_OVERSAMPLING_RATIO;
+    }
 
-        if(DHT21_HUMIDITY_ID != -1) {
-            humidity->data_f32[DHT21_HUMIDITY_ID] = event.relative_humidity;
-        }
+    if(DHT21_HUMIDITY_ID != -1) {
+        humidity->data_f32[DHT21_HUMIDITY_ID] /= DHT21_OVERSAMPLING_RATIO;
     }
     #endif
 
     #ifdef DEVICE_DHT22
-    dht22.temperature().getEvent(&event);
-    if (isnan(event.temperature)) {
-        MY_DEBUG_PRINTLN(F("Error reading temperature from DHT22!"));
-    } else {
+    tempSuccess = 0;
+    humiditySuccess = 0;
+    for (uint8_t i = 0; i < DHT21_OVERSAMPLING_RATIO; i ++) {
+        dht22.temperature().getEvent(&event);
+        if (isnan(event.temperature)) {
+            MY_DEBUG_PRINTLN(F("Error reading temperature from DHT22!"));
+        } else {
+            if(DHT22_TEMPERATURE_ID != -1) {
+                temp->data_f32[DHT22_TEMPERATURE_ID] = event.temperature;
+            }
+            tempSuccess += 1;
+        }
 
-        if(DHT22_TEMPERATURE_ID != -1) {
-            temp->data_f32[DHT22_TEMPERATURE_ID] = event.temperature;
+        dht22.humidity().getEvent(&event);
+        if (isnan(event.relative_humidity)) {
+            MY_DEBUG_PRINTLN(F("Error reading humidity from DHT22!"));
+        } else {
+            if(DHT22_HUMIDITY_ID != -1) {
+                humidity->data_f32[DHT22_HUMIDITY_ID] = event.relative_humidity;
+            }
+            humiditySuccess += 1;
         }
     }
 
-    dht22.humidity().getEvent(&event);
-    if (isnan(event.relative_humidity)) {
-        MY_DEBUG_PRINTLN(F("Error reading humidity from DHT22!"));
-    } else {
+    // Scale back down oversampling
+    if(DHT22_TEMPERATURE_ID != -1) {
+        temp->data_f32[DHT22_TEMPERATURE_ID] /= DHT22_OVERSAMPLING_RATIO;
+    }
 
-        if(DHT22_HUMIDITY_ID != -1) {
-            humidity->data_f32[DHT22_HUMIDITY_ID] = event.relative_humidity;
-        }
+    if(DHT22_HUMIDITY_ID != -1) {
+        humidity->data_f32[DHT22_HUMIDITY_ID] /= DHT22_OVERSAMPLING_RATIO;
     }
     #endif
 }

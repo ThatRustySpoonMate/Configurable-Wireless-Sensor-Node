@@ -26,14 +26,28 @@ uint8_t init_aht20() {
 
 void read_aht20(transmit_data_t *temp, transmit_data_t *humidity) {
     sensors_event_t humidityEvent, tempEvent;
-    aht20.getEvent(&humidityEvent, &tempEvent);
-    
+
+    for (uint8_t i = 0; i < AHT20_OVERSAMPLING_RATIO; i ++) {
+
+        aht20.getEvent(&humidityEvent, &tempEvent);
+        
+        if(AHT20_TEMPERATURE_ID != -1) {
+            temp->data_f32[AHT20_TEMPERATURE_ID] += tempEvent.temperature;
+        }
+
+        if(AHT20_HUMIDITY_ID != -1) {
+            humidity->data_f32[AHT20_HUMIDITY_ID] += humidityEvent.relative_humidity;
+        }
+
+    }
+
+    // Scale back down oversampling
     if(AHT20_TEMPERATURE_ID != -1) {
-        temp->data_f32[AHT20_TEMPERATURE_ID] = tempEvent.temperature;
+        temp->data_f32[AHT20_TEMPERATURE_ID] /= AHT20_OVERSAMPLING_RATIO;
     }
 
     if(AHT20_HUMIDITY_ID != -1) {
-        humidity->data_f32[AHT20_HUMIDITY_ID] = humidityEvent.relative_humidity;
+        humidity->data_f32[AHT20_HUMIDITY_ID] /= AHT20_OVERSAMPLING_RATIO;
     }
 }
 

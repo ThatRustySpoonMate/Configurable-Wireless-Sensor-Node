@@ -47,8 +47,7 @@ void read_bme280(transmit_data_t *temp, transmit_data_t *humidity, transmit_data
     if(BME280_ALTITUDE_ID != -1) {
         altitude->data_f32[BME280_ALTITUDE_ID] = bme.readAltitude(SEALEVELPRESSURE_HPA);
     }
-    
-    //bme.setSampling(Adafruit_BME280::MODE_SLEEP);
+
 }
 
 #endif // DEVICE_BME280

@@ -90,21 +90,21 @@
 #define FIRST_SETUP_KEY "first-setup" // Bool - Whether first time setup has been done or not
 #define MQTT_BROKER_IP_KEY "mqtt-broker-ip"    // String - MQTT Broker IP Address
 #define MQTT_BROKER_PORT_KEY "mqtt-broker-port" // Int - MQTT Broker Port
-#define DEBUG_MODE_KEY "debug" // bool
+#define DEBUG_MODE_KEY "debug"             // bool
 
 
 // ========== DEVICE CONFIGURATION ==========
 // Uncomment the devices you have connected
 #define DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR
-//#define DEVICE_BME280
-//#define DEVICE_SCD4X
-//#define DEVICE_AHT20                    // Use this for all AHT2x sensors
-//#define DEVICE_ENS160
-//#define DEVICE_DHT11
-//#define DEVICE_DHT21
-//#define DEVICE_DHT22
-//#define INTERNAL_SUPPLY_MONITORING      // Resistor divider from supply to ADC Pin
-//#define INTERNAL_ADC_SAMPLING 
+#define DEVICE_BME280
+#define DEVICE_SCD4X
+#define DEVICE_AHT20                    // Use this for all AHT2x sensors
+#define DEVICE_ENS160
+#define DEVICE_DHT11
+#define DEVICE_DHT21
+#define DEVICE_DHT22
+#define INTERNAL_SUPPLY_MONITORING      // Resistor divider from supply to ADC Pin
+#define INTERNAL_ADC_SAMPLING 
 
 // Software Features
 #define UPTIME_MONITORING            // Software feature
@@ -158,6 +158,22 @@
 // BME280 Sensor Configuration
 #ifdef DEVICE_BME280
 #define BME280_ADDR 0x76            // 0x76 or 0x77
+#define BME280_OVERSAMPLING_RATIO Adafruit_BME280::SAMPLING_X16  // Must be from Adafruit_BME280
+#endif
+
+// ENS160 Sensor Configuration
+#ifdef DEVICE_ENS160
+#define ENS160_OVERSAMPLING_RATIO 1  // 1 sample per reading - currently unimplemented
+#endif
+
+// SCD4X Sensor Configuration
+#ifdef DEVICE_SCD4X
+#define SCD4X_OVERSAMPLING_RATIO 1  // 1 sample per reading
+#endif
+
+// AHT20 Sensor Configuration
+#ifdef DEVICE_AHT20
+#define AHT20_OVERSAMPLING_RATIO 1  // 1 sample per reading
 #endif
 
 // ENS160
@@ -168,21 +184,25 @@
 #define ENS160_STATE_FIRST_STARTUP_POLL_INTERVAL 25000 // ms
 #define ENS160_STATE_WARMING_POLL_INTERVAL 3000 // ms
 #define ENS160_STATE_INVALID_POLL_INTERVAL 50 // ms
+#define ENS160_OVERSAMPLING_RATIO 1 // 1 sample per reading
 #endif
 
 // DHT11 Sensor Configuration
 #ifdef DEVICE_DHT11
 #define DHT11_OUT_PIN 13            // Data Out pin of DHT11
+#define DHT11_OVERSAMPLING_RATIO 1  // 1 sample per reading
 #endif
 
 // DHT21 Sensor Configuration
 #ifdef DEVICE_DHT21
 #define DHT21_OUT_PIN 13            // Data Out pin of DHT21
+#define DHT21_OVERSAMPLING_RATIO 1  // 1 sample per reading
 #endif
 
 // DHT22 Sensor Configuration
 #ifdef DEVICE_DHT22
 #define DHT22_OUT_PIN 13            // Data Out pin of DHT22
+#define DHT22_OVERSAMPLING_RATIO 1  // 1 sample per reading
 #endif
 
 // ========== OUTPUT PACKET CONFIGURATION ==========

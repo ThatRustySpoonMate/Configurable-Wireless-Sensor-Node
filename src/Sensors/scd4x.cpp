@@ -45,22 +45,42 @@ void read_scd4x(transmit_data_t *temp, transmit_data_t *humidity, transmit_data_
         scd4x.measureSingleShot();
     }
 
-    while(!scd4x.readMeasurement()){
-        MY_DEBUG_PRINTLN("Waiting for SCD4X");
-        delay(500);
+    for (uint8_t i = 0; i < SCD4X_OVERSAMPLING_RATIO; i ++) {
+
+        while(!scd4x.readMeasurement()){
+            MY_DEBUG_PRINTLN("Waiting for SCD4X");
+            delay(500);
+        }
+
+        if(SCD4X_TEMPERATURE_ID != -1) {
+            temp->data_f32[SCD4X_TEMPERATURE_ID] += scd4x.getTemperature();
+        }
+
+        if(SCD4X_HUMIDITY_ID != -1) {
+            humidity->data_f32[SCD4X_HUMIDITY_ID] += scd4x.getHumidity();
+        }
+
+        if(SCD4X_CO2_ID != -1) {
+            CO2->data_u16[SCD4X_CO2_ID] += scd4x.getCO2();
+        }
+
+        scd4x.measureSingleShot();
     }
 
+    // Scale back down oversampling
     if(SCD4X_TEMPERATURE_ID != -1) {
-        temp->data_f32[SCD4X_TEMPERATURE_ID] = scd4x.getTemperature();
+        temp->data_f32[SCD4X_TEMPERATURE_ID] /= SCD4X_OVERSAMPLING_RATIO;
     }
 
     if(SCD4X_HUMIDITY_ID != -1) {
-        humidity->data_f32[SCD4X_HUMIDITY_ID] = scd4x.getHumidity();
+        humidity->data_f32[SCD4X_HUMIDITY_ID] /= SCD4X_OVERSAMPLING_RATIO;
     }
 
     if(SCD4X_CO2_ID != -1) {
-        CO2->data_u16[SCD4X_CO2_ID] = scd4x.getCO2();
+        CO2->data_f32[SCD4X_CO2_ID] /= SCD4X_OVERSAMPLING_RATIO;
     }
+
+    
 
 }
 
