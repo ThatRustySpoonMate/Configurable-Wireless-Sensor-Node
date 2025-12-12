@@ -95,16 +95,16 @@
 
 // ========== DEVICE CONFIGURATION ==========
 // Uncomment the devices you have connected
-#define DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR
-#define DEVICE_BME280
-#define DEVICE_SCD4X
+//#define DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR
+//#define DEVICE_BME280
+//#define DEVICE_SCD4X
 #define DEVICE_AHT20                    // Use this for all AHT2x sensors
-#define DEVICE_ENS160
-#define DEVICE_DHT11
-#define DEVICE_DHT21
-#define DEVICE_DHT22
-#define INTERNAL_SUPPLY_MONITORING      // Resistor divider from supply to ADC Pin
-#define INTERNAL_ADC_SAMPLING 
+//#define DEVICE_ENS160
+//#define DEVICE_DHT11
+//#define DEVICE_DHT21
+//#define DEVICE_DHT22
+//#define INTERNAL_SUPPLY_MONITORING      // Resistor divider from supply to ADC Pin
+//#define INTERNAL_ADC_SAMPLING 
 
 // Software Features
 #define UPTIME_MONITORING            // Software feature

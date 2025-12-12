@@ -168,7 +168,7 @@ void first_time_setup() {
 
 void load_config(String *DEVICE_NAME, uint32_t *time_to_sleep, String *WIFI_SSID, String *WIFI_PASSWORD, String *MQTT_BROKER_IP, uint16_t * MQTT_BROKER_PORT) {
 
-extern char location_slug[];
+  extern char location_slug[];
 
   bool firstTimeSetupComplete = preferences.getBool(FIRST_SETUP_KEY, false);
 
