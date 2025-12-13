@@ -11,7 +11,7 @@
 #define CPU_FREQUENCY_MHZ 80                    // Lower frequency saves power
 
 // ========== BATTERY MONITORING ==========
-#define ENABLE_POWER_SAVING_MODE_ON_LOW_BATTERY // Enables the modification of sleep timer when battery crosses below thresholds
+//#define ENABLE_POWER_SAVING_MODE_ON_LOW_BATTERY // Enables the modification of sleep timer when battery crosses below thresholds -- currently unimplemented
 #define MODERATE_POWER_SAVE_THRESHOLD_V 3.0f    // Voltage to trigger power saving
 #define AGGRESSIVE_POWER_SAVE_THRESHOLD_V 2.7f  // Voltage to trigger aggressive power saving
 #define BATTERY_ADC_SAMPLES 16                  // Number of ADC samples to average
@@ -98,7 +98,7 @@
 //#define DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR
 //#define DEVICE_BME280
 //#define DEVICE_SCD4X
-#define DEVICE_AHT20                    // Use this for all AHT2x sensors
+//#define DEVICE_AHT20                    // Use this for all AHT2x sensors
 //#define DEVICE_ENS160
 //#define DEVICE_DHT11
 //#define DEVICE_DHT21
@@ -129,13 +129,14 @@
 // Supply Voltage Monitoring
 #ifdef INTERNAL_SUPPLY_MONITORING
 #define SUPPLY_MON_ADC_PIN 3                   // ADC1_CH2 on WEMOS S2 Mini
-#define SUPPLY_MON_R1 100000.0f                // 100k ohm - upper resistor
-#define SUPPLY_MON_R2 100000.0f                // 100k ohm - lower resistor
-#define SUPPLY_MON_RDIV_RATIO (1.0f / (SUPPLY_MON_R2 / (SUPPLY_MON_R1 + SUPPLY_MON_R2)))
-#define SUPPLY_MON_FUDGE_FACTOR_DIV 1.25200f   // Calibration factor
-#define ADC_RESOLUTION_BITS 12
-#define ADC_MAX_VALUE 4095
+#define SUPPLY_MON_R1 10000.0f                 // 10k ohm - from 3V3 to ADC pin
+#define SUPPLY_MON_R2 10000.0f                 // 10k ohm - from ADC pin to GND
+#define SUPPLY_MON_DIVIDER_RATIO ((SUPPLY_MON_R1 + SUPPLY_MON_R2) / SUPPLY_MON_R2)  // = 2.0
+#define SUPPLY_MON_CALIBRATION 1.0f            // Adjust based on actual measurements
+#define ADC_MAX_VALUE 4095.0f
 #define ESP32_ADC_REFERENCE_VOLTAGE 3.3f
+#define ADC_RESOLUTION_BITS 12
+
 #endif
 
 // LED configuration
