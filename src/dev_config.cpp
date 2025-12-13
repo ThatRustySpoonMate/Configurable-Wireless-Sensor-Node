@@ -180,6 +180,15 @@ void load_config(String *DEVICE_NAME, uint32_t *time_to_sleep, String *WIFI_SSID
 
   // Load Debug State
   device_state.debug_log = preferences.getBool(DEBUG_MODE_KEY, false);
+
+  #ifdef DATA_OUTPUT_OVER_SERIAL
+    delay(750); // Delay for serial monitor to connect
+  #else
+    if(device_state.debug_log == true) {
+      delay(750);
+    }
+  #endif
+
   MY_DEBUG_PRINT("Loaded debug state: ");
   MY_DEBUG_PRINTLN(device_state.debug_log);
 

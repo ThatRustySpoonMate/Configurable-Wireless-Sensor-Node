@@ -41,7 +41,7 @@ void setup() {
 
   setCpuFrequencyMhz(CPU_FREQUENCY_MHZ);
   serial_setup();
-
+  
   preferences.begin(PREFS_NAMESPACE, false); // false = read/write mode
 
   load_config(&DEVICE_NAME, &(device_state.time_to_sleep), &WIFI_SSID, &WIFI_PASSWORD, &MQTT_BROKER_IP, &MQTT_BROKER_PORT);
@@ -49,6 +49,7 @@ void setup() {
   setup_watchdog();
 
   transmitTask_init();
+  
   setup_mqtt(MQTT_BROKER_IP.c_str(), MQTT_BROKER_PORT, DEVICE_NAME.c_str());
 
   // Build transmit data topics
