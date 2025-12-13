@@ -86,4 +86,6 @@ int8_t wifi_get_rssi() {
   }
 
   #endif
+
+  return 0;
 }
