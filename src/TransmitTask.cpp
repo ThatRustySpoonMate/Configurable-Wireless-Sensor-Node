@@ -135,6 +135,12 @@ void transmitTask_run(transmit_data_entry_t transmitData[DATAPOINTS_NUM]) {
     serial_transmit(transmitData[WIFI_RSSI_IDX].topic, readingStr.c_str());
   #endif
 
+  #ifdef BATTERY_SOC_MONITORING
+    readingStr = String(device_state.battery_soc);
+    mqtt_transmit(MQTT_TOPIC_BATTERY_SOC, readingStr.c_str());
+    serial_transmit(MQTT_TOPIC_BATTERY_SOC, readingStr.c_str());
+  #endif
+
   serial_transmit_end(); // Terminate serial strings for json and csv
 
   MY_DEBUG_PRINTLN("All data queued for transmission");

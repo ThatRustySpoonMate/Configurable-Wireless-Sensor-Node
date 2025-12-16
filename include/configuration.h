@@ -53,6 +53,7 @@
 #define PRESSURE_TOPIC_SUFFIX "/pressure"
 #define ALTITUDE_TOPIC_SUFFIX "/altitude"
 #define SUPPLY_VOLTAGE_TOPIC_SUFFIX "/supply-voltage"
+#define BATTERY_SOC_TOPIC_SUFFIX "/battery-soc"
 #define ANALOG_PINS_TOPIC_SUFFIX "/analog-pins"
 #define UPTIME_TOPIC_SUFFIX "/uptime"
 #define WIFI_RSSI_TOPIC_SUFFIX "/wifi-rssi"
@@ -103,7 +104,7 @@
 //#define DEVICE_DHT11
 //#define DEVICE_DHT21
 //#define DEVICE_DHT22
-//#define INTERNAL_SUPPLY_MONITORING      // Resistor divider from supply to ADC Pin
+#define INTERNAL_SUPPLY_MONITORING      // Resistor divider from supply to ADC Pin
 //#define INTERNAL_ADC_SAMPLING 
 
 // Software Features
@@ -111,6 +112,11 @@
 #define WAKE_LED                     // Toggle an LED on during wake and off during sleep
 #define WIFI_RSSI                    // Output the WiFi RSSI 
 #define HARDWARE_FACTORY_RESET       // Enables watching GPIO for short to 3v3
+
+#ifdef INTERNAL_SUPPLY_MONITORING
+    #define BATTERY_SOC_MONITORING
+    #define BATTERY_CHEMISTRY_LIFEPO4  // or BATTERY_CHEMISTRY_NMC
+#endif
 
 
 // ========== SENSOR CONSTANTS ==========

@@ -62,6 +62,9 @@ typedef struct {
     uint32_t identify_entered_time;
     uint32_t time_to_sleep; /* Time ESP32 will sleep for between readings (in seconds) */
     uint32_t device_uptime; /* Ongoing uptime calculation between deep-sleeps */
+
+    float battery_soc;
+
     bool debug_log;
 } device_state_t;
 
