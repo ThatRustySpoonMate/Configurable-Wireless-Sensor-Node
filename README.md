@@ -97,9 +97,9 @@ home/downstairs/testing/acknowledge
 
 
 ## LED Blink Codes
-**Rapid blinking** (~10hz) - Error handler - critical failure
-**Slow blinking** (~2hz) - Identify state
-**Heartbeat pattern** (two short pulses on, one long pulse off) - serial config mode
+**Rapid blinking** (~10hz) - Error handler - critical failure <br>
+**Slow blinking** (~2hz) - Identify state <br>
+**Heartbeat pattern** (two short pulses on, one long pulse off) - serial config mode <br>
 
 ### Continuous sampling mode
 If you set the interval to 0, the device will never enter deep sleep and will read and transmit data as fast as it can via it's configured channels. This will persist until the device is manually rebooted.
@@ -116,3 +116,7 @@ home/downstairs/testing/manage/factory-reset
 Alternatively if you have access to the hardware, the factory-reset pin is configured in the firmware's configuration.h file, however the defaults is GPIO pin 2, which is the 2nd pin down from the top on the right-column of the left-bank of pins (i.e. Left-Bank - right column - second row) when the USB-C connector is oriented at the bottom of the board.  Short this pin to 3v3 (left bank - left column - last pin) while the device is awake to initiate a factory reset.
 
 Upon successful factory reset, the device will power off, then power back on, if configured the wake LED will stay on for a few seconds, then begin flashing in a heartbeat pattern while it awaits serial configuration. 
+
+
+## Debugging
+If you are encountering strange issues, you can enable debug mode by either compiling the firmware with it enabled or by sending a payload of 1 to MQTT Topic home/downstairs/testing/manage/debug. After you have done this, the Weather node will begin spitting our verbose debug info over the serial port. To read this, plug in your PC to the Weather Node and open a serial monitor at the configured baud rate.
