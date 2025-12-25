@@ -53,10 +53,11 @@ To use these weather nodes, you require the following:
 - 2.4GHz WiFi Network
 - MQTT broker accessible over the WiFi network
 - Something connected to the MQTT broker in order to view the data
-- A way to send commands over the MQTT network (***Optional***)
+- A PC and Serial Software (Such as Putty) to perform the first time setup
+- A way to send commands over the MQTT network (***Optional***) <br>
+
 *For serial connection:*
-- A PC or other Serial host
-- Serial software such as Putty
+- A PC or other Serial host to receive the data and do first time setup
 
 ### Powering on the device
 
