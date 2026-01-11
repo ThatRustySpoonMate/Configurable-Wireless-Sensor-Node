@@ -8,6 +8,7 @@
 
 // Function declarations
 uint8_t init_aht20();
+
 void read_aht20(transmit_data_t *temp, transmit_data_t *humidity);
 
 #endif // DEVICE_AHT20

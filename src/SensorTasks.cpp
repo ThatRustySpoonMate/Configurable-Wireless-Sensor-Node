@@ -13,6 +13,10 @@
 #include "Sensors/scd4x.hpp"
 #endif
 
+#ifdef DEVICE_SHT4X
+#include "Sensors/sht4x.hpp"
+#endif
+
 #ifdef DEVICE_AHT20
 #include "Sensors/aht20.hpp"
 #endif
@@ -66,6 +70,13 @@ void sensorTask_init() {
   sensorStatus = init_scd4x();
   if(0 == sensorStatus) {
     mqtt_log_error("Error initializing SCD4X sensor.");
+  }
+  #endif
+
+  #ifdef DEVICE_SHT4X
+  sensorStatus = init_sht4x();
+  if(0 == sensorStatus) {
+    mqtt_log_error("Error initializing SHT4X sensor.");
   }
   #endif
 
@@ -123,6 +134,11 @@ void stubReadSensors(transmit_data_t *moistureReading, transmit_data_t *temp, tr
   temp->data_f32[SCD4X_TEMPERATURE_ID] = random() % 65535;
   humidity->data_f32[SCD4X_HUMIDITY_ID] = random() % 65535;
   baroPres->data_f32[SCD4X_CO2_ID] = random() % 65535;
+  #endif
+
+  #ifdef DEVICE_SHT4X
+  temp->data_f32[SHT4X_TEMPERATURE_ID] = random() % 65535;
+  humidity->data_f32[SHT4X_HUMIDITY_ID] = random() % 65535;
   #endif
 
   /* Read values from DEVICE_AHT20 */
@@ -191,6 +207,10 @@ void readSensors(transmit_data_t *moistureReading, transmit_data_t *temp, transm
 
   #ifdef DEVICE_SCD4X
   read_scd4x(temp, humidity, CO2, baroPres, sensorsInitPreviously); // Needs to be called before barometric pressure (pascals) is measured
+  #endif
+
+  #ifdef DEVICE_SHT4X
+  read_sht4x(temp, humidity);
   #endif
 
   /* Read values from DEVICE_AHT20 */

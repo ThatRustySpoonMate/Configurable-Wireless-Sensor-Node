@@ -39,6 +39,10 @@ void read_aht20(transmit_data_t *temp, transmit_data_t *humidity) {
             humidity->data_f32[AHT20_HUMIDITY_ID] += humidityEvent.relative_humidity;
         }
 
+        if (i < AHT20_OVERSAMPLING_RATIO - 1) {  // Don't delay after last reading
+            delay(10);
+        }
+
     }
 
     // Scale back down oversampling
