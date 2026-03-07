@@ -97,15 +97,15 @@
 // ========== DEVICE CONFIGURATION ==========
 // Uncomment the devices you have connected
 //#define DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR
-//#define DEVICE_BME280
-//#define DEVICE_SCD4X
-#define DEVICE_SHT4X                      // Use this for all AHT4x sensors
+#define DEVICE_BME280
+#define DEVICE_SCD4X
+//#define DEVICE_SHT4X                      // Use this for all AHT4x sensors
 //#define DEVICE_AHT20                    // Use this for all AHT2x sensors
 //#define DEVICE_ENS160
 //#define DEVICE_DHT11
 //#define DEVICE_DHT21
 //#define DEVICE_DHT22
-//#define INTERNAL_SUPPLY_MONITORING      // Resistor divider from supply to ADC Pin
+#define INTERNAL_SUPPLY_MONITORING      // Resistor divider from supply to ADC Pin
 //#define INTERNAL_ADC_SAMPLING 
 
 // Software Features
@@ -177,6 +177,7 @@
 // SCD4X Sensor Configuration
 #ifdef DEVICE_SCD4X
 #define SCD4X_OVERSAMPLING_RATIO 1  // 1 sample per reading
+#define SCD4X_I2C_ADDRESS SCD41_I2C_ADDR_62
 #endif
 
 // SHT4X Sensor Configuration
@@ -193,7 +194,7 @@
 // ENS160
 #ifdef DEVICE_ENS160
 #define ENS160_I2C_ADDRESS 0x53     // 0X52: ADDR low, 0x53: ADDR high
-#define ENS160_IDLE_AFTER_READING false // Set to false to disable. If true, will enter idle state after a reading is taken, this presumably lowers power consumption, but results in a longer startup time for next reading (~3m from my testing). Only set to true if you have a large value for DEFAULT_SLEEP_TIME_SECONDS (e.g. 10+ minutes)
+#define ENS160_IDLE_AFTER_READING true // Set to false to disable. If true, will enter idle state after a reading is taken, this presumably lowers power consumption, but results in a longer startup time for next reading (~3m from my testing). Only set to true if you have a large value for DEFAULT_SLEEP_TIME_SECONDS (e.g. 10+ minutes)
 #define ENS160_SLEEP_AFTER_READING false // Set to false to disable. If true, will enter sleep state after a reading is taken, this lowers power consumption, but results in a longer startup time for next reading (~3m from my testing). Only set to true if you have a large value for DEFAULT_SLEEP_TIME_SECONDS (e.g. 10+ minutes)
 #define ENS160_STATE_FIRST_STARTUP_POLL_INTERVAL 25000 // ms
 #define ENS160_STATE_WARMING_POLL_INTERVAL 3000 // ms
