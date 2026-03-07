@@ -54,6 +54,11 @@ void read_sht4x(transmit_data_t *temp, transmit_data_t *humidity) {
     if(SHT4X_HUMIDITY_ID != -1) {
         humidity->data_f32[SHT4X_HUMIDITY_ID] /= SHT4X_OVERSAMPLING_RATIO;
     }
+
+    // Put sensor into lowest power state after reading - no heater, shortest pulse
+    // SHT4X draws ~800uA when idle; this minimises current until deep sleep
+    sht4.setPrecision(SHT4X_LOW_PRECISION);
+    sht4.setHeater(SHT4X_NO_HEATER);
 }
 
 

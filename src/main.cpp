@@ -6,6 +6,7 @@
 #include "esp_task_wdt.h" 
 #include "SerialTask.hpp"
 #include "dev_config.hpp"
+#include "esp_wifi.h"
 
 
 
@@ -21,6 +22,11 @@ transmit_data_entry_t transmitData[DATAPOINTS_NUM];
 
 // Stateful device information
 device_state_t device_state;
+
+// RTC memory persists across deep sleep - used for WiFi fast reconnect
+RTC_DATA_ATTR static uint8_t rtc_wifi_channel = 0;
+RTC_DATA_ATTR static uint8_t rtc_bssid[6] = {0};
+RTC_DATA_ATTR static bool rtc_wifi_cached = false;
 
 volatile bool factoryResetRequested = false;
 void IRAM_ATTR factoryResetSignalled();
@@ -138,13 +144,32 @@ void upon_wake() {
 
   pat_watchdog();
 
-  // Connect to WIFI
-  if (!setup_wifi_with_timeout(WIFI_SSID.c_str(), WIFI_PASSWORD.c_str(), WIFI_CONNECT_TIMEOUT_MS)) { // 30 second timeout
+  unsigned long wake_start_ms = millis(); // Track wake cycle duration for diagnostics
+
+  // Connect to WIFI - use cached channel/BSSID for fast reconnect if available
+  bool wifi_ok = false;
+  if (rtc_wifi_cached) {
+    wifi_ok = setup_wifi_fast(WIFI_SSID.c_str(), WIFI_PASSWORD.c_str(), rtc_wifi_channel, rtc_bssid, WIFI_CONNECT_TIMEOUT_MS);
+    if (!wifi_ok) {
+      // Fast reconnect failed (AP may have moved channel) - fall back to full scan
+      MY_DEBUG_PRINTLN("Fast WiFi reconnect failed, falling back to full scan");
+      rtc_wifi_cached = false;
+      wifi_ok = setup_wifi_with_timeout(WIFI_SSID.c_str(), WIFI_PASSWORD.c_str(), WIFI_CONNECT_TIMEOUT_MS);
+    }
+  } else {
+    wifi_ok = setup_wifi_with_timeout(WIFI_SSID.c_str(), WIFI_PASSWORD.c_str(), WIFI_CONNECT_TIMEOUT_MS);
+  }
+
+  if (!wifi_ok) {
     MY_DEBUG_PRINTLN("WiFi connection failed - entering deep sleep");
     MY_WAKE_LED_OFF();
     enter_deep_sleep();
     return;
   }
+
+  // Cache WiFi channel and BSSID in RTC memory for fast reconnect next wake
+  wifi_cache_connection_info(rtc_bssid, &rtc_wifi_channel);
+  rtc_wifi_cached = true;
 
   pat_watchdog(); 
 
@@ -169,6 +194,10 @@ void upon_wake() {
   #endif
 
   pat_watchdog();
+
+  MY_DEBUG_PRINT("Wake cycle duration before transmit: ");
+  MY_DEBUG_PRINT(millis() - wake_start_ms);
+  MY_DEBUG_PRINTLN("ms");
 
   transmitTask_run(transmitData);
 
@@ -203,9 +232,9 @@ void enter_deep_sleep() {
   esp_sleep_enable_timer_wakeup(device_state.time_to_sleep * uS_TO_S_FACTOR);
   
   // Power down peripherals to save battery
+  // NOTE: RTC_SLOW_MEM and RTC_FAST_MEM must remain on to preserve RTC_DATA_ATTR
+  // variables (WiFi channel/BSSID cache) across deep sleep cycles.
   esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_OFF);
-  esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_SLOW_MEM, ESP_PD_OPTION_OFF);
-  esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_FAST_MEM, ESP_PD_OPTION_OFF);
   
   MY_DEBUG_PRINTLN("Entering deep sleep...");
   Serial.flush(); // Make sure debug message is sent

@@ -89,3 +89,52 @@ int8_t wifi_get_rssi() {
 
   return 0;
 }
+
+// Fast reconnect using cached channel and BSSID - skips full AP scan (~1-2s saving)
+bool setup_wifi_fast(const char *ssid, const char *password, uint8_t channel, uint8_t *bssid, uint32_t timeout_ms) {
+  #ifdef WIFI_REQUIRED
+
+  if (WiFi.status() == WL_CONNECTED) {
+    return true;
+  }
+
+  MY_DEBUG_PRINTLN("Attempting fast WiFi reconnect...");
+
+  WiFi.begin(ssid, password, channel, bssid, true);
+
+  uint32_t start_time = millis();
+  while (WiFi.status() != WL_CONNECTED && (millis() - start_time < timeout_ms)) {
+    delay(100);
+    extern void pat_watchdog();
+    pat_watchdog();
+  }
+
+  if (WiFi.status() == WL_CONNECTED) {
+    MY_DEBUG_PRINTLN("Fast WiFi reconnect succeeded");
+    return true;
+  }
+
+  MY_DEBUG_PRINTLN("Fast WiFi reconnect failed");
+  return false;
+
+  #else
+  return true;
+  #endif
+}
+
+// Cache the current connection's channel and BSSID into caller-provided buffers
+void wifi_cache_connection_info(uint8_t *bssid_out, uint8_t *channel_out) {
+  #ifdef WIFI_REQUIRED
+
+  if (WiFi.status() != WL_CONNECTED) {
+    return;
+  }
+
+  *channel_out = WiFi.channel();
+  memcpy(bssid_out, WiFi.BSSID(), 6);
+
+  MY_DEBUG_PRINT("Cached WiFi channel: ");
+  MY_DEBUG_PRINTLN(*channel_out);
+
+  #endif
+}
