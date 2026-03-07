@@ -126,7 +126,7 @@ void read_dht_unified(transmit_data_t *temp, transmit_data_t *humidity) {
     #ifdef DEVICE_DHT22
     tempSuccess = 0;
     humiditySuccess = 0;
-    for (uint8_t i = 0; i < DHT21_OVERSAMPLING_RATIO; i ++) {
+    for (uint8_t i = 0; i < DHT22_OVERSAMPLING_RATIO; i ++) {
         dht22.temperature().getEvent(&event);
         if (isnan(event.temperature)) {
             MY_DEBUG_PRINTLN(F("Error reading temperature from DHT22!"));

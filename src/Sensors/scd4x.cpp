@@ -64,7 +64,10 @@ void read_scd4x(transmit_data_t *temp, transmit_data_t *humidity, transmit_data_
             CO2->data_u16[SCD4X_CO2_ID] += scd4x.getCO2();
         }
 
-        scd4x.measureSingleShot();
+        // Do not measure on last sample
+        if (i < (SCD4X_OVERSAMPLING_RATIO-1)) {
+            scd4x.measureSingleShot();
+        }
     }
 
     // Scale back down oversampling
@@ -79,8 +82,6 @@ void read_scd4x(transmit_data_t *temp, transmit_data_t *humidity, transmit_data_
     if(SCD4X_CO2_ID != -1) {
         CO2->data_f32[SCD4X_CO2_ID] /= SCD4X_OVERSAMPLING_RATIO;
     }
-
-    
 
 }
 

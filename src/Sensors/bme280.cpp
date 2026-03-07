@@ -20,9 +20,9 @@ uint8_t init_bme280() {
     }
 
     bme.setSampling(Adafruit_BME280::MODE_FORCED,
-                Adafruit_BME280::SAMPLING_X16,
-                Adafruit_BME280::SAMPLING_X16,
-                Adafruit_BME280::SAMPLING_X16,
+                Adafruit_BME280::SAMPLING_X2,
+                Adafruit_BME280::SAMPLING_X2,
+                Adafruit_BME280::SAMPLING_X2,
                 Adafruit_BME280::FILTER_OFF);
 
     MY_DEBUG_PRINTLN("BME280 successfully Initialized");
