@@ -99,12 +99,13 @@
 //#define DEVICE_CAPACITIVE_SOIL_MOISTURE_SENSOR
 //#define DEVICE_BME280
 //#define DEVICE_SCD4X
+#define DEVICE_SHT4X                      // Use this for all AHT4x sensors
 //#define DEVICE_AHT20                    // Use this for all AHT2x sensors
 //#define DEVICE_ENS160
 //#define DEVICE_DHT11
 //#define DEVICE_DHT21
 //#define DEVICE_DHT22
-#define INTERNAL_SUPPLY_MONITORING      // Resistor divider from supply to ADC Pin
+//#define INTERNAL_SUPPLY_MONITORING      // Resistor divider from supply to ADC Pin
 //#define INTERNAL_ADC_SAMPLING 
 
 // Software Features
@@ -178,6 +179,12 @@
 #define SCD4X_OVERSAMPLING_RATIO 1  // 1 sample per reading
 #endif
 
+// SHT4X Sensor Configuration
+#ifdef DEVICE_SHT4X
+#define SHT4X_OVERSAMPLING_RATIO 1  // 1 sample per reading
+// Add precision config
+#endif
+
 // AHT20 Sensor Configuration
 #ifdef DEVICE_AHT20
 #define AHT20_OVERSAMPLING_RATIO 1  // 1 sample per reading
@@ -225,8 +232,13 @@
 
 #if defined(DEVICE_SCD4X)
 #define SCD4X_CO2_ID 0
-#define SCD4X_TEMPERATURE_ID 0
-#define SCD4X_HUMIDITY_ID 0
+#define SCD4X_TEMPERATURE_ID 1
+#define SCD4X_HUMIDITY_ID 1
+#endif
+
+#if defined(DEVICE_SHT4X)
+#define SHT4X_TEMPERATURE_ID 0
+#define SHT4X_HUMIDITY_ID 0
 #endif
 
 #if defined(DEVICE_AHT20)
@@ -301,6 +313,14 @@
 #define HAS_SCD4X 0
 #endif
 
+#if defined(DEVICE_SHT4X)
+#define TEMPERATURE_SENSOR_CONNECTED
+#define HUMIDITY_SENSOR_CONNECTED
+#define HAS_SHT4X 1
+#else
+#define HAS_SHT4X 0
+#endif
+
 #if defined(DEVICE_AHT20)
 #define TEMPERATURE_SENSOR_CONNECTED
 #define HUMIDITY_SENSOR_CONNECTED
@@ -370,8 +390,8 @@
 
 
 // ========== SENSOR COUNT CALCULATIONS ==========
-#define TEMPERATURE_SENSOR_COUNT (HAS_BME280 + HAS_AHT20 + HAS_DHT11 + HAS_DHT21 + HAS_DHT22 + HAS_SCD4X)
-#define HUMIDITY_SENSOR_COUNT (HAS_BME280 + HAS_AHT20 + HAS_DHT11 + HAS_DHT21 + HAS_DHT22 + HAS_SCD4X)
+#define TEMPERATURE_SENSOR_COUNT (HAS_BME280 + HAS_AHT20 + HAS_DHT11 + HAS_DHT21 + HAS_DHT22 + HAS_SCD4X + HAS_SHT4X)
+#define HUMIDITY_SENSOR_COUNT (HAS_BME280 + HAS_AHT20 + HAS_DHT11 + HAS_DHT21 + HAS_DHT22 + HAS_SCD4X + HAS_SHT4X)
 #define PRESSURE_SENSOR_COUNT (HAS_BME280)
 #define ALTITUDE_SENSOR_COUNT (HAS_BME280)
 #define SOIL_MOISTURE_SENSOR_COUNT (HAS_CAPACITIVE_SOIL_MOISTURE)
