@@ -48,6 +48,7 @@ uint8_t init_dht_unified() {
 }
 
 void read_dht_unified(transmit_data_t *temp, transmit_data_t *humidity) {
+    MY_DEBUG_PRINTLN("Starting read from DHT Family");
     sensors_event_t event;
     uint8_t tempSuccess = 0;
     uint8_t humiditySuccess = 0;

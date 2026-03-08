@@ -27,6 +27,8 @@ uint8_t init_aht20() {
 void read_aht20(transmit_data_t *temp, transmit_data_t *humidity) {
     sensors_event_t humidityEvent, tempEvent;
 
+    MY_DEBUG_PRINTLN("Starting read from AHT20");
+
     for (uint8_t i = 0; i < AHT20_OVERSAMPLING_RATIO; i ++) {
 
         aht20.getEvent(&humidityEvent, &tempEvent);

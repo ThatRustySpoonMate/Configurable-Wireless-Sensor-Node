@@ -48,6 +48,7 @@ uint8_t init_supply_monitoring() {
 }
 
 void read_supply_voltage(transmit_data_t *voltage) {
+    MY_DEBUG_PRINTLN("Starting read of Supply Voltage");
     uint32_t totalMillivolts = 0;
     
     // Average the millivolt readings directly
@@ -68,7 +69,7 @@ void read_supply_voltage(transmit_data_t *voltage) {
 }
 
 float estimate_soc(uint16_t vbat_mv) {
-    
+    MY_DEBUG_PRINTLN("Estimating SOC");
     #ifdef BATTERY_CHEMISTRY_LIFEPO4
         const uint16_t *voltage_table = lifepo4_voltage;
         const float *soc_table = lifepo4_soc;

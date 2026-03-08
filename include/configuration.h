@@ -34,14 +34,14 @@
 #endif
 
 // ========== CONNECTION TIMEOUTS ==========
-#define WIFI_CONNECT_TIMEOUT_MS 30000           // 30 seconds
+#define WIFI_CONNECT_TIMEOUT_MS 10000           // 10 seconds
 #define MQTT_CONNECT_TIMEOUT_MS 10000           // 10 seconds
 #define WATCHDOG_TIMEOUT_SECONDS 30             // 30 seconds before watchdog triggers
 
 // ========== MQTT CONFIGURATION ==========
 #define MQTT_TOPIC_LOCATION_SLUG_BACKUP "home/new-device"  // Backup location slug (can be changed via MQTT)
 #define MQTT_TOPIC_LENGTH_MAX 100
-#define MQTT_TRANSMIT_TIME_BUFFER 3000                    // Amount of time after queueing last message to be sent before disconnecting and sleeping, this is also the window of time that you have to issue commands to the device over MQTT, decrease to increase battery life if you don't need to configure it once deployed. Increase if your MQTT messages are not reliably coming through (especially on slower networks)
+#define MQTT_TRANSMIT_TIME_BUFFER 1000                    // Amount of time after queueing last message to be sent before disconnecting and sleeping, this is also the window of time that you have to issue commands to the device over MQTT, decrease to increase battery life if you don't need to configure it once deployed. Increase if your MQTT messages are not reliably coming through (especially on slower networks)
 
 // MQTT Data topic suffixes - Transmit
 #define MOISTURE_TOPIC_SUFFIX "/moisture"
@@ -110,7 +110,7 @@
 
 // Software Features
 #define UPTIME_MONITORING            // Software feature
-#define WAKE_LED                     // Toggle an LED on during wake and off during sleep
+//#define WAKE_LED                     // Toggle an LED on during wake and off during sleep
 #define WIFI_RSSI                    // Output the WiFi RSSI 
 #define HARDWARE_FACTORY_RESET       // Enables watching GPIO for short to 3v3
 

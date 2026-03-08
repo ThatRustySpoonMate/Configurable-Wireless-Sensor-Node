@@ -8,59 +8,38 @@
 
 // Global sensor instance
 static SensirionI2cScd4x scd4x;
+uint16_t previous_uptime_mod = 0;
+
 
 uint8_t init_scd4x() {
     MY_DEBUG_PRINTLN("Detected SCD4X");
 
     Wire.begin();
     scd4x.begin(Wire, SCD4X_I2C_ADDRESS);
+    delay(50);
 
-    // Allow sensor time to power up before issuing commands
-    delay(30);
+    int16_t error = 0;
 
-    // Ensure sensor is in a clean idle state before configuring:
-    // wakeUp() is harmless if the sensor isn't sleeping, but handles
-    // the case where a previous session left it powered down.
-    int16_t error;
-    error = scd4x.wakeUp();
-    if (error) {
-        MY_DEBUG_PRINTLN("SCD4X wakeUp failed (sensor may already be awake - continuing)");
+    // Only write altitude to EEPROM periodically to preserve write endurance
+    if(device_state.device_uptime % 1000 > previous_uptime_mod) {
+        error = scd4x.setSensorAltitude(SENSOR_ALTITUDE);
+        if (error) {
+            MY_DEBUG_PRINTLN("SCD4X setSensorAltitude failed - continuing anyway");
+        }
+        previous_uptime_mod = device_state.device_uptime % 1000;
     }
 
-    // stopPeriodicMeasurement is required before any configuration commands
-    error = scd4x.stopPeriodicMeasurement();
-    if (error) {
-        MY_DEBUG_PRINTLN("SCD4X stopPeriodicMeasurement failed");
-    }
-
-    // Brief pause required after stopPeriodicMeasurement before issuing further commands
-    delay(500);
-
-    error = scd4x.setSensorAltitude(SENSOR_ALTITUDE);
-    if (error) {
-        MY_DEBUG_PRINTLN("SCD4X setSensorAltitude failed");
-    }
-
-    // Verify sensor is present and responding by reading serial number
-    uint64_t serialNumber = 0;
-    error = scd4x.getSerialNumber(serialNumber);
-    if (error) {
-        MY_DEBUG_PRINTLN("Could not find a valid SCD4X sensor, check wiring and address");
-        return 0; // Fail
-    }
-
-    // Kick off the first single shot measurement so data is ready by the time
-    // read_scd4x() is called (after WiFi + MQTT connect)
-    error = scd4x.measureSingleShot();
-    if (error) {
-        MY_DEBUG_PRINTLN("SCD4X measureSingleShot failed on init");
-    }
+    // Kick off measurement - sensor may not ACK this immediately after power-on
+    // but read_scd4x() will poll getDataReadyStatus() and wait regardless
+    scd4x.measureSingleShot(); // Return value intentionally ignored
 
     MY_DEBUG_PRINTLN("SCD4X successfully Initialized");
-    return 1; // Success
+    return 1; // Presence is confirmed when read_scd4x() gets valid data
 }
 
 void read_scd4x(transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *CO2, transmit_data_t *baroPres, uint8_t initSkipped) {
+    MY_DEBUG_PRINTLN("Starting read from SCD4X");
+    
     int16_t error;
 
     // Apply ambient pressure compensation if a barometric sensor is present

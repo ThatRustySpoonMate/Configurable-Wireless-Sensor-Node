@@ -17,6 +17,7 @@ uint8_t init_soil_sensor() {
 }
 
 void read_capacitive_soil_moisture_sensor(transmit_data_t *moisture) {
+    MY_DEBUG_PRINTLN("Starting read from Soil Moisture");
     // Power up Soil sensor
     digitalWrite(CAPACITIVE_SOIL_MOISTURE_SENS_VCC_PIN, HIGH);
     delay(CAPACITIVE_SOIL_MOISTURE_SETTLE_TIME_MS);

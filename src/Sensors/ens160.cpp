@@ -24,6 +24,8 @@ uint8_t init_ens160() {
 }
 
 void read_ens160(transmit_data_t *aqi, transmit_data_t *tvoc, transmit_data_t *CO2, transmit_data_t *temp, transmit_data_t *humidity) {
+    MY_DEBUG_PRINTLN("Starting read from ENS160");
+    
     uint16_t new_AQI;
     uint16_t new_TVOC;
     uint16_t new_eCO2;

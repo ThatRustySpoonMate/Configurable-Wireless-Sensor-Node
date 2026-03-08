@@ -30,6 +30,8 @@ uint8_t init_bme280() {
 }
 
 void read_bme280(transmit_data_t *temp, transmit_data_t *humidity, transmit_data_t *baroPres, transmit_data_t *altitude) {
+    MY_DEBUG_PRINTLN("Starting read from BME280");
+    
     bme.takeForcedMeasurement();
     
     if(BME280_TEMPERATURE_ID != -1) {

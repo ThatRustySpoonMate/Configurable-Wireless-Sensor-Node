@@ -26,6 +26,7 @@ uint8_t init_sht4x() {
 }
 
 void read_sht4x(transmit_data_t *temp, transmit_data_t *humidity) {
+    MY_DEBUG_PRINTLN("Starting read from SHT4X");
     sensors_event_t humidityEvent, tempEvent;
 
     for (uint8_t i = 0; i < SHT4X_OVERSAMPLING_RATIO; i ++) {
